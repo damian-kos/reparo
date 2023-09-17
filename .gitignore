@@ -1056,7 +1056,7 @@ imgui.ini
 examples/*/Debug/*
 examples/*/Release/*
 examples/*/x64/*
-.json
+*.json
 
 ## Visual Studio artifacts
 .vs

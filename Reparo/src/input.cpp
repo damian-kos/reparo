@@ -42,6 +42,11 @@ void CustomerDetailsInputWindow() {
     if (ImGui::Button("Submit Customer Details")) {
         DebugLog();
         InputsHandler::HandleInputsFromFields(inputFields, sizeof(inputFields) / sizeof(inputFields[0]));
+
+        // Clear the input fields using memset
+        for (InputField& field : inputFields) {
+            memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
+        }
     }
     SearchField();
 

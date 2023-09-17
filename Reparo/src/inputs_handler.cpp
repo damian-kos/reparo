@@ -5,18 +5,27 @@
 using json = nlohmann::json;
 
 int FindLastID() {
-    // Find last ID in customer_data and increment it by 1.
-    json customerDataJson = CustomerData::GetCustomerData();
-    json lastElement = customerDataJson.back();
-    if (lastElement.find("ID") != lastElement.end()) {
-        int lastElementID = lastElement["ID"];
-        lastElementID++;
-        return lastElementID;
+    
 
-        std::cout << "Last element's ID: " << lastElementID << std::endl;
+    json customerDataJson = CustomerData::GetCustomerData();
+
+    if (!customerDataJson.empty()) {
+        json lastElement = customerDataJson.back();
+        if (lastElement.find("ID") != lastElement.end()) {
+            int lastElementID = lastElement["ID"];
+            lastElementID++;
+            return lastElementID;
+        }
+        else {
+            std::cout << "Last element does not have an 'ID' key." << std::endl;
+        }
     }
     else {
-        std::cout << "Last element does not have an 'ID' key." << std::endl;
+        std::cout << "The customer data is empty." << std::endl;
+        // Set the "ID" key to 1 in the lastElement JSON object
+        json lastElement;
+        lastElement["ID"] = 1;
+        return 1;  // Or return lastElement["ID"];
     }
 }
 
@@ -37,6 +46,7 @@ void InputsHandler::HandleInputsFromFields(const InputField* fields, size_t numF
         const char* fieldValue = field.buffer;
         customerData[fieldName] = fieldValue;
     }
+    
     CustomerDataInJson(customerData);
 }
   
