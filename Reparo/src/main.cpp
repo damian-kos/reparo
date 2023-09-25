@@ -7,6 +7,7 @@
 #include "debug_window.h"
 #include "customer_data.h"
 
+
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
@@ -114,6 +115,8 @@ int main(int, char**)
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
+    bool show_add_customer_window = false;
+
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
@@ -155,7 +158,7 @@ int main(int, char**)
         
         DebugWindow();
 
-        CustomerDetailsInputWindow();
+
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
             static float f = 0.0f;
@@ -191,6 +194,16 @@ int main(int, char**)
                 show_another_window = false;
             ImGui::End();
         }
+
+        ImGui::Begin("Main Menu");
+        //CustomerInputWindow:: // Edit bools storing our window open/close state
+        ImGui::Checkbox("Add customer", &show_add_customer_window);
+        ImGui::End();
+        CustomerInputWindow inputWindow;
+        if (show_add_customer_window) {
+        inputWindow.Render();
+        }
+
 
         // Rendering
         ImGui::Render();

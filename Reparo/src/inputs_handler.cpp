@@ -17,11 +17,11 @@ int FindLastID() {
             return lastElementID;
         }
         else {
-            std::cout << "Last element does not have an 'ID' key." << std::endl;
+
         }
     }
     else {
-        std::cout << "The customer data is empty." << std::endl;
+
         // Set the "ID" key to 1 in the lastElement JSON object
         json lastElement;
         lastElement["ID"] = 1;

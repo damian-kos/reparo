@@ -1,25 +1,24 @@
 #pragma once
-// input.h
-
-#ifndef INPUT_H
-#define INPUT_H
 
 #include "imgui.h"
-#include <iostream>
+//#include "inputs_handler.h"
+#include "search.h"
+#include <string>
 
-
+// Define InputField struct here
 struct InputField {
     const char* label;
     const char* hint;
     char* buffer;
-    size_t bufferSize;
+    int bufferSize;
     ImGuiInputTextFlags flags;
 };
 
-// Declare the input handling functions
-void CustomerDetailsInputWindow();
+class CustomerInputWindow {
 
 
+public:
+    void Render();
 
 
-#endif // INPUT_H
+};

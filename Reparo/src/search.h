@@ -7,6 +7,6 @@
 #include "customer_data.h"
 #include "imgui.h"
 
-void SearchField();
+void SearchField(const char* searchQuery);
 
 #endif // SEARCH_H

@@ -22,7 +22,7 @@ void CustomerData::LoadCustomerData(const std::string& filename) {
             // The file is not empty, so proceed with parsing
             inputFile >> customerDataArray;
             inputFile.close();
-            std::cout << "Loaded customer data successfully from file: " << filename << std::endl;
+            //std::cout << "Loaded customer data successfully from file: " << filename << std::endl;
         }
         else {
             // The file is empty, no need to parse

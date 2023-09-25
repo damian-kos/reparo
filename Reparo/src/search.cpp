@@ -1,9 +1,9 @@
-#include "search.h"
+﻿#include "search.h"
 #include <iostream>
 
 
 bool searchResultsBox = false;
-static char searchQuery[128] = "";
+
 json customerDataJson;
 json matchingRecords;
 
@@ -20,7 +20,7 @@ void MatchingResults(const char* search) {
     for (const auto& record : customerDataJson) {
         // Check if the "PhoneNumber" field contains the search query
         std::string phoneNumber = record["PhoneNumber"];
-        if (phoneNumber.find(searchQuery) != std::string::npos) {
+        if (phoneNumber.find(search) != std::string::npos) {
             // Add the matching record to the result array
             matchingRecords.push_back(record);
         }
@@ -34,15 +34,17 @@ void Search() {
     if (searchResultsBox) {
         static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
-        if (ImGui::BeginTable("table1", 4, flags))
+        if (ImGui::BeginTable("table1", 5, flags))
         {
             ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Phone", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Email", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed);
+
             ImGui::TableHeadersRow();
 
-            for (int row = 0; row < matchingRecords.size(); row++)
+            for (int row = 0; row < matchingRecords.size() ; row++)
             {
                 const json& record = matchingRecords[row];
 
@@ -74,6 +76,22 @@ void Search() {
                 ImGui::Text("%s", record["Email"].get<std::string>().c_str());
 
                 //ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_None;
+                
+                ImGui::TableNextColumn();
+
+                //if (ImGui::TableNextColumn())
+                {
+                    if (ImGui::SmallButton("Edit")) {
+                        std::cout << "Edit" << std::endl            ;
+                    }
+                    ImGui::SameLine();
+                    ImGui::Text("/");
+                    ImGui::SameLine();
+                    if (ImGui::SmallButton("Add repair"))
+                    {
+                        std::cout << "Add repair" << std::endl;
+                    }
+                }
 
             }
             ImGui::EndTable();
@@ -81,9 +99,10 @@ void Search() {
     }
 }
 
-void SearchField() {
-    ImGui::InputTextWithHint("##Search", "Search..", searchQuery, IM_ARRAYSIZE(searchQuery));
+void SearchField(const char* searchQuery) {
+    //ImGui::InputTextWithHint("##Search", "Search..", searchQuery, IM_ARRAYSIZE(searchQuery));
     if (strlen(searchQuery) >= 3) {
+        std::cout << searchQuery << std::endl;
         searchResultsBox = true;
         LoadPresentCustomerData();
         MatchingResults(searchQuery);
