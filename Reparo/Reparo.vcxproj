@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <IncludePath>D:\Programming\CPP\Reparo\Reparo\vendor\nlohmann;D:\Programming\CPP\Reparo\Reparo\vendor\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\nlohmann;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -136,6 +136,7 @@
     <ClInclude Include="src\debug_window.h" />
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\inputs_handler.h" />
+    <ClInclude Include="src\repair.h" />
     <ClInclude Include="src\search.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
@@ -149,6 +150,7 @@
     <ClInclude Include="vendor\nlohmann\json_fwd.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\repair.cpp" />
     <ClCompile Include="src\customer_data.cpp" />
     <ClCompile Include="src\debug_window.cpp" />
     <ClCompile Include="src\input.cpp" />

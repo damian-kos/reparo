@@ -12,7 +12,7 @@ static char phoneNumber[128] = "";
 
 
 
-InputField inputFields[] = {
+InputField customerDetails[] = {
     {"##Name", "Name..", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_None},
     {"##Surname", "Surname..", surname, IM_ARRAYSIZE(surname), ImGuiInputTextFlags_None},
     {"##Email", "Email..", email, IM_ARRAYSIZE(email), ImGuiInputTextFlags_None},
@@ -35,16 +35,16 @@ void CustomerDetailsInputWindow() {
     ImGui::Begin("Customer Details");
 
     // Create input fields
-    for (const InputField& field : inputFields) {
+    for (const InputField& field : customerDetails) {
         ImGui::InputTextWithHint(field.label, field.hint, field.buffer, field.bufferSize, field.flags);
     }
     // Pass filled inputs fields to handler.
     if (ImGui::Button("Submit Customer Details")) {
         DebugLog();
-        InputsHandler::HandleInputsFromFields(inputFields, sizeof(inputFields) / sizeof(inputFields[0]));
+        InputsHandler::HandleInputsFromFields(customerDetails, sizeof(customerDetails) / sizeof(customerDetails[0]));
 
         // Clear the input fields using memset
-        for (InputField& field : inputFields) {
+        for (InputField& field : customerDetails) {
             memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
         }
     }

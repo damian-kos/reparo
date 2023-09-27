@@ -60,6 +60,9 @@
     <ClInclude Include="src\search.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\repair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vendor\imgui\imgui.cpp">
@@ -99,6 +102,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\repair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

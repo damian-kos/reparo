@@ -18,8 +18,12 @@ public:
 
     static void SaveCustomerData(const std::string& filename);
 
+
+
 private:
     static json customerDataArray;
+    static json brandsArray;
+
 };
 
 #endif // CUSTOMER_DATA_H

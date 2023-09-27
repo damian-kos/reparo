@@ -6,6 +6,7 @@
 #include "input.h"
 #include "debug_window.h"
 #include "customer_data.h"
+#include "repair.h"
 
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -156,6 +157,8 @@ int main(int, char**)
         DebugWindow();
 
         CustomerDetailsInputWindow();
+
+        AddRepairWindow();
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
             static float f = 0.0f;

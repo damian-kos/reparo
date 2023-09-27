@@ -7,6 +7,9 @@ using json = nlohmann::json;
 
 // Initialize the static member variable
 json CustomerData::customerDataArray = json();
+//json CustomerData::brandsArray = json();
+
+std::vector<const char*> brands;
 
 // Member function to load customer data from a JSON file
 void CustomerData::LoadCustomerData(const std::string& filename) {
@@ -55,3 +58,7 @@ void CustomerData::SaveCustomerData(const std::string& filename) {
         outputFile.close();
     }
 }
+
+
+
+
