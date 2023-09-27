@@ -5,13 +5,13 @@
 
 #include <string>
 #include "json.hpp" // Include the nlohmann/json library
-#include "input.h"  // Include the input.h header to access InputField
+#include "customer_input_window.h"  // Include the customer_input_window.h header to access InputField
 
 using json = nlohmann::json;
 
 class InputsHandler {
 public:
-    static void HandleInputsFromFields(const InputField* fields, size_t numFields);
+    static void HandleInputsFromFields(const InputField* fields, int numFields);
 private:
 };
 

@@ -39,7 +39,7 @@
     <ClInclude Include="vendor\imgui\imstb_textedit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\input.h">
+    <ClInclude Include="src\customer_input_window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\debug_window.h">
@@ -58,6 +58,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\search.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\edit_customer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -86,7 +89,7 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\input.cpp">
+    <ClCompile Include="src\customer_input_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\debug_window.cpp">
@@ -99,6 +102,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\edit_customer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

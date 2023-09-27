@@ -7,6 +7,8 @@ bool searchResultsBox = false;
 json customerDataJson;
 json matchingRecords;
 
+
+
 void LoadPresentCustomerData() {
     CustomerData::LoadCustomerData("customer_data.json");
     customerDataJson = CustomerData::GetCustomerData();
@@ -29,11 +31,12 @@ void MatchingResults(const char* search) {
 }
 
 void Search() {
+    CustomerEditWindow customerEditWindow;
+
     static bool selected[10] = {};
     //static int selected = -1;
     if (searchResultsBox) {
         static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-
         if (ImGui::BeginTable("table1", 5, flags))
         {
             ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
@@ -50,12 +53,15 @@ void Search() {
 
                 char label[32];
                 int id = record["ID"].get<int>();
+
+                ImGui::PushID(id);
+
                 sprintf_s(label, "%05d", id); // Format as 5-digit string with leading zeros
 
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
 
-                if (ImGui::Selectable(label, selected[row], ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick)) {
+                if (ImGui::Selectable(label, selected[row], ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
                     if (ImGui::IsMouseDoubleClicked(0)) {
                         selected[row] = !selected[row];
                         std::cout << matchingRecords[row] << std::endl;
@@ -79,11 +85,15 @@ void Search() {
                 
                 ImGui::TableNextColumn();
 
+                
                 //if (ImGui::TableNextColumn())
                 {
+
                     if (ImGui::SmallButton("Edit")) {
-                        std::cout << "Edit" << std::endl            ;
+                        std::cout << "Edit" << std::endl;
+                        customerEditWindow.SetShouldRender(true);
                     }
+
                     ImGui::SameLine();
                     ImGui::Text("/");
                     ImGui::SameLine();
@@ -92,6 +102,7 @@ void Search() {
                         std::cout << "Add repair" << std::endl;
                     }
                 }
+                ImGui::PopID();
 
             }
             ImGui::EndTable();
@@ -99,13 +110,13 @@ void Search() {
     }
 }
 
-void SearchField(const char* searchQuery) {
+void SearchField(const char& searchQuery) {
     //ImGui::InputTextWithHint("##Search", "Search..", searchQuery, IM_ARRAYSIZE(searchQuery));
-    if (strlen(searchQuery) >= 3) {
-        std::cout << searchQuery << std::endl;
+    if (strlen(&searchQuery) >= 3) {
+        //std::cout << searchQuery << std::endl;
         searchResultsBox = true;
         LoadPresentCustomerData();
-        MatchingResults(searchQuery);
+        MatchingResults(&searchQuery);
         Search();
     }
     else {

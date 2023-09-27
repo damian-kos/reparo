@@ -3,9 +3,11 @@
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 #include "imgui.h"
-#include "input.h"
+#include "customer_input_window.h"
 #include "debug_window.h"
 #include "customer_data.h"
+#include "edit_customer.h"
+
 
 
 #include "imgui_impl_win32.h"
@@ -31,6 +33,10 @@ void CleanupDeviceD3D();
 void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+
+CustomerInputWindow inputWindow;
+CustomerEditWindow customerEditWindow;
 
 int main(int, char**)
 // Main code
@@ -166,8 +172,6 @@ int main(int, char**)
 
             ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
 
-            
-
             ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
             ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
@@ -179,7 +183,6 @@ int main(int, char**)
                 counter++;
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
-
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
@@ -199,10 +202,15 @@ int main(int, char**)
         //CustomerInputWindow:: // Edit bools storing our window open/close state
         ImGui::Checkbox("Add customer", &show_add_customer_window);
         ImGui::End();
-        CustomerInputWindow inputWindow;
-        if (show_add_customer_window) {
+        
+        //if (show_add_customer_window) {
         inputWindow.Render();
-        }
+        //}
+        
+        
+        if(customerEditWindow.GetShouldRender())
+            customerEditWindow.Render();
+
 
 
         // Rendering

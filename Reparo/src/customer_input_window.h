@@ -1,9 +1,9 @@
 #pragma once
 
 #include "imgui.h"
-//#include "inputs_handler.h"
 #include "search.h"
 #include <string>
+
 
 // Define InputField struct here
 struct InputField {
@@ -19,6 +19,12 @@ class CustomerInputWindow {
 
 public:
     void Render();
+
+    void CreateInputFields();
+
+    void Submit();
+
+    void SearchForCustomers();
 
 
 };
