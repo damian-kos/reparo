@@ -40,7 +40,29 @@ const json& CustomerData::GetCustomerData() {
 
 // Member function to add customer data to the array
 void CustomerData::AddCustomerData(const json& data) {
-    customerDataArray.push_back(data);
+    bool found = false; // Flag to indicate if a record with the same ID was found
+    std::cout << data << "NO ID" << std::endl;
+
+    for (json& record : customerDataArray) {
+        if (record["ID"] == data["ID"]) {
+            std::cout << data << "found ID" << std::endl;
+
+            // Replace the data with new data
+            record["Email"] = data["Email"];
+            record["Name"] = data["Name"];
+            record["Surname"] = data["Surname"];
+            record["PhoneNumber"] = data["PhoneNumber"];
+            found = true; // Record with the same ID was found
+            break; // Exit the loop since we don't need to search further
+        }
+    }
+
+    if (!found) {
+        std::cout << data << "NO found ID" << std::endl;
+
+        // Add a new record to the array if no record with the same ID was found
+        //customerDataArray.push_back(data);
+    }
 }
 
 // Member function to save customer data to the JSON file

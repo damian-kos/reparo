@@ -132,6 +132,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\helpmarker.h" />
+    <ClInclude Include="src\error_handler.h" />
+    <ClInclude Include="src\input_field.h" />
     <ClInclude Include="src\customer_data.h" />
     <ClInclude Include="src\debug_window.h" />
     <ClInclude Include="src\edit_customer.h" />
@@ -150,10 +153,12 @@
     <ClInclude Include="vendor\nlohmann\json_fwd.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\error_handler.cpp" />
     <ClCompile Include="src\edit_customer.cpp" />
     <ClCompile Include="src\customer_data.cpp" />
     <ClCompile Include="src\debug_window.cpp" />
     <ClCompile Include="src\customer_input_window.cpp" />
+    <ClCompile Include="src\helpmarker.cpp" />
     <ClCompile Include="src\inputs_handler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\search.cpp" />

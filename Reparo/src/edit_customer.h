@@ -1,19 +1,18 @@
 #pragma once
-// edit_customer.h
-
-#ifndef EDIT_CUSTOMER_H
-#define EDIT_CUSTOMER_H
 
 #include "customer_data.h"
+#include "inputs_handler.h"
 #include "customer_input_window.h"
+#include "error_handler.h"
 
 class CustomerEditWindow {
 
 public:
+    ModalController modalController;
+
+    void SetCustomerToEdit(json* customerData);
     void Render();
+    void DataToFields();
     void SetShouldRender(bool);
     bool GetShouldRender();
-
 };
-
-#endif // EDIT_CUSTOMER_H
