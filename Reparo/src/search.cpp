@@ -1,11 +1,13 @@
-#include "search.h"
+﻿#include "search.h"
 #include <iostream>
 
 
 bool searchResultsBox = false;
-static char searchQuery[128] = "";
+
 json customerDataJson;
 json matchingRecords;
+
+
 
 void LoadPresentCustomerData() {
     CustomerData::LoadCustomerData("customer_data.json");
@@ -20,7 +22,7 @@ void MatchingResults(const char* search) {
     for (const auto& record : customerDataJson) {
         // Check if the "PhoneNumber" field contains the search query
         std::string phoneNumber = record["PhoneNumber"];
-        if (phoneNumber.find(searchQuery) != std::string::npos) {
+        if (phoneNumber.find(search) != std::string::npos) {
             // Add the matching record to the result array
             matchingRecords.push_back(record);
         }
@@ -29,31 +31,37 @@ void MatchingResults(const char* search) {
 }
 
 void Search() {
+    CustomerEditWindow customerEditWindow;
+
     static bool selected[10] = {};
     //static int selected = -1;
     if (searchResultsBox) {
         static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-
-        if (ImGui::BeginTable("table1", 4, flags))
+        if (ImGui::BeginTable("table1", 5, flags))
         {
             ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Phone", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Email", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed);
+
             ImGui::TableHeadersRow();
 
-            for (int row = 0; row < matchingRecords.size(); row++)
+            for (int row = 0; row < matchingRecords.size() ; row++)
             {
                 const json& record = matchingRecords[row];
 
                 char label[32];
                 int id = record["ID"].get<int>();
+
+                ImGui::PushID(id);
+
                 sprintf_s(label, "%05d", id); // Format as 5-digit string with leading zeros
 
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
 
-                if (ImGui::Selectable(label, selected[row], ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick)) {
+                if (ImGui::Selectable(label, selected[row], ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
                     if (ImGui::IsMouseDoubleClicked(0)) {
                         selected[row] = !selected[row];
                         std::cout << matchingRecords[row] << std::endl;
@@ -74,6 +82,27 @@ void Search() {
                 ImGui::Text("%s", record["Email"].get<std::string>().c_str());
 
                 //ImGuiSelectableFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_None;
+                
+                ImGui::TableNextColumn();
+
+                
+                //if (ImGui::TableNextColumn())
+                {
+
+                    if (ImGui::SmallButton("Edit")) {
+                        std::cout << "Edit" << std::endl;
+                        customerEditWindow.SetShouldRender(true);
+                    }
+
+                    ImGui::SameLine();
+                    ImGui::Text("/");
+                    ImGui::SameLine();
+                    if (ImGui::SmallButton("Add repair"))
+                    {
+                        std::cout << "Add repair" << std::endl;
+                    }
+                }
+                ImGui::PopID();
 
             }
             ImGui::EndTable();
@@ -81,12 +110,13 @@ void Search() {
     }
 }
 
-void SearchField() {
-    ImGui::InputTextWithHint("##Search", "Search..", searchQuery, IM_ARRAYSIZE(searchQuery));
-    if (strlen(searchQuery) >= 3) {
+void SearchField(const char& searchQuery) {
+    //ImGui::InputTextWithHint("##Search", "Search..", searchQuery, IM_ARRAYSIZE(searchQuery));
+    if (strlen(&searchQuery) >= 3) {
+        //std::cout << searchQuery << std::endl;
         searchResultsBox = true;
         LoadPresentCustomerData();
-        MatchingResults(searchQuery);
+        MatchingResults(&searchQuery);
         Search();
     }
     else {

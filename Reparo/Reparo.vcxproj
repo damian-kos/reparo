@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(ProjectDir)vendor\imgui;$(ProjectDir)vendor\nlohmann;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Programming\CPP\Reparo\Reparo\vendor\nlohmann;D:\Programming\CPP\Reparo\Reparo\vendor\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -134,9 +134,9 @@
   <ItemGroup>
     <ClInclude Include="src\customer_data.h" />
     <ClInclude Include="src\debug_window.h" />
-    <ClInclude Include="src\input.h" />
+    <ClInclude Include="src\edit_customer.h" />
+    <ClInclude Include="src\customer_input_window.h" />
     <ClInclude Include="src\inputs_handler.h" />
-    <ClInclude Include="src\repair.h" />
     <ClInclude Include="src\search.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
@@ -150,10 +150,10 @@
     <ClInclude Include="vendor\nlohmann\json_fwd.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\repair.cpp" />
+    <ClCompile Include="src\edit_customer.cpp" />
     <ClCompile Include="src\customer_data.cpp" />
     <ClCompile Include="src\debug_window.cpp" />
-    <ClCompile Include="src\input.cpp" />
+    <ClCompile Include="src\customer_input_window.cpp" />
     <ClCompile Include="src\inputs_handler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\search.cpp" />

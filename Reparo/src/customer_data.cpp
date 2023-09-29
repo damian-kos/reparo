@@ -1,9 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include "json.hpp"
 #include "customer_data.h"
 
-using json = nlohmann::json;
 
 // Initialize the static member variable
 json CustomerData::customerDataArray = json();
@@ -18,14 +16,14 @@ void CustomerData::LoadCustomerData(const std::string& filename) {
     if (inputFile.is_open()) {
         // Check the file size
         inputFile.seekg(0, std::ios::end);
-        std::streampos fileSize = inputFile.tellg();
+        int fileSize = inputFile.tellg();
         inputFile.seekg(0, std::ios::beg);
 
         if (fileSize > 0) {
             // The file is not empty, so proceed with parsing
             inputFile >> customerDataArray;
             inputFile.close();
-            std::cout << "Loaded customer data successfully from file: " << filename << std::endl;
+            //std::cout << "Loaded customer data successfully from file: " << filename << std::endl;
         }
         else {
             // The file is empty, no need to parse
@@ -39,15 +37,13 @@ void CustomerData::LoadCustomerData(const std::string& filename) {
 }
 // Member function to access the loaded customer data
 const json& CustomerData::GetCustomerData() {
+ 
         return customerDataArray;
 }
 
 // Member function to add customer data to the array
 void CustomerData::AddCustomerData(const json& data) {
-
-    std::cout << "WORK HERE" << std::endl;
     customerDataArray.push_back(data);
-    std::cout << "WORK HERE" << std::endl;
 }
 
 // Member function to save customer data to the JSON file

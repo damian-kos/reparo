@@ -3,11 +3,11 @@
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 #include "imgui.h"
-#include "input.h"
+#include "customer_input_window.h"
 #include "debug_window.h"
 #include "customer_data.h"
+#include "edit_customer.h"
 #include "repair.h"
-
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
@@ -31,6 +31,10 @@ void CleanupDeviceD3D();
 void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+
+CustomerInputWindow inputWindow;
+CustomerEditWindow customerEditWindow;
 
 int main(int, char**)
 // Main code
@@ -115,6 +119,8 @@ int main(int, char**)
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
+    bool show_add_customer_window = false;
+
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
@@ -166,8 +172,6 @@ int main(int, char**)
 
             ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
 
-            
-
             ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
             ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
             ImGui::Checkbox("Another Window", &show_another_window);
@@ -179,7 +183,6 @@ int main(int, char**)
                 counter++;
             ImGui::SameLine();
             ImGui::Text("counter = %d", counter);
-
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
@@ -194,6 +197,21 @@ int main(int, char**)
                 show_another_window = false;
             ImGui::End();
         }
+
+        ImGui::Begin("Main Menu");
+        //CustomerInputWindow:: // Edit bools storing our window open/close state
+        ImGui::Checkbox("Add customer", &show_add_customer_window);
+        ImGui::End();
+        
+        //if (show_add_customer_window) {
+        inputWindow.Render();
+        //}
+        
+        
+        if(customerEditWindow.GetShouldRender())
+            customerEditWindow.Render();
+
+
 
         // Rendering
         ImGui::Render();

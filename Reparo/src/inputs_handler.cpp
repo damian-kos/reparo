@@ -17,11 +17,11 @@ int FindLastID() {
             return lastElementID;
         }
         else {
-            std::cout << "Last element does not have an 'ID' key." << std::endl;
+
         }
     }
     else {
-        std::cout << "The customer data is empty." << std::endl;
+
         // Set the "ID" key to 1 in the lastElement JSON object
         json lastElement;
         lastElement["ID"] = 1;
@@ -29,7 +29,7 @@ int FindLastID() {
     }
 }
 
-void CustomerDataInJson(json passedCustomerData) {
+void CustomerDataInJson(json& passedCustomerData) {
 
     CustomerData::LoadCustomerData("customer_data.json");
     passedCustomerData["ID"] = FindLastID();
@@ -38,9 +38,11 @@ void CustomerDataInJson(json passedCustomerData) {
 
 }
 
-void InputsHandler::HandleInputsFromFields(const InputField* fields, size_t numFields) {
+void InputsHandler::HandleInputsFromFields(const InputField* fields, int numFields) {
+
     json customerData;
-    for (size_t i = 0; i < numFields; ++i) {
+
+    for (int i = 0; i < numFields; ++i) {
         const InputField& field = fields[i];
         const char* fieldName = field.label + 2; // Skip "##" prefix in label
         const char* fieldValue = field.buffer;
