@@ -8,6 +8,7 @@ json customerDataJson;
 json matchingRecords;
 
 
+int currentlySelectedRow = -1;
 
 void LoadPresentCustomerData() {
     CustomerData::LoadCustomerData("customer_data.json");
@@ -48,7 +49,7 @@ void Search() {
             ImGui::TableHeadersRow();
 
             for (int row = 0; row < matchingRecords.size() ; row++)
-            {
+            { 
                 const json& record = matchingRecords[row];
 
                 char label[32];
@@ -63,8 +64,15 @@ void Search() {
 
                 if (ImGui::Selectable(label, selected[row], ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
                     if (ImGui::IsMouseDoubleClicked(0)) {
+                        std::cout << "After: " << currentlySelectedRow << std::endl;
+
+                        for (int i = 0; i < 10; i++) {
+                            selected[i] = false;
+                        }
                         selected[row] = !selected[row];
                         std::cout << matchingRecords[row] << std::endl;
+                        currentlySelectedRow = row;
+                        std::cout << "After: " << currentlySelectedRow << std::endl;
 
                     }
                 }
@@ -90,8 +98,11 @@ void Search() {
                 {
 
                     if (ImGui::SmallButton("Edit")) {
-                        std::cout << "Edit" << std::endl;
+                        std::cout << "Edit" << row << std::endl;
+                        customerEditWindow.SetCustomerToEdit(&matchingRecords[row]);
+                        customerEditWindow.DataToFields();
                         customerEditWindow.SetShouldRender(true);
+                      
                     }
 
                     ImGui::SameLine();
@@ -110,13 +121,13 @@ void Search() {
     }
 }
 
-void SearchField(const char& searchQuery) {
+void SearchField(const char* searchQuery) {
     //ImGui::InputTextWithHint("##Search", "Search..", searchQuery, IM_ARRAYSIZE(searchQuery));
-    if (strlen(&searchQuery) >= 3) {
+    if (strlen(searchQuery) >= 3) {
         //std::cout << searchQuery << std::endl;
         searchResultsBox = true;
         LoadPresentCustomerData();
-        MatchingResults(&searchQuery);
+        MatchingResults(searchQuery);
         Search();
     }
     else {

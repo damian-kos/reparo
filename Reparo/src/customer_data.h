@@ -1,6 +1,4 @@
-#ifndef CUSTOMER_DATA_H
-#define CUSTOMER_DATA_H
-
+#pragma once
 #include <string>
 #include "json.hpp"
 
@@ -23,4 +21,3 @@ private:
 
 };
 
-#endif // CUSTOMER_DATA_H

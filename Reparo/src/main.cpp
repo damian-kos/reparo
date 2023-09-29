@@ -7,6 +7,9 @@
 #include "debug_window.h"
 #include "customer_data.h"
 #include "edit_customer.h"
+#include "helpmarker.h"
+
+
 #include "repair.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -14,6 +17,7 @@
 #include <tchar.h>
 
 #include <iostream>
+#include <string>
 
 
 
@@ -35,6 +39,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 CustomerInputWindow inputWindow;
 CustomerEditWindow customerEditWindow;
+ModalController modalController;
 
 int main(int, char**)
 // Main code
@@ -160,11 +165,9 @@ int main(int, char**)
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
         
-        DebugWindow();
+  
 
-        CustomerDetailsInputWindow();
 
-        AddRepairWindow();
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
         {
             static float f = 0.0f;
@@ -199,14 +202,18 @@ int main(int, char**)
         }
 
         ImGui::Begin("Main Menu");
-        //CustomerInputWindow:: // Edit bools storing our window open/close state
-        ImGui::Checkbox("Add customer", &show_add_customer_window);
+
+        // Window for Adding Customers
+        ImGui::Checkbox("Add customer", &show_add_customer_window); 
+        ImGui::SameLine(); HelpMarker("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer");
+     
         ImGui::End();
         
-        //if (show_add_customer_window) {
+        if (show_add_customer_window) {
         inputWindow.Render();
-        //}
-        
+        }
+
+        DebugWindow();
         
         if(customerEditWindow.GetShouldRender())
             customerEditWindow.Render();
