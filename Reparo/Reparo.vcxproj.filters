@@ -72,6 +72,18 @@
     <ClInclude Include="src\helpmarker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\parts_stock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\repair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\sqlite3\sqlite3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\parts_stock_window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vendor\imgui\imgui.cpp">
@@ -122,5 +134,24 @@
     <ClCompile Include="src\helpmarker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\parts_stock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parts_stock_window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\repair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\sqlite3\sqlite3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="devices.json" />
+    <None Include="vendor\sqlite3\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="vendor\sqlite3\CMakeLists.txt" />
   </ItemGroup>
 </Project>

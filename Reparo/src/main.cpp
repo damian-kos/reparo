@@ -8,7 +8,7 @@
 #include "customer_data.h"
 #include "edit_customer.h"
 #include "helpmarker.h"
-
+#include "parts_stock_window.h"
 
 #include "repair.h"
 #include "imgui_impl_win32.h"
@@ -19,8 +19,7 @@
 #include <iostream>
 #include <string>
 
-
-
+#include "parts_stock.h"
 
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
@@ -40,6 +39,9 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 CustomerInputWindow inputWindow;
 CustomerEditWindow customerEditWindow;
 ModalController modalController;
+PartsStockWindow partsStockWindow;
+PartsStock partsStock;
+
 
 int main(int, char**)
 // Main code
@@ -125,6 +127,8 @@ int main(int, char**)
     bool show_demo_window = true;
     bool show_another_window = false;
     bool show_add_customer_window = false;
+    bool add_part_to_stock_window = false;
+
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -206,11 +210,23 @@ int main(int, char**)
         // Window for Adding Customers
         ImGui::Checkbox("Add customer", &show_add_customer_window); 
         ImGui::SameLine(); HelpMarker("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer");
-     
+        ImGui::Checkbox("Add part to stock", &add_part_to_stock_window);
+        ImGui::SameLine(); HelpMarker("Adding new part \nSearching for parts to update \nEditing existings ones");
+        if (ImGui::Button("Create database")) {
+            //partsStock.OpenPartsStockDb();
+            partsStock.CreateTable();
+        }
+        if(ImGui::Button("Print data")) {
+            //partsStock.PrintOutData();
+        }
         ImGui::End();
         
         if (show_add_customer_window) {
         inputWindow.Render();
+        }
+        if (add_part_to_stock_window) {
+            partsStockWindow.GetBrands();
+            partsStockWindow.Render();
         }
 
         DebugWindow();
@@ -218,6 +234,7 @@ int main(int, char**)
         if(customerEditWindow.GetShouldRender())
             customerEditWindow.Render();
 
+        AddRepairWindow();
 
 
         // Rendering
