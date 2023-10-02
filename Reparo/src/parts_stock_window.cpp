@@ -110,6 +110,7 @@ void PartsStockWindow::Render() {
             GetColorsForModel();
         }
         else {
+            current_color_id = -1;
             colors.clear();
         }
     }

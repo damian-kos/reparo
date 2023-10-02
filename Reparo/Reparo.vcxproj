@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <IncludePath>D:\Programming\CPP\Reparo\Reparo\vendor\nlohmann;D:\Programming\CPP\Reparo\Reparo\vendor\imgui;$(ProjectDir)vendor\sqlite3;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)vendor\sqlite3;$(ProjectDir)vendor\nlohmann;$(ProjectDir)vendor\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
