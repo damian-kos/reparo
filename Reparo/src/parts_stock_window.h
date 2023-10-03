@@ -8,11 +8,23 @@ void PopulateListBox(const char* label, std::vector<std::string>& vector, int& s
 void PopulateListBoxMulti(const char* label, std::vector<std::string>& vector, bool(&selectables)[20]);
 void ResetOnBrandChange();
 
+struct DataPair {
+	int current_id = -1;
+	std::vector<std::string> data;
+	bool retreived;
+};
+
 class PartsStockWindow {
 public:
+	DataPair brand;
+	DataPair model;
+	DataPair category;
+	DataPair color;
+	void ResetOnBrandChange();
+
 	void Render();
 	void AddPart();
-	void Retreive();
+	int SearchForSimilarRecords();
 	void GetBrands();
 	void GetModels();
 	void GetCategories();

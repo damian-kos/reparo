@@ -4,27 +4,37 @@
 #include <iostream>
 #include "parts_stock_window.h"
 #include <unordered_map>
+#include <set>
+#include <sstream>
 
 char partQuery[128] = "";
-static int current_brand_id = -1; // Initialize current_brand_id
-static int previorus_brand_id = -1;
-static std::vector<std::string> brands; // Change the vector type to `const char*`
+static int previous_brand_id = -1;
 
-static int current_model_id = -1; // Initialize current_brand_id
-static std::vector<std::string> models; // Change the vector type to `const char*`
+//static int brand.current_id = -1; 
+//static std::vector<std::string> brands; 
+//
+//static int model.current_id = -1; 
+//static std::vector<std::string> models; 
+//
+//static int category.current_id = -1; 
+//static std::vector<std::string> categories; 
+//
+//static int color.current_id = -1; 
+//static std::vector<std::string> colors;
 
-static int current_category_id = -1; // Initialize current_brand_id
-static std::vector<std::string> categories; // Change the vector type to `const char*`
-
-static int current_color_id = -1; // Initialize current_brand_id
-static std::vector<std::string> colors; // Change the vector type to `const char*`
-
-static bool selected_qualities[20] = {}; // Initialize current_brand_id
-static std::vector<std::string> qualities; // Change the vector type to `const char*`
+static bool selected_qualities[20] = {}; 
+static std::vector<std::string> qualities; 
 static std::vector<int> order;
 
+std::string qualityString = "";
 
-bool brands_retreived = false;
+//bool brands_retreived = false;
+//bool models_retreived = false;
+//bool categories_retreived = false;
+bool qualities_retreived = false;
+//bool colors_retreived = false;
+
+
 bool qualities_populated = false;
 
 std::string text;
@@ -32,6 +42,9 @@ std::string text;
 void PartsStockWindow::Render() {
   
     ImGui::Begin("Add part to stock");
+    ImGui::InputTextWithHint(
+        "##SearchPart", "Part to search... ", partQuery, 
+        IM_ARRAYSIZE(partQuery), ImGuiInputTextFlags_ReadOnly);
     if (ImGui::BeginTable("Too add", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable)) {
         ImGui::TableSetupColumn("Brand");
         ImGui::TableSetupColumn("Model");
@@ -40,106 +53,143 @@ void PartsStockWindow::Render() {
         ImGui::TableSetupColumn("Quality(if any)");
         ImGui::TableHeadersRow();
         ImGui::TableNextRow();
-
         ImGui::TableSetColumnIndex(0);
-        if (current_brand_id != -1) {
-            ImGui::Text(brands[current_brand_id].c_str());
+        if (brand.current_id != -1) {
+            ImGui::Text(brand.data[brand.current_id].c_str());
         }
         ImGui::TableSetColumnIndex(1);
-        if (current_model_id != -1) {
-            ImGui::Text(models[current_model_id].c_str());
+        if (model.current_id != -1) {
+            ImGui::Text(model.data[model.current_id].c_str());
         }
         ImGui::TableSetColumnIndex(2);
-        if (current_category_id != -1) {
-            ImGui::Text(categories[current_category_id].c_str());
+        if (category.current_id != -1) {
+            ImGui::Text(category.data[category.current_id].c_str());
         }
         ImGui::TableSetColumnIndex(3);
-        if (current_color_id != -1) {
-            ImGui::Text(colors[current_color_id].c_str());
+        if (color.current_id != -1) {
+            ImGui::Text(color.data[color.current_id].c_str());
         }
         ImGui::TableSetColumnIndex(4);
-        if (!qualities_populated) {
-            if (order.size() == 0) {
-                text = "";
+        if (order.size() == 0) {
+            text = "";
+        }
+        else {
+            text = "";
+            for (size_t i = 0; i < order.size(); i++)
+            {
+                text += qualities[order[i]] + " ";
             }
-            else {
-                text = "";
-                for (size_t i = 0; i < order.size(); i++)
-                {
-                    text += qualities[order[i]] + " ";
-                }
-            }
-            qualities_populated = true; 
         }
         ImGui::Text(text.c_str());
-
-        
         ImGui::EndTable();
  
     }
 
-    if (ImGui::Button("hash")) {
-        std::cout << order.size() << "[";
-
-        for (size_t i = 0; i < order.size(); i++) {
-            std::cout << order[i];
-            if (i < order.size() - 1) {
-                std::cout << ", ";
-            }
-        }
-
-        std::cout << "]" << std::endl;
-    }
-
-    ImGui::InputTextWithHint("##SearchPart", "Part to search... ", partQuery, IM_ARRAYSIZE(partQuery), ImGuiInputTextFlags_ReadOnly);
-
     ImGui::PushItemWidth(128);
 
-    PopulateListBox("##Brand", brands, current_brand_id);
+    PopulateListBox("##Brand", brand.data, brand.current_id);
     ResetOnBrandChange();
 
-    if (current_brand_id != -1) {
+    if (brand.current_id != -1) {
         GetModels();
     }
 
-    PopulateListBox("##Models", models, current_model_id);
+    PopulateListBox("##Models", model.data, model.current_id);
 
-    if (current_model_id != -1) {
+    if (model.current_id != -1) {
         GetCategories();
-        if (current_category_id+1 == 1 || current_category_id + 1 == 4)  {
+        if (category.current_id+1 == 1 || category.current_id + 1 == 4)  {
+
+
             GetColorsForModel();
+            std::cout << color.data.size() << "Size " << std::endl;
+
         }
         else {
-            current_color_id = -1;
-            colors.clear();
+            color.current_id = -1;
+            color.data.clear();
         }
     }
 
-    PopulateListBox("##Categories", categories, current_category_id);
+    PopulateListBox("##Categories", category.data, category.current_id);
 
- 
-    PopulateListBox("##Colors", colors, current_color_id);
+    PopulateListBox("##Colors", color.data, color.current_id);
 
-    if (current_category_id != -1) {
+    if (category.current_id != -1) {
         GetQualities();
         PopulateListBoxMulti("##Qualities", qualities, selected_qualities);
     }
-
     if (ImGui::Button("Add part to stock..")) {
         AddPart();
     }
-
-    if (ImGui::Button("Retreive..")) {
-        Retreive();
-    }
-
     ImGui::End();
 }
 
+
 void PartsStockWindow::AddPart()
 {
+    if (brand.current_id == -1 || model.current_id == -1 || category.current_id == -1) { return; }
+
+    int rowToUpdate = SearchForSimilarRecords();
+    if (rowToUpdate > 0) {
+        partsStock.OpenPartsStockDb();
+        std::string updateQuery = "UPDATE parts SET quantity = quantity + 1 WHERE part_id = ?";
+        sqlite3_stmt* updateStmt;
+        if (sqlite3_prepare_v2(partsStock.db, updateQuery.c_str(), -1, &updateStmt, NULL) == SQLITE_OK) {
+            // Bind the parameter values to the placeholders in the query
+            sqlite3_bind_int(updateStmt, 1, rowToUpdate);
+
+            // Execute the update query
+            int rc = sqlite3_step(updateStmt);
+            if (rc == SQLITE_DONE) {
+                // Update successful
+                std::cout << "Quantity increased by 1 for matching record." << std::endl;
+            }
+            else {
+                std::cerr << "Error updating record: " << sqlite3_errmsg(partsStock.db) << std::endl;
+            }
+            // Finalize the update statement
+            sqlite3_finalize(updateStmt);
+            sqlite3_close(partsStock.db);
+        }
+        else {
+            std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
+        }
+        return;
+    }
+    else {
+        partsStock.OpenPartsStockDb();
+
+        //Construct the SQL query to insert data into the 'parts' table
+        std::string sqlQuery = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (";
+        sqlQuery += std::to_string(model.current_id + 1) + ", ";
+        sqlQuery += std::to_string(brand.current_id + 1) + ", ";
+        sqlQuery += std::to_string(category.current_id + 1) + ", ";
+        sqlQuery += std::to_string(color.current_id + 1) + ", ";
+        sqlQuery += "'" + qualityString + "', "; // Assuming quality is TEXT
+        sqlQuery += "1)"; // Assuming quantity is initialized to 0
+        int rc = sqlite3_exec(partsStock.db, sqlQuery.c_str(), 0, 0, 0);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(partsStock.db));
+        }
+        sqlite3_close(partsStock.db);
+
+    }
+}
+
+std::set<std::string> TokenizeAndStore(const std::string& input) {
+    std::set<std::string> words;
+    std::istringstream iss(input);
+    std::string word;
+
+    while (iss >> word) {
+        words.insert(word);
+    }
+    return words;
+}
+
+int PartsStockWindow::SearchForSimilarRecords() {
     partsStock.OpenPartsStockDb();
-    std::string qualityString = "";
     if (order.size() == 0) {
         qualityString = "";
     }
@@ -150,77 +200,74 @@ void PartsStockWindow::AddPart()
             qualityString += qualities[order[i]] + " ";
         }
     }
-    std::string color;
-    if (current_color_id != -1) {
-       color = colors[current_color_id];
-    }
-    else {
-        color = "";
-    }
-    //Construct the SQL query to insert data into the 'parts' table
-        std::string sqlQuery = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (";
-    sqlQuery += std::to_string(current_model_id+1) + ", ";
-    sqlQuery += std::to_string(current_brand_id+1) + ", ";
-    sqlQuery += std::to_string(current_category_id+1) + ", ";
-    sqlQuery += "'" + color + "', "; // Assuming color is TEXT
-    sqlQuery += "'" + qualityString + "', "; // Assuming quality is TEXT
-    sqlQuery += "1)"; // Assuming quantity is initialized to 0
-    int rc = sqlite3_exec(partsStock.db, sqlQuery.c_str(), 0, 0, 0);
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(partsStock.db));
-    }
-}
-
-
-void PartsStockWindow::Retreive() {
-    partsStock.OpenPartsStockDb();
-    const char* sqlQuery = "SELECT color, quality FROM parts WHERE brand_id = ? AND model_id = ? AND category_id = ?";
+    std::set<std::string> words1 = TokenizeAndStore(qualityString);
+    const char* sqlQuery = "SELECT part_id, quality FROM parts WHERE brand_id = ? AND model_id = ? AND category_id = ? AND color = ?";
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(partsStock.db, sqlQuery, -1, &stmt, NULL) == SQLITE_OK) {
         // Bind the parameter values to the placeholders in the query
-        int brandId = current_brand_id+1;
-        int modelId = current_model_id+1;
-        int categoryId = current_category_id+1;
+        int brandId = brand.current_id + 1;
+        int modelId = model.current_id + 1;
+        int categoryId = category.current_id + 1;
+        int colorId = color.current_id + 1;
+
         sqlite3_bind_int(stmt, 1, brandId);
         sqlite3_bind_int(stmt, 2, modelId);
         sqlite3_bind_int(stmt, 3, categoryId);
+        sqlite3_bind_int(stmt, 4, colorId);
 
         // Execute the query
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             // Retrieve data from the result set
-            const char* color = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            int partId = sqlite3_column_int(stmt, 0);
             const char* quality = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-
-            // Use 'color' and 'quality' as needed
-            // Print or store the retrieved data, for example:
-            std::cout << "Color: " << color << ", Quality: " << quality << std::endl;
+            std::set<std::string> words2 = TokenizeAndStore(quality);
+            if (words1 == words2) {
+                std::cout << "TRUE FOR: " << quality <<  " " << partId << std::endl;
+            
+                sqlite3_finalize(stmt);
+                sqlite3_close(partsStock.db);
+                return partId;
+            }
+            std::cout << " Quality: " << quality << std::endl;
         }
 
         // Finalize the statement
         sqlite3_finalize(stmt);
+        sqlite3_close(partsStock.db);
+        return 0;
     }
     else {
         // Handle the error
         std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
     }
+    sqlite3_finalize(stmt);
+    sqlite3_close(partsStock.db);
+    return 0;
 
 }
 
+// ########################
 
-void ResetOnBrandChange() {
-    if (current_brand_id != previorus_brand_id) {
+
+void PartsStockWindow::ResetOnBrandChange() {
+    if (brand.current_id != previous_brand_id) {
         std::cout << "RESET" << std::endl;
-        previorus_brand_id = current_brand_id;
-        current_model_id = -1;
-        current_category_id = -1;
-        current_color_id = -1;
-        models.clear();
-        categories.clear();
-        colors.clear();
+        previous_brand_id = brand.current_id;
+        model.current_id = -1;
+        category.current_id = -1;
+        color.current_id = -1;
+        model.data.clear();
+        category.data.clear();
+        color.data.clear();
         order.clear();
         text = "";
         qualities.clear(); 
         for (bool& value : selected_qualities) { value = false; }
+        qualityString = "";
+        model.retreived = false;
+        category.retreived = false;
+        qualities_retreived = false;
+        color.retreived = false;
     }
 }
 
@@ -228,7 +275,7 @@ void PopulateListBox(const char* label, std::vector<std::string>& vector, int& s
     if (ImGui::BeginListBox(label)) {
         for (int n = 0; n < vector.size(); n++) {
             const bool is_selected = (selectable == n);
-            if (ImGui::Selectable(vector[n].c_str(), is_selected)) // Removed .c_str()
+            if (ImGui::Selectable(vector[n].c_str(), is_selected))
                 selectable = n;
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)
@@ -267,6 +314,7 @@ void PopulateListBoxMulti(const char* label, std::vector<std::string>& vector, b
     ImGui::SameLine();
 }
 
+
 void PartsStockWindow::Query(const char* query, std::vector<std::string>& vector) {
 
     partsStock.OpenPartsStockDb();
@@ -277,7 +325,6 @@ void PartsStockWindow::Query(const char* query, std::vector<std::string>& vector
         std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
     }
     else {
-        // Execute the query and populate the `brands` vector
         vector.clear(); // Clear the vector if needed
 
         while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -286,18 +333,19 @@ void PartsStockWindow::Query(const char* query, std::vector<std::string>& vector
         }
         // Finalize the statement
         sqlite3_finalize(stmt);
-        sqlite3_close(partsStock.db);
     }
+    sqlite3_close(partsStock.db);
+
 }
 
 void PartsStockWindow::GetBrands() {
-    if (!brands_retreived) {
+    if (!brand.retreived) {
 
         const char* brandsQuery = "SELECT brand FROM brands";
-        Query(brandsQuery, brands);
+        Query(brandsQuery, brand.data);
 
         sqlite3_close(partsStock.db);
-        brands_retreived = true;
+        brand.retreived = true;
 
     }
 }
@@ -329,39 +377,46 @@ void PartsStockWindow::QueryRelationalTables(const char* query, std::vector<std:
 }
 
 void PartsStockWindow::GetModels() {
+    if (!model.retreived) {
+        const char* currentBrand = brand.data[brand.current_id].c_str();
+        int brand_id = GetIdForValue("brands", "brand", currentBrand);
 
-    const char* currentBrand = brands[current_brand_id].c_str();
-    int brand_id = GetIdForValue("brands", "brand", currentBrand);
-
-    const char* brandsQuery = "SELECT model FROM models WHERE brand_id = ?";
-    QueryRelationalTables(brandsQuery, models, brand_id);
-
+        const char* modelsQuery = "SELECT model FROM models WHERE brand_id = ?";
+        QueryRelationalTables(modelsQuery, model.data, brand_id);
+        model.retreived = true;
+    }
 }
 
 void PartsStockWindow::GetCategories() {
-
-    const char* categoriesQuery = "SELECT category FROM categories";
-    Query(categoriesQuery, categories);
-
+    if (!category.retreived) {
+        const char* categoriesQuery = "SELECT category FROM categories";
+        Query(categoriesQuery, category.data);
+        category.retreived = true;
+    }
 }
 
 void PartsStockWindow::GetQualities() {
-
-    const char* qualitiesQuery = "SELECT quality FROM qualities";
-    Query(qualitiesQuery, qualities);
+    if (!qualities_retreived) {
+        const char* qualitiesQuery = "SELECT quality FROM qualities";
+        Query(qualitiesQuery, qualities);
+        qualities_retreived = true;
+    }
 
 }
 
 
 void PartsStockWindow::GetColorsForModel() {
+    if (!color.retreived) {
+        const char* currentModel = model.data[model.current_id].c_str();
+        int model_id = GetIdForValue("models", "model", currentModel);
 
-    const char* currentModel = models[current_model_id].c_str();
-    int model_id = GetIdForValue("models", "model", currentModel);
+        const char* colorsQuery = "SELECT color FROM colors WHERE color_id IN (SELECT color_id FROM model_color WHERE model_id = ?)";
 
-    const char* colorsQuery = "SELECT color FROM colors WHERE color_id IN (SELECT color_id FROM model_color WHERE model_id = ?)";
+        QueryRelationalTables(colorsQuery, color.data, model_id);
+        color.retreived = true;
+        std::cout << "Category id: " << category.current_id << std::endl;
 
-    QueryRelationalTables(colorsQuery, colors, model_id);
-    
+    }
 }
 
 int PartsStockWindow::GetIdForValue(const char* tableName, const char* columnName, const char* searchValue) {

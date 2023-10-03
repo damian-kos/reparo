@@ -5,7 +5,7 @@
 void PartsStock::OpenPartsStockDb() {
     // 1. Declare a pointer to an SQLite database connection
     db = nullptr;
-
+    std::cout << "is open" << std::endl;
     // 2. Open or create the SQLite database
     int rc = sqlite3_open("parts_stock.db", &db);
 
@@ -48,7 +48,7 @@ void PartsStock::CreateTable() {
         "brand_id INTEGER NOT NULL,"
         "model_id INTEGER NOT NULL,"
         "category_id INTEGER NOT NULL,"
-        "color TEXT,"
+        "color INTEGER NOT NULL,"
         "quality TEXT,"
         "quantity INTEGER NOT NULL,"
         "FOREIGN KEY(model_id) REFERENCES models(model_id),"
