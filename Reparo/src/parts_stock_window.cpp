@@ -178,9 +178,9 @@ void PartsStockWindow::Retreive() {
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(partsStock.db, sqlQuery, -1, &stmt, NULL) == SQLITE_OK) {
         // Bind the parameter values to the placeholders in the query
-        int brandId = current_brand_id;
-        int modelId = current_model_id;
-        int categoryId = current_category_id;
+        int brandId = current_brand_id+1;
+        int modelId = current_model_id+1;
+        int categoryId = current_category_id+1;
         sqlite3_bind_int(stmt, 1, brandId);
         sqlite3_bind_int(stmt, 2, modelId);
         sqlite3_bind_int(stmt, 3, categoryId);
