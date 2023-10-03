@@ -7,9 +7,12 @@
 void PopulateListBox(const char* label, std::vector<std::string>& vector, int& selectable);
 void PopulateListBoxMulti(const char* label, std::vector<std::string>& vector, bool(&selectables)[20]);
 void ResetOnBrandChange();
+
 class PartsStockWindow {
 public:
 	void Render();
+	void AddPart();
+	void Retreive();
 	void GetBrands();
 	void GetModels();
 	void GetCategories();

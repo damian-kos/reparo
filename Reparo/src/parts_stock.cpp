@@ -43,7 +43,17 @@ void PartsStock::CreateTable() {
     const char* createBrandTable = "CREATE TABLE IF NOT EXISTS brands (brand_id INTEGER PRIMARY KEY, brand TEXT UNIQUE)";
     const char* createModelTable = "CREATE TABLE IF NOT EXISTS models (model_id INTEGER PRIMARY KEY, model TEXT UNIQUE, brand_id INTEGER, FOREIGN KEY (brand_id) REFERENCES brands (brand_id))";
     const char* createCategoriesTable = "CREATE TABLE IF NOT EXISTS categories (category_id INTEGER PRIMARY KEY, category TEXT UNIQUE)";
-    const char* createPartsTable = "CREATE TABLE IF NOT EXISTS parts (part_id INTEGER PRIMARY KEY, brand_id INTEGER, model_id INTEGER, category_id INTEGER, color TEXT, quality TEXT, quantity INTEGER, FOREIGN KEY (model_id) REFERENCES models (model_id), FOREIGN KEY (category_id) REFERENCES categories (category_id))";
+    const char* createPartsTable = "CREATE TABLE IF NOT EXISTS parts("
+        "part_id INTEGER PRIMARY KEY,"
+        "brand_id INTEGER NOT NULL,"
+        "model_id INTEGER NOT NULL,"
+        "category_id INTEGER NOT NULL,"
+        "color TEXT,"
+        "quality TEXT,"
+        "quantity INTEGER NOT NULL,"
+        "FOREIGN KEY(model_id) REFERENCES models(model_id),"
+        "FOREIGN KEY(category_id) REFERENCES categories(category_id))";
+  
 
     const char* createColorsTable = "CREATE TABLE IF NOT EXISTS colors (color_id INTEGER PRIMARY KEY, color TEXT UNIQUE)";
     const char* createModelColorTable =
@@ -59,12 +69,12 @@ void PartsStock::CreateTable() {
 
 
     int rc = sqlite3_exec(db, createBrandTable, 0, 0, 0);
-    rc = sqlite3_exec(db, createModelTable, 0, 0, 0);
-    rc = sqlite3_exec(db, createCategoriesTable, 0, 0, 0);
+    //rc = sqlite3_exec(db, createModelTable, 0, 0, 0);
+    //rc = sqlite3_exec(db, createCategoriesTable, 0, 0, 0);
     rc = sqlite3_exec(db, createPartsTable, 0, 0, 0);
-    rc = sqlite3_exec(db, createColorsTable, 0, 0, 0);
-    rc = sqlite3_exec(db, createModelColorTable, 0, 0, 0);
-    rc = sqlite3_exec(db, createQualityTable, 0, 0, 0);
+    //rc = sqlite3_exec(db, createColorsTable, 0, 0, 0);
+    //rc = sqlite3_exec(db, createModelColorTable, 0, 0, 0);
+    //rc = sqlite3_exec(db, createQualityTable, 0, 0, 0);
 
 
 
@@ -86,8 +96,8 @@ void PartsStock::CreateTable() {
     //rc = sqlite3_exec(db, populateCategories, 0, 0, 0);
     //rc = sqlite3_exec(db, populatePart, 0, 0, 0);
     //rc = sqlite3_exec(db, populateColors, 0, 0, 0);
-    rc = sqlite3_exec(db, populateModelColors, 0, 0, 0);
-    rc = sqlite3_exec(db, popuulateQuality, 0, 0, 0);
+    //rc = sqlite3_exec(db, populateModelColors, 0, 0, 0);
+    //rc = sqlite3_exec(db, popuulateQuality, 0, 0, 0);
 
 
 

@@ -116,6 +116,7 @@ void PartsStockWindow::Render() {
     }
 
     PopulateListBox("##Categories", categories, current_category_id);
+
  
     PopulateListBox("##Colors", colors, current_color_id);
 
@@ -124,8 +125,87 @@ void PartsStockWindow::Render() {
         PopulateListBoxMulti("##Qualities", qualities, selected_qualities);
     }
 
+    if (ImGui::Button("Add part to stock..")) {
+        AddPart();
+    }
+
+    if (ImGui::Button("Retreive..")) {
+        Retreive();
+    }
+
     ImGui::End();
 }
+
+void PartsStockWindow::AddPart()
+{
+    partsStock.OpenPartsStockDb();
+    std::string qualityString = "";
+    if (order.size() == 0) {
+        qualityString = "";
+    }
+    else {
+        qualityString = "";
+        for (size_t i = 0; i < order.size(); i++)
+        {
+            qualityString += qualities[order[i]] + " ";
+        }
+    }
+    std::string color;
+    if (current_color_id != -1) {
+       color = colors[current_color_id];
+    }
+    else {
+        color = "";
+    }
+    //Construct the SQL query to insert data into the 'parts' table
+        std::string sqlQuery = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (";
+    sqlQuery += std::to_string(current_model_id+1) + ", ";
+    sqlQuery += std::to_string(current_brand_id+1) + ", ";
+    sqlQuery += std::to_string(current_category_id+1) + ", ";
+    sqlQuery += "'" + color + "', "; // Assuming color is TEXT
+    sqlQuery += "'" + qualityString + "', "; // Assuming quality is TEXT
+    sqlQuery += "1)"; // Assuming quantity is initialized to 0
+    int rc = sqlite3_exec(partsStock.db, sqlQuery.c_str(), 0, 0, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(partsStock.db));
+    }
+}
+
+
+void PartsStockWindow::Retreive() {
+    partsStock.OpenPartsStockDb();
+    const char* sqlQuery = "SELECT color, quality FROM parts WHERE brand_id = ? AND model_id = ? AND category_id = ?";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(partsStock.db, sqlQuery, -1, &stmt, NULL) == SQLITE_OK) {
+        // Bind the parameter values to the placeholders in the query
+        int brandId = current_brand_id;
+        int modelId = current_model_id;
+        int categoryId = current_category_id;
+        sqlite3_bind_int(stmt, 1, brandId);
+        sqlite3_bind_int(stmt, 2, modelId);
+        sqlite3_bind_int(stmt, 3, categoryId);
+
+        // Execute the query
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            // Retrieve data from the result set
+            const char* color = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            const char* quality = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+
+            // Use 'color' and 'quality' as needed
+            // Print or store the retrieved data, for example:
+            std::cout << "Color: " << color << ", Quality: " << quality << std::endl;
+        }
+
+        // Finalize the statement
+        sqlite3_finalize(stmt);
+    }
+    else {
+        // Handle the error
+        std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
+    }
+
+}
+
 
 void ResetOnBrandChange() {
     if (current_brand_id != previorus_brand_id) {
