@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="src\helpmarker.h" />
     <ClInclude Include="src\error_handler.h" />
+    <ClInclude Include="src\imgui_helper.h" />
     <ClInclude Include="src\input_field.h" />
     <ClInclude Include="src\customer_data.h" />
     <ClInclude Include="src\debug_window.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="src\parts_stock_window.h" />
     <ClInclude Include="src\repair.h" />
     <ClInclude Include="src\search.h" />
+    <ClInclude Include="src\sql_queries.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_dx11.h" />
@@ -157,6 +159,7 @@
     <ClInclude Include="vendor\sqlite3\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\imgui_helper.cpp" />
     <ClCompile Include="src\parts_stock.cpp" />
     <ClCompile Include="src\error_handler.cpp" />
     <ClCompile Include="src\edit_customer.cpp" />
@@ -169,6 +172,7 @@
     <ClCompile Include="src\parts_stock_window.cpp" />
     <ClCompile Include="src\repair.cpp" />
     <ClCompile Include="src\search.cpp" />
+    <ClCompile Include="src\sql_queries.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
