@@ -84,6 +84,9 @@
     <ClInclude Include="src\parts_stock_window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\sql_queries.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vendor\imgui\imgui.cpp">
@@ -144,6 +147,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vendor\sqlite3\sqlite3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sql_queries.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

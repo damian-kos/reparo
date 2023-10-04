@@ -144,6 +144,7 @@
     <ClInclude Include="src\parts_stock_window.h" />
     <ClInclude Include="src\repair.h" />
     <ClInclude Include="src\search.h" />
+    <ClInclude Include="src\sql_queries.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_dx11.h" />
@@ -169,6 +170,7 @@
     <ClCompile Include="src\parts_stock_window.cpp" />
     <ClCompile Include="src\repair.cpp" />
     <ClCompile Include="src\search.cpp" />
+    <ClCompile Include="src\sql_queries.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />

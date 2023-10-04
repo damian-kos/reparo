@@ -102,8 +102,6 @@ void PartsStockWindow::Render() {
 
 
             GetColorsForModel();
-            std::cout << color.data.size() << "Size " << std::endl;
-
         }
         else {
             color.current_id = -1;
@@ -246,9 +244,6 @@ int PartsStockWindow::SearchForSimilarRecords() {
 
 }
 
-// ########################
-
-
 void PartsStockWindow::ResetOnBrandChange() {
     if (brand.current_id != previous_brand_id) {
         std::cout << "RESET" << std::endl;
@@ -390,7 +385,8 @@ void PartsStockWindow::GetModels() {
 void PartsStockWindow::GetCategories() {
     if (!category.retreived) {
         const char* categoriesQuery = "SELECT category FROM categories";
-        Query(categoriesQuery, category.data);
+        sqlQuery.QueryAllFromTable(categoriesQuery, category.data);
+        //Query(categoriesQuery, category.data);
         category.retreived = true;
     }
 }

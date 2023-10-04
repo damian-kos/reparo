@@ -3,6 +3,8 @@
 #include "imgui.h"
 #include <sqlite3.h>
 #include "parts_stock.h"
+#include "sql_queries.h"
+
 
 void PopulateListBox(const char* label, std::vector<std::string>& vector, int& selectable);
 void PopulateListBoxMulti(const char* label, std::vector<std::string>& vector, bool(&selectables)[20]);
@@ -16,6 +18,8 @@ struct DataPair {
 
 class PartsStockWindow {
 public:
+	PartsStock partsStock;
+	SQLQuery sqlQuery;
 	DataPair brand;
 	DataPair model;
 	DataPair category;
@@ -33,7 +37,6 @@ public:
 	int GetIdForValue(const char* tableName, const char* columnName, const char* searchValue);
 	void Query(const char* query, std::vector<std::string>& vector);
 	void QueryRelationalTables(const char* query, std::vector<std::string>& vector, int id);
-	PartsStock partsStock;
 
 
 };
