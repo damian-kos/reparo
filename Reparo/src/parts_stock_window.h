@@ -21,7 +21,6 @@ public:
 	DataPair category;
 	DataPair color;
 	void ResetOnBrandChange();
-
 	void Render();
 	void AddPart();
 	int SearchForSimilarRecords();

@@ -8,34 +8,15 @@
 #include <sstream>
 
 char partQuery[128] = "";
-static int previous_brand_id = -1;
 
-//static int brand.current_id = -1; 
-//static std::vector<std::string> brands; 
-//
-//static int model.current_id = -1; 
-//static std::vector<std::string> models; 
-//
-//static int category.current_id = -1; 
-//static std::vector<std::string> categories; 
-//
-//static int color.current_id = -1; 
-//static std::vector<std::string> colors;
+static int previous_brand_id = -1;
 
 static bool selected_qualities[20] = {}; 
 static std::vector<std::string> qualities; 
 static std::vector<int> order;
 
 std::string qualityString = "";
-
-//bool brands_retreived = false;
-//bool models_retreived = false;
-//bool categories_retreived = false;
 bool qualities_retreived = false;
-//bool colors_retreived = false;
-
-
-bool qualities_populated = false;
 
 std::string text;
 
@@ -246,8 +227,6 @@ int PartsStockWindow::SearchForSimilarRecords() {
 
 }
 
-// ########################
-
 
 void PartsStockWindow::ResetOnBrandChange() {
     if (brand.current_id != previous_brand_id) {
@@ -294,7 +273,6 @@ void PopulateListBoxMulti(const char* label, std::vector<std::string>& vector, b
                 selectables[n] = !selectables[n];
                 if (selectables[n]) {
                     order.push_back(n);
-                    qualities_populated = false;
                 }
                 else {
                     auto it = std::find(order.begin(), order.end(), n);
@@ -304,8 +282,6 @@ void PopulateListBoxMulti(const char* label, std::vector<std::string>& vector, b
                         order.erase(it);
                         std::cout << "ERASED " << it._Unwrapped() << std::endl;
                     }
-                    qualities_populated = false;
-
                 }
             }
         }
@@ -378,9 +354,9 @@ void PartsStockWindow::QueryRelationalTables(const char* query, std::vector<std:
 
 void PartsStockWindow::GetModels() {
     if (!model.retreived) {
+
         const char* currentBrand = brand.data[brand.current_id].c_str();
         int brand_id = GetIdForValue("brands", "brand", currentBrand);
-
         const char* modelsQuery = "SELECT model FROM models WHERE brand_id = ?";
         QueryRelationalTables(modelsQuery, model.data, brand_id);
         model.retreived = true;
@@ -409,12 +385,9 @@ void PartsStockWindow::GetColorsForModel() {
     if (!color.retreived) {
         const char* currentModel = model.data[model.current_id].c_str();
         int model_id = GetIdForValue("models", "model", currentModel);
-
         const char* colorsQuery = "SELECT color FROM colors WHERE color_id IN (SELECT color_id FROM model_color WHERE model_id = ?)";
-
         QueryRelationalTables(colorsQuery, color.data, model_id);
         color.retreived = true;
-        std::cout << "Category id: " << category.current_id << std::endl;
 
     }
 }
