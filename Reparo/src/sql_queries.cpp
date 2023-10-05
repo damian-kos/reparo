@@ -100,17 +100,17 @@ std::set<std::string> TokenizeAndStore(const std::string& input) {
     return words;
 }
 
-int SQLQuery::SearchForSimilarRecords(PartData& brand, PartData& model, PartData& category, PartData& color, PartQualityData& quality) {
+int SQLQuery::SearchForSimilarRecords(Part part) {
     partsStock.OpenPartsStockDb();
-    std::set<std::string> words1 = TokenizeAndStore(quality.desc);
+    std::set<std::string> words1 = TokenizeAndStore(part.quality.desc);
     const char* sqlQuery = "SELECT part_id, quality FROM parts WHERE brand_id = ? AND model_id = ? AND category_id = ? AND color = ?";
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(partsStock.db, sqlQuery, -1, &stmt, NULL) == SQLITE_OK) {
         // Bind the parameter values to the placeholders in the query
-        int brandId = brand.current_id + 1;
-        int modelId = model.current_id + 1;
-        int categoryId = category.current_id + 1;
-        int colorId = color.current_id + 1;
+        int brandId = part.brand.current_id + 1;
+        int modelId = part.model.current_id + 1;
+        int categoryId = part.category.current_id + 1;
+        int colorId = part.color.current_id + 1;
 
         sqlite3_bind_int(stmt, 1, brandId);
         sqlite3_bind_int(stmt, 2, modelId);
@@ -175,16 +175,16 @@ void SQLQuery::Update(int& rowToUpdate) {
     return;
 }
 
-void SQLQuery::InsertPart(PartData& brand, PartData& model, PartData& category, PartData& color, PartQualityData& quality) {
+void SQLQuery::InsertPart(Part part) {
         partsStock.OpenPartsStockDb(); 
 
         //Construct the SQL query to insert data into the 'parts' table
         std::string sqlInsert = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (";
-        sqlInsert += std::to_string(model.current_id + 1) + ", ";
-        sqlInsert += std::to_string(brand.current_id + 1) + ", ";
-        sqlInsert += std::to_string(category.current_id + 1) + ", ";
-        sqlInsert += std::to_string(color.current_id + 1) + ", ";
-        sqlInsert += "'" + quality.desc + "', "; // Assuming quality is TEXT
+        sqlInsert += std::to_string(part.model.current_id + 1) + ", ";
+        sqlInsert += std::to_string(part.brand.current_id + 1) + ", ";
+        sqlInsert += std::to_string(part.category.current_id + 1) + ", ";
+        sqlInsert += std::to_string(part.color.current_id + 1) + ", ";
+        sqlInsert += "'" + part.quality.desc + "', "; // Assuming quality is TEXT
         sqlInsert += "1)"; // Assuming quantity is initialized to 0
         int rc = sqlite3_exec(partsStock.db, sqlInsert.c_str(), 0, 0, 0);
         if (rc != SQLITE_OK) {

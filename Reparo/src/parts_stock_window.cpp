@@ -18,45 +18,8 @@ void PartsStockWindow::Render() {
     ImGui::InputTextWithHint(
         "##SearchPart", "Part to search... ", partQuery, 
         IM_ARRAYSIZE(partQuery), ImGuiInputTextFlags_ReadOnly);
-    if (ImGui::BeginTable("Too add", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable)) {
-        ImGui::TableSetupColumn("Brand");
-        ImGui::TableSetupColumn("Model");
-        ImGui::TableSetupColumn("Category");
-        ImGui::TableSetupColumn("Color(if any)");
-        ImGui::TableSetupColumn("Quality(if any)");
-        ImGui::TableHeadersRow();
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        if (part.brand.current_id != -1) {
-            ImGui::Text(part.brand.data[part.brand.current_id].c_str());
-        }
-        ImGui::TableSetColumnIndex(1);
-        if (part.model.current_id != -1) {
-            ImGui::Text(part.model.data[part.model.current_id].c_str());
-        }
-        ImGui::TableSetColumnIndex(2);
-        if (part.category.current_id != -1) {
-            ImGui::Text(part.category.data[part.category.current_id].c_str());
-        }
-        ImGui::TableSetColumnIndex(3);
-        if (part.color.current_id != -1) {
-            ImGui::Text(part.color.data[part.color.current_id].c_str());
-        }
-        ImGui::TableSetColumnIndex(4);
-        if (part.quality.order.size() == 0) {
-            part.quality.desc = "";
-        }
-        else {
-            part.quality.desc = "";
 
-            for (size_t i = 0; i < part.quality.order.size(); i++)
-            {
-                part.quality.desc+= part.quality.data[part.quality.order[i]] + " ";
-            }
-        }
-        ImGui::Text(part.quality.desc.c_str());
-        ImGui::EndTable();
-    }
+    imguiHelper.PartTableStockWindow(part);
 
     ImGui::PushItemWidth(128);
     imguiHelper.PopulateListBox("##Brand", part.brand.data, part.brand.current_id);
@@ -92,9 +55,6 @@ void PartsStockWindow::Render() {
     if (ImGui::Button("Add part to stock..")) {
         AddPart();
     }
-    if (ImGui::Button("XDDD")) {
-        std::cout << part.brand.current_id << "BRAND " << std::endl;
-    }
     ImGui::End();
 }
 
@@ -102,13 +62,13 @@ void PartsStockWindow::Render() {
 void PartsStockWindow::AddPart()
 {
     if (part.brand.current_id == -1 || part.model.current_id == -1 || part.category.current_id == -1) { return; }
-    int rowToUpdate = sqlQuery.SearchForSimilarRecords(part.brand, part.model, part.category, part.color, part.quality);
+    int rowToUpdate = sqlQuery.SearchForSimilarRecords(part);
     std::cout << "ROW TO UPDATE: " << rowToUpdate << std::endl;
     if (rowToUpdate > 0) {
         sqlQuery.Update(rowToUpdate);
     }
     else {
-        sqlQuery.InsertPart(part.brand, part.model, part.category, part.color, part.quality);
+        sqlQuery.InsertPart(part);
     }
 }
 

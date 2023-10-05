@@ -38,3 +38,45 @@ void ImGuiHelper::PopulateListBoxMulti(const char* label, PartQualityData& quali
     }
     ImGui::SameLine();
 }
+
+void ImGuiHelper::PartTableStockWindow(Part& part) {
+    if (ImGui::BeginTable("To add", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable)) {
+        ImGui::TableSetupColumn("Brand");
+        ImGui::TableSetupColumn("Model");
+        ImGui::TableSetupColumn("Category");
+        ImGui::TableSetupColumn("Color(if any)");
+        ImGui::TableSetupColumn("Quality(if any)");
+        ImGui::TableHeadersRow();
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        if (part.brand.current_id != -1) {
+            ImGui::Text(part.brand.data[part.brand.current_id].c_str());
+        }
+        ImGui::TableSetColumnIndex(1);
+        if (part.model.current_id != -1) {
+            ImGui::Text(part.model.data[part.model.current_id].c_str());
+        }
+        ImGui::TableSetColumnIndex(2);
+        if (part.category.current_id != -1) {
+            ImGui::Text(part.category.data[part.category.current_id].c_str());
+        }
+        ImGui::TableSetColumnIndex(3);
+        if (part.color.current_id != -1) {
+            ImGui::Text(part.color.data[part.color.current_id].c_str());
+        }
+        ImGui::TableSetColumnIndex(4);
+        if (part.quality.order.size() == 0) {
+            part.quality.desc = "";
+        }
+        else {
+            part.quality.desc = "";
+
+            for (size_t i = 0; i < part.quality.order.size(); i++)
+            {
+                part.quality.desc += part.quality.data[part.quality.order[i]] + " ";
+            }
+        }
+        ImGui::Text(part.quality.desc.c_str());
+        ImGui::EndTable();
+    }
+}
