@@ -23,3 +23,12 @@ struct PartQualityData {
 	std::string desc = "";
 	bool retreived = false;
 };
+
+struct Part {
+	PartData brand;
+	PartData model;
+	PartData category;
+	PartData color;
+	PartQualityData quality;
+
+};

@@ -8,7 +8,7 @@ class ImGuiHelper {
 public:
     void PopulateListBox(const char* label, std::vector<std::string>& vector, int& selectable);
     void PopulateListBoxMulti(const char* label,PartQualityData& quality);
-
+    //void PartTable(int columns, ):
 
 };
 

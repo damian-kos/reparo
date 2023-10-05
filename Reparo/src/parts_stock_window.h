@@ -14,11 +14,12 @@ public:
 	PartsStock partsStock;
 	SQLQuery sqlQuery;
 	ImGuiHelper imguiHelper;
-	PartData brand;
-	PartData model;
-	PartData category;
-	PartData color;
-	PartQualityData quality;
+	//PartData brand;
+	//PartData model;
+	//PartData category;
+	//PartData color;
+	//PartQualityData quality;
+	Part part;
 	void Render();
 	void ResetOnBrandChange();
 	void AddPart();

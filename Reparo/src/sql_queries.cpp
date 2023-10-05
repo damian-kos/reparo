@@ -147,4 +147,55 @@ int SQLQuery::SearchForSimilarRecords(PartData& brand, PartData& model, PartData
     return 0;
 
 }
+void SQLQuery::Update(int& rowToUpdate) {
+    partsStock.OpenPartsStockDb();
 
+    std::string updateQuery = "UPDATE parts SET quantity = quantity + 1 WHERE part_id = ?";
+    sqlite3_stmt* updateStmt;
+    if (sqlite3_prepare_v2(partsStock.db, updateQuery.c_str(), -1, &updateStmt, NULL) == SQLITE_OK) {
+        // Bind the parameter values to the placeholders in the query
+        sqlite3_bind_int(updateStmt, 1, rowToUpdate);
+
+        // Execute the update query
+        int rc = sqlite3_step(updateStmt);
+        if (rc == SQLITE_DONE) {
+            // Update successful
+            std::cout << "Quantity increased by 1 for matching record." << std::endl;
+        }
+        else {
+            std::cerr << "Error updating record: " << sqlite3_errmsg(partsStock.db) << std::endl;
+        }
+        // Finalize the update statement
+        sqlite3_finalize(updateStmt);
+        sqlite3_close(partsStock.db);
+    }
+    else {
+        std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
+    }
+    return;
+}
+
+void SQLQuery::InsertPart(PartData& brand, PartData& model, PartData& category, PartData& color, PartQualityData& quality) {
+        partsStock.OpenPartsStockDb(); 
+
+        //Construct the SQL query to insert data into the 'parts' table
+        std::string sqlInsert = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (";
+        sqlInsert += std::to_string(model.current_id + 1) + ", ";
+        sqlInsert += std::to_string(brand.current_id + 1) + ", ";
+        sqlInsert += std::to_string(category.current_id + 1) + ", ";
+        sqlInsert += std::to_string(color.current_id + 1) + ", ";
+        sqlInsert += "'" + quality.desc + "', "; // Assuming quality is TEXT
+        sqlInsert += "1)"; // Assuming quantity is initialized to 0
+        int rc = sqlite3_exec(partsStock.db, sqlInsert.c_str(), 0, 0, 0);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(partsStock.db));
+        }
+        if (rc == SQLITE_DONE) {
+            // Update successful
+        }
+        std::cout << "Part added to stock." << std::endl;
+
+        sqlite3_close(partsStock.db);
+
+
+}

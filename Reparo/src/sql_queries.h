@@ -12,4 +12,6 @@ public:
     void OnID(const char* query, std::vector<std::string>& vector, int id);
     int GetIdForValue(const char* tableName, const char* columnName, const char* searchValue);
     int SearchForSimilarRecords(PartData& brand, PartData& model, PartData& category, PartData& color, PartQualityData& quality);
+    void Update(int& rowToUpdate);
+    void InsertPart(PartData& brand, PartData& model, PartData& category, PartData& color, PartQualityData& quality);
 };
