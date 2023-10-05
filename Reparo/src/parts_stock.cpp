@@ -65,6 +65,8 @@ void PartsStock::CreateTable() {
         "FOREIGN KEY (color_id) REFERENCES colors (color_id));";
 
     const char* createQualityTable = "CREATE TABLE IF NOT EXISTS qualities (quality_id INTEGER PRIMARY KEY, quality TEXT UNIQUE)";
+
+    const char* createCustomerTable = "CREATE TABLE IF NOT EXISTS customers (customer_id INTEGER PRIMARY KEY, name TEXT NOT NULL, surname TEXT, email TEXT, phone INTEGER NOT NULL UNIQUE)";
     
 
 
@@ -75,6 +77,8 @@ void PartsStock::CreateTable() {
     //rc = sqlite3_exec(db, createColorsTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createModelColorTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createQualityTable, 0, 0, 0);
+    rc = sqlite3_exec(db, createCustomerTable, 0, 0, 0);
+
 
 
 

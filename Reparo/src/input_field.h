@@ -30,5 +30,5 @@ struct Part {
 	PartData category;
 	PartData color;
 	PartQualityData quality;
-
+ 
 };
