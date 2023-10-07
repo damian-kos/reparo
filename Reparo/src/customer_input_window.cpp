@@ -1,4 +1,3 @@
-#include "inputs_handler.h"
 #include "customer_input_window.h"
 
 char name[128] = "";
@@ -6,6 +5,7 @@ char surname[128] = "";
 char email[128] = "";
 char phoneNumber[128] = "";
 int phoneNumberIndex = -1; // Initialize to an invalid index
+SQLQuery sql;
 
 InputField inputFields[4] = {
     {"##Name", "Name..", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_None},
@@ -25,7 +25,7 @@ void CustomerInputWindow::Render() {
         ImGui::Spacing();
         Submit();
         ImGui::Spacing();
-        SearchForCustomers();
+        SearchForExsitingCustomers();
 
        
         ImGui::End();
@@ -42,27 +42,32 @@ void CustomerInputWindow::CreateInputFields()
         }
     }
 }
-
+#include <iostream>
 void CustomerInputWindow::Submit()
 {
     // Pass filled input fields to the handler.
     if (ImGui::Button("Submit Customer Details")) {
-        if (InputsHandler::HandleInputsFromFields(inputFields, sizeof(inputFields) / sizeof(inputFields[0]), nullptr)) {
-            //Clear the input fields using memset
+        customer.name = inputFields[0].buffer;
+        customer.surname = inputFields[1].buffer;
+        customer.email = inputFields[2].buffer;
+        customer.phone_number = inputFields[3].buffer;
+        int test = sql.SearchForExsitingCustomers(customer);
+        if (test == 0) {
+            sql.InsertCustomer(customer);
             for (InputField& field : inputFields) {
-                memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
+            memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
             }
         }
         else {
             ModalController modalController;
-            modalController.RenderErrorModal("Missing values");
+            modalController.RenderErrorModal("Customer with this phone number already exists.");
         }
     }
     modalController.GetErrorState("Missing values", "All fields must be filled, please try again.");
 }
 
 
-void CustomerInputWindow::SearchForCustomers()
+void CustomerInputWindow::SearchForExsitingCustomers()
 {
     if (phoneNumberIndex != -1) {
         SearchField(inputFields[phoneNumberIndex].buffer);

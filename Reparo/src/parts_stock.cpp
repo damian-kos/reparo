@@ -5,7 +5,7 @@
 void PartsStock::OpenPartsStockDb() {
     // 1. Declare a pointer to an SQLite database connection
     db = nullptr;
-    std::cout << "is open" << std::endl;
+    //std::cout << "is open" << std::endl;
     // 2. Open or create the SQLite database
     int rc = sqlite3_open("parts_stock.db", &db);
 
@@ -66,7 +66,7 @@ void PartsStock::CreateTable() {
 
     const char* createQualityTable = "CREATE TABLE IF NOT EXISTS qualities (quality_id INTEGER PRIMARY KEY, quality TEXT UNIQUE)";
 
-    const char* createCustomerTable = "CREATE TABLE IF NOT EXISTS customers (customer_id INTEGER PRIMARY KEY, name TEXT NOT NULL, surname TEXT, email TEXT, phone INTEGER NOT NULL UNIQUE)";
+    const char* createCustomerTable = "CREATE TABLE IF NOT EXISTS customers (customer_id INTEGER PRIMARY KEY, name TEXT NOT NULL, surname TEXT, email TEXT, phone TEXT NOT NULL UNIQUE)";
     
 
 

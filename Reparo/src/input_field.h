@@ -1,6 +1,8 @@
 #pragma once
+
 #include <vector>
 #include <string>
+
 struct InputField {
     const char* label;
     const char* hint;
@@ -31,4 +33,11 @@ struct Part {
 	PartData color;
 	PartQualityData quality;
  
+};
+
+struct Customer {
+	std::string name;
+	std::string surname;
+	std::string email;
+	std::string phone_number;
 };

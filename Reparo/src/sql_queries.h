@@ -4,6 +4,8 @@
 #include "input_field.h"
 #include <set>
 #include <sstream>
+#include <unordered_map>
+
 
 class SQLQuery {
 public:
@@ -14,4 +16,7 @@ public:
     int SearchForSimilarRecords(Part part);
     void Update(int& rowToUpdate);
     void InsertPart(Part part);
+    void InsertCustomer(Customer customer);
+    int SearchForExsitingCustomers(Customer customer);
+    void MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers);
 };

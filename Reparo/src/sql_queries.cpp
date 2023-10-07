@@ -147,6 +147,7 @@ int SQLQuery::SearchForSimilarRecords(Part part) {
     return 0;
 
 }
+
 void SQLQuery::Update(int& rowToUpdate) {
     partsStock.OpenPartsStockDb();
 
@@ -198,4 +199,103 @@ void SQLQuery::InsertPart(Part part) {
         sqlite3_close(partsStock.db);
 
 
+}
+
+int SQLQuery::SearchForExsitingCustomers(Customer customer) {
+    partsStock.OpenPartsStockDb();
+
+    std::set<std::string> words1 = TokenizeAndStore(customer.phone_number);
+    const char* sqlQuery = "SELECT customer_id, phone FROM customers WHERE phone = ?";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(partsStock.db, sqlQuery, -1, &stmt, NULL) == SQLITE_OK) {
+        // Bind the parameter values to the placeholders in the query
+        const char* phone_number = customer.phone_number.c_str();
+        sqlite3_bind_text(stmt, 1, phone_number, strlen(phone_number), NULL);
+        // Execute the query
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            // Retrieve data from the result set
+            int customerid = sqlite3_column_int(stmt, 0);
+            const char* quality = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+
+            std::set<std::string> words2 = TokenizeAndStore(quality);
+
+            if (words1 == words2) {
+                std::cout << "TRUE FOR CUSTOMER: " << customerid << std::endl;
+                sqlite3_finalize(stmt);
+                sqlite3_close(partsStock.db);
+                return customerid;
+            }
+        }
+        // Finalize the statement
+        sqlite3_finalize(stmt);
+        sqlite3_close(partsStock.db);
+        return 0;
+    }
+    else {
+        // Handle the error
+        std::cerr << "Error preparing SQL statement Search For Customers: " << sqlite3_errmsg(partsStock.db) << std::endl;
+        sqlite3_close(partsStock.db); // Close the database in case of an error
+    }
+
+    // Return 0 in case of an error
+    return 0;
+}
+
+
+void SQLQuery::InsertCustomer(Customer customer) {
+    partsStock.OpenPartsStockDb();
+    std::cout << customer.name << " " << customer.phone_number << std::endl;
+    ////Construct the SQL query to insert data into the 'parts' table
+    std::string sqlInsert = "INSERT INTO customers (name, surname, email, phone) VALUES (";
+    sqlInsert += "'" + customer.name + "', ";
+    sqlInsert += "'" + customer.surname + "', ";
+    sqlInsert += "'" + customer.email + "', ";
+    sqlInsert += "'" + customer.phone_number + "')";
+
+    int rc = sqlite3_exec(partsStock.db, sqlInsert.c_str(), 0, 0, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(partsStock.db));
+    }
+    if (rc == SQLITE_DONE) {
+       // Update successful
+    }
+    std::cout << "Customer added." << std::endl;
+
+    sqlite3_close(partsStock.db);
+
+}
+
+void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers) {
+    partsStock.OpenPartsStockDb();
+    // Define the SQL query with a parameterized query.
+    const char* queryByPhone = "SELECT * FROM customers WHERE phone LIKE ?";
+    //std::cout << "WE ARE HERE " << std::endl;
+    // Prepare the SQL statement.
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(partsStock.db, queryByPhone, -1, &stmt, NULL) == SQLITE_OK) {
+        std::string phonePattern = "%" + partial_phone_number;
+        customers.clear();
+        std::cout << phonePattern << std::endl;
+        sqlite3_bind_text(stmt, 1, phonePattern.c_str(), -1, SQLITE_STATIC);
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            Customer customer;
+            customer.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            customer.surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+            customer.email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+            customer.phone_number = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            customers[(sqlite3_column_int(stmt, 0))] = customer;
+            //const char* firstName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            //const char* lastName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+            //const char* email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+            //const char* phoneNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
+            //customers.push_back(customer);
+        }
+    }
+    else {
+        // Handle the error
+        std::cerr << "Error preparing SQL statement MatchingCustomers: " << sqlite3_errmsg(partsStock.db) << std::endl;
+        sqlite3_close(partsStock.db); // Close the database in case of an error
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(partsStock.db);
 }
