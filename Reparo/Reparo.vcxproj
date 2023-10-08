@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\customer_fields.h" />
     <ClInclude Include="src\add_repair.h" />
     <ClInclude Include="src\helpmarker.h" />
     <ClInclude Include="src\error_handler.h" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\add_repair.cpp" />
+    <ClCompile Include="src\customer_fields.cpp" />
     <ClCompile Include="src\imgui_helper.cpp" />
     <ClCompile Include="src\parts_stock.cpp" />
     <ClCompile Include="src\error_handler.cpp" />

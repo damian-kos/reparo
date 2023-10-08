@@ -33,8 +33,9 @@ void PartsStock::CreateTable() {
     // 
     const char* createBrandTable = "CREATE TABLE IF NOT EXISTS brands (brand_id INTEGER PRIMARY KEY, brand TEXT UNIQUE)";
     //const char* createModelTable = "CREATE TABLE IF NOT EXISTS models (model_id INTEGER PRIMARY KEY, model TEXT UNIQUE, brand_id INTEGER, FOREIGN KEY (brand_id) REFERENCES brands (brand_id))";
-    const char* createRepairsTable = "CREATE TABLE IF NOT EXISTS repairs (repair_id INTEGER PRIMARY KEY, customer_id INTEGER NOT NULL, model_id INTEGER NOT NULL, category_id INTEGER, color_id INTEGER, repair_desc TEXT NOT NULL, repair_desc_hidden TEXT, price DECIMAL(10,2) NOT NULL, FOREIGN KEY (customer_id) REFERENCES customers (customer_id))";
+    const char* createRepairsTable = "CREATE TABLE IF NOT EXISTS repairs (repair_id INTEGER PRIMARY KEY, customer_id INTEGER NOT NULL, model_id INTEGER NOT NULL, category_id INTEGER, color_id INTEGER, repair_desc TEXT NOT NULL, repair_desc_hidden TEXT, price DECIMAL(10,2) NOT NULL, repair_state_id INTEGER NOT NULL, FOREIGN KEY (customer_id) REFERENCES customers (customer_id), FOREIGN KEY (repair_state_id) REFERENCES repair_states (repair_state_id))";
     const char* createRepairsPartsTable = "CREATE TABLE IF NOT EXISTS repairs_parts (repair_id INTEGER, part_id INTEGER, PRIMARY KEY (repair_id, part_id), FOREIGN KEY (repair_id) REFERENCES repairs (repair_id), FOREIGN KEY (part_id) REFERENCES parts (part_id))";
+    const char* createRepairStatesTable = "CREATE TABLE IF NOT EXISTS repair_states (repair_state_id INTEGER PRIMARY KEY, repair_state TEXT UNIQUE NOT NULL)";
     //const char* createCategoriesTable = "CREATE TABLE IF NOT EXISTS categories (category_id INTEGER PRIMARY KEY, category TEXT UNIQUE)";
     //const char* createPartsTable = "CREATE TABLE IF NOT EXISTS parts("
         //"part_id INTEGER PRIMARY KEY,"
@@ -69,8 +70,10 @@ void PartsStock::CreateTable() {
     //rc = sqlite3_exec(db, createModelColorTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createQualityTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createCustomerTable, 0, 0, 0);
-    //rc = sqlite3_exec(db, createRepairsTable, 0, 0, 0);
+    rc = sqlite3_exec(db, createRepairsTable, 0, 0, 0);
     rc = sqlite3_exec(db, createRepairsPartsTable, 0, 0, 0);
+    rc = sqlite3_exec(db, createRepairStatesTable, 0, 0, 0);
+
 
     // 
     //const char* populateBrands = "INSERT INTO brands (brand) VALUES ('Apple'), ('Samsung'), ('Xiaomi'), ('Google')";
@@ -82,13 +85,17 @@ void PartsStock::CreateTable() {
     //const char* populateModelColors = "INSERT OR IGNORE INTO model_color (model_id, color_id) VALUES (5,5), (5,6), (5,7), (5,8), (3,9), (3,10), (3,11), (3,12), (3,13)";
 
     //const char* populatePart = "INSERT INTO parts (model_id, brand_id, category_id, color, quality) SELECT 2, brand_id, 1, 'black', 'genuine' FROM models WHERE model_id = 2";
+    const char* insertStates = "INSERT INTO repair_states (repair_state) VALUES ('To do'), ('Processing'), ('Warranty'), ('Waiting for parts')";
     //rc = sqlite3_exec(db, populateBrands, 0, 0, 0);
+
     //rc = sqlite3_exec(db, populateModels, 0, 0, 0);
     //rc = sqlite3_exec(db, populateCategories, 0, 0, 0);
     //rc = sqlite3_exec(db, populatePart, 0, 0, 0);
     //rc = sqlite3_exec(db, populateColors, 0, 0, 0);
     //rc = sqlite3_exec(db, populateModelColors, 0, 0, 0);
     //rc = sqlite3_exec(db, popuulateQuality, 0, 0, 0);
+    rc = sqlite3_exec(db, insertStates, 0, 0, 0);
+
 
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error parts_stock: %s\n", sqlite3_errmsg(db));

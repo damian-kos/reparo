@@ -264,14 +264,19 @@ void SQLQuery::InsertCustomer(Customer customer) {
 void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers) {
     partsStock.OpenPartsStockDb();
     // Define the SQL query with a parameterized query.
-    const char* queryByPhone = "SELECT * FROM customers WHERE phone LIKE ?";
+    const char* query = "SELECT * FROM customers WHERE name LIKE ? OR surname LIKE ? OR email LIKE ? OR phone LIKE ?";
+
     //std::cout << "WE ARE HERE " << std::endl;
     // Prepare the SQL statement.
     sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(partsStock.db, queryByPhone, -1, &stmt, NULL) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, NULL) == SQLITE_OK) {
         std::string phonePattern = "%" + partial_phone_number + "%";
         customers.clear();
         sqlite3_bind_text(stmt, 1, phonePattern.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, phonePattern.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 3, phonePattern.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 4, phonePattern.c_str(), -1, SQLITE_STATIC);
+
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             Customer customer;
             customer.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));

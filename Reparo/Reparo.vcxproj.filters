@@ -84,6 +84,9 @@
     <ClInclude Include="src\add_repair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\customer_fields.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vendor\imgui\imgui.cpp">
@@ -144,6 +147,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\add_repair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\customer_fields.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

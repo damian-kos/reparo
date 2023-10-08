@@ -6,5 +6,11 @@
 #include "sql_queries.h"
 #include "imgui_helper.h"
 
-void SearchField(const char* searchQuery);
+
+class Search {
+public:
+    void ForEdit();
+    void SearchField(const char* searchQuery);
+    void ForAdd(std::vector<InputField>& fields);
+};
 
