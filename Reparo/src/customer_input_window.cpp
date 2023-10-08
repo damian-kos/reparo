@@ -14,35 +14,28 @@ InputField inputFields[4] = {
     {"##PhoneNumber", "Phone Number..", phoneNumber, IM_ARRAYSIZE(phoneNumber), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank}
 };
 
-bool showPopup = false;
-
-
 void CustomerInputWindow::Render() {
-    
         ImGui::Begin("Add customer");
         ImGui::PushItemWidth(-1);
         CreateInputFields();
         ImGui::Spacing();
         Submit();
         ImGui::Spacing();
-        SearchForExsitingCustomers();
-
-       
+        PassSearchQuery();
         ImGui::End();
-    }
+        }
 
 void CustomerInputWindow::CreateInputFields()
 {
     // Create input fields
     for (int i = 0; i < sizeof(inputFields) / sizeof(inputFields[0]); ++i) {
         ImGui::InputTextWithHint(inputFields[i].label, inputFields[i].hint, inputFields[i].buffer, inputFields[i].bufferSize, inputFields[i].flags);
-
         if (std::strcmp(inputFields[i].label, "##PhoneNumber") == 0) {
             phoneNumberIndex = i; // Store the index of the phoneNumber field
         }
     }
 }
-#include <iostream>
+
 void CustomerInputWindow::Submit()
 {
     // Pass filled input fields to the handler.
@@ -51,7 +44,7 @@ void CustomerInputWindow::Submit()
         customer.surname = inputFields[1].buffer;
         customer.email = inputFields[2].buffer;
         customer.phone_number = inputFields[3].buffer;
-        int test = sql.SearchForExsitingCustomers(customer);
+        int test = sql.SearchForCustomerSQL(customer);
         if (test == 0) {
             sql.InsertCustomer(customer);
             for (InputField& field : inputFields) {
@@ -67,7 +60,7 @@ void CustomerInputWindow::Submit()
 }
 
 
-void CustomerInputWindow::SearchForExsitingCustomers()
+void CustomerInputWindow::PassSearchQuery()
 {
     if (phoneNumberIndex != -1) {
         SearchField(inputFields[phoneNumberIndex].buffer);

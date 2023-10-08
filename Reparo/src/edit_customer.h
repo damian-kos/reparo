@@ -1,10 +1,9 @@
 #pragma once
 
-#include "customer_data.h"
-#include "inputs_handler.h"
-#include "customer_input_window.h"
+#include "sql_queries.h"
 #include "error_handler.h"
-#include "input_field.h"
+#include "structs.h"
+#include <iostream>
 
 class CustomerEditWindow {
 

@@ -16,6 +16,5 @@ public:
     }
 
     void RenderErrorModal(const char* errorName);
-
     void GetErrorState(const char* errorName, const char* errorMessage);
 };

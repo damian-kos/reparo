@@ -1,29 +1,25 @@
 #pragma once
 
 #include "imgui.h"
-#include <sqlite3.h>
+#include <iostream>
 #include "parts_stock.h"
 #include "sql_queries.h"
 #include "imgui_helper.h"
-#include "input_field.h"
+#include "structs.h"
 
-
+void ClearPart(PartData& part);
 
 class PartsStockWindow {
 public:
 	PartsStock partsStock;
 	SQLQuery sqlQuery;
 	ImGuiHelper imguiHelper;
-	//PartData brand;
-	//PartData model;
-	//PartData category;
-	//PartData color;
-	//PartQualityData quality;
 	Part part;
 	void Render();
 	void ResetOnBrandChange();
+	void ResetOnModelChange();
+
 	void AddPart();
-	//int SearchForSimilarRecords();
 	void GetBrands();
 	void GetModels();
 	void GetCategories();

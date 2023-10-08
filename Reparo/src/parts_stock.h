@@ -8,5 +8,5 @@ public:
 	sqlite3* db;
 	void OpenPartsStockDb();
 	void CreateTable();
-	void PrintOutData();
+
 };

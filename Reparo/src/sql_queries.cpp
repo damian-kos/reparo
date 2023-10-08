@@ -2,7 +2,6 @@
 #include <iostream>
 
 void SQLQuery::AllFromTable(const char* query, std::vector<std::string>& vector) {
-
     partsStock.OpenPartsStockDb();
     sqlite3_stmt* stmt;
 
@@ -21,7 +20,6 @@ void SQLQuery::AllFromTable(const char* query, std::vector<std::string>& vector)
         sqlite3_finalize(stmt);
     }
     sqlite3_close(partsStock.db);
-
 }
 
 void SQLQuery::OnID(const char* query, std::vector<std::string>& vector, int id) {
@@ -197,11 +195,9 @@ void SQLQuery::InsertPart(Part part) {
         std::cout << "Part added to stock." << std::endl;
 
         sqlite3_close(partsStock.db);
-
-
 }
 
-int SQLQuery::SearchForExsitingCustomers(Customer customer) {
+int SQLQuery::SearchForCustomerSQL(Customer customer) {
     partsStock.OpenPartsStockDb();
 
     std::set<std::string> words1 = TokenizeAndStore(customer.phone_number);

@@ -5,12 +5,11 @@
 #include "imgui.h"
 #include "customer_input_window.h"
 #include "debug_window.h"
-#include "customer_data.h"
 #include "edit_customer.h"
 #include "helpmarker.h"
 #include "parts_stock_window.h"
+#include "add_repair.h"
 
-#include "repair.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
@@ -234,7 +233,9 @@ int main(int, char**)
         if(customerEditWindow.GetShouldRender())
             customerEditWindow.Render();
 
-        AddRepairWindow();
+        AddRepair repair;
+        repair.AddRepairWindow();
+
 
 
         // Rendering

@@ -1,15 +1,10 @@
-//#include "input_field.h
+//#include "structs.h
 #include "parts_stock_window.h"
-#include <vector>
-#include <string>
-#include <iostream>
-#include <set>
-#include <sstream>
 
 char partQuery[128] = "";
 
 static int previous_brand_id = -1;
-
+static int previous_model_id = -1;
 
 
 void PartsStockWindow::Render() {
@@ -22,7 +17,7 @@ void PartsStockWindow::Render() {
     imguiHelper.PartTableStockWindow(part);
 
     ImGui::PushItemWidth(128);
-    imguiHelper.PopulateListBox("##Brand", part.brand.data, part.brand.current_id);
+    imguiHelper.PopulateListBox("##Brand", part.brand.data, part.brand.current_id, part.brand.name);
 
     ResetOnBrandChange();
 
@@ -30,8 +25,9 @@ void PartsStockWindow::Render() {
         GetModels();
     }
 
-    imguiHelper.PopulateListBox("##Models", part.model.data, part.model.current_id);
-
+    imguiHelper.PopulateListBox("##Models", part.model.data, part.model.current_id, part.model.name);
+    ResetOnModelChange();
+    
     if (part.model.current_id != -1) {
         GetCategories();
         if (part.category.current_id+1 == 1 || part.category.current_id + 1 == 4)  {
@@ -45,8 +41,8 @@ void PartsStockWindow::Render() {
         }
     }
 
-    imguiHelper.PopulateListBox("##Categories", part.category.data, part.category.current_id);
-    imguiHelper.PopulateListBox("##Colors", part.color.data, part.color.current_id);
+    imguiHelper.PopulateListBox("##Categories", part.category.data, part.category.current_id, part.category.name);
+    imguiHelper.PopulateListBox("##Colors", part.color.data, part.color.current_id, part.color.name);
 
     if (part.category.current_id != -1) {
         GetQualities();
@@ -105,7 +101,6 @@ void PartsStockWindow::GetQualities() {
         sqlQuery.AllFromTable(qualitiesQuery, part.quality.data);
         part.quality.retreived = true;
     }
-
 }
 
 void PartsStockWindow::GetColorsForModel() {
@@ -118,20 +113,30 @@ void PartsStockWindow::GetColorsForModel() {
     }
 }
 
+void ClearPart(PartData& part) {
+    part.current_id = -1;
+    part.data.clear();
+    part.name = "";
+    part.retreived = false;
+}
+
+void PartsStockWindow::ResetOnModelChange() {
+    if (part.model.current_id != previous_model_id) {
+        std::cout << "RESET" << std::endl;
+        ClearPart(part.color);
+        GetColorsForModel();
+        previous_model_id = part.model.current_id;
+    }
+}
+
 void PartsStockWindow::ResetOnBrandChange() {
     if (part.brand.current_id != previous_brand_id) {
         std::cout << "RESET" << std::endl;
         previous_brand_id = part.brand.current_id;
 
-        part.category.retreived = false;
-        part.category.current_id = -1;
-        part.color.current_id = -1;
-        part.color.retreived = false;
-        part.model.current_id = -1;
-        part.model.data.clear();
-        part.model.retreived = false;
-        part.category.data.clear();
-        part.color.data.clear();
+        ClearPart(part.model);
+        ClearPart(part.category);
+        ClearPart(part.color);
         part.quality.order.clear();
         part.quality.desc = "";
         part.quality.retreived = false;
@@ -139,3 +144,4 @@ void PartsStockWindow::ResetOnBrandChange() {
         for (bool& value : part.quality.selections) { value = false; }
     }
 }
+

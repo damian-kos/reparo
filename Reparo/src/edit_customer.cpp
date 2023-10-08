@@ -1,11 +1,11 @@
 #include "edit_customer.h"
-#include <iostream>
 
 char editName[128] = "";
 char editSurname[128] = "";
 char editEmail[128] = "";
 char editPhoneNumber[128] = "";
-
+Customer customerDataToEdit;
+int idToEdit;
 bool shouldRender = false;
 
 InputField editFields[4] = {
@@ -15,8 +15,6 @@ InputField editFields[4] = {
     {"##PhoneNumber", "Phone Number..", editPhoneNumber, IM_ARRAYSIZE(editPhoneNumber), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank}
 };
 
-Customer customerDataToEdit;
-int idToEdit;
 
 void CustomerEditWindow::Render() {
     if (shouldRender) {
@@ -40,6 +38,7 @@ void CustomerEditWindow::Render() {
         ImGui::End();
     }
 }
+
 void CustomerEditWindow::DataToFields()
 {
     std::cout << "DATA TO FIELDS: " << customerDataToEdit.name.c_str() << std::endl;
@@ -48,13 +47,14 @@ void CustomerEditWindow::DataToFields()
         strncpy_s(editSurname,customerDataToEdit.surname.c_str(), sizeof(editSurname));
         strncpy_s(editEmail, customerDataToEdit.email.c_str(), sizeof(editEmail));
         strncpy_s(editPhoneNumber, customerDataToEdit.phone_number.c_str(), sizeof(editPhoneNumber));
-    
 }
+
 void CustomerEditWindow::SetCustomerToEdit(Customer* customerData, int id) {
     std::cout << customerData->name << " " << id << std::endl;
     idToEdit = id;
     customerDataToEdit = *customerData;
-
+    DataToFields();
+    SetShouldRender(true);
 }
 
 void CustomerEditWindow::SetShouldRender(bool setter) {
@@ -64,3 +64,4 @@ void CustomerEditWindow::SetShouldRender(bool setter) {
 bool CustomerEditWindow::GetShouldRender() {
     return shouldRender;
 }
+

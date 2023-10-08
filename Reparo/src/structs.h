@@ -1,5 +1,6 @@
 #pragma once
 
+#include "imgui.h"
 #include <vector>
 #include <string>
 
@@ -14,6 +15,7 @@ struct InputField {
 struct PartData {
 	int current_id = -1;
 	std::vector<std::string> data;
+	std::string name = "";
 	bool retreived;
 };
 

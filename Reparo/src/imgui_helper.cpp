@@ -1,11 +1,14 @@
 #include "imgui_helper.h"
+#include <iostream>
 
-void ImGuiHelper::PopulateListBox(const char* label, std::vector<std::string>& vector, int& selectable) {
+void ImGuiHelper::PopulateListBox(const char* label, std::vector<std::string>& vector, int& selectable, std::string& text) {
     if (ImGui::BeginListBox(label)) {
         for (int n = 0; n < vector.size(); n++) {
             const bool is_selected = (selectable == n);
-            if (ImGui::Selectable(vector[n].c_str(), is_selected))
+            if (ImGui::Selectable(vector[n].c_str(), is_selected)) {
                 selectable = n;
+                text = vector[n].c_str();
+            }
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)
                 ImGui::SetItemDefaultFocus();
@@ -40,31 +43,21 @@ void ImGuiHelper::PopulateListBoxMulti(const char* label, PartQualityData& quali
 }
 
 void ImGuiHelper::PartTableStockWindow(Part& part) {
-    if (ImGui::BeginTable("To add", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable)) {
-        ImGui::TableSetupColumn("Brand");
-        ImGui::TableSetupColumn("Model");
-        ImGui::TableSetupColumn("Category");
-        ImGui::TableSetupColumn("Color(if any)");
-        ImGui::TableSetupColumn("Quality(if any)");
-        ImGui::TableHeadersRow();
+    std::vector<std::string> names = { "Brand", "Model", "Category", "Color(if any)", "Quality(if any)" };
+    std::vector<std::string> texts = { part.brand.name, part.model.name, part.category.name, part.color.name};
+    ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable;
+    TableBegin("To add", 5, names, flags);
         ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        if (part.brand.current_id != -1) {
-            ImGui::Text(part.brand.data[part.brand.current_id].c_str());
-        }
-        ImGui::TableSetColumnIndex(1);
-        if (part.model.current_id != -1) {
-            ImGui::Text(part.model.data[part.model.current_id].c_str());
-        }
-        ImGui::TableSetColumnIndex(2);
-        if (part.category.current_id != -1) {
-            ImGui::Text(part.category.data[part.category.current_id].c_str());
-        }
-        ImGui::TableSetColumnIndex(3);
-        if (part.color.current_id != -1) {
-            ImGui::Text(part.color.data[part.color.current_id].c_str());
-        }
-        ImGui::TableSetColumnIndex(4);
+        ImGui::TableNextColumn();
+        ImGui::Text(part.brand.name.c_str());
+        ImGui::TableNextColumn();
+        ImGui::Text(part.model.name.c_str());
+        ImGui::TableNextColumn();
+        ImGui::Text(part.category.name.c_str());
+        ImGui::TableNextColumn();
+        ImGui::Text(part.color.name.c_str());
+        
+        ImGui::TableNextColumn();
         if (part.quality.order.size() == 0) {
             part.quality.desc = "";
         }
@@ -77,6 +70,38 @@ void ImGuiHelper::PartTableStockWindow(Part& part) {
             }
         }
         ImGui::Text(part.quality.desc.c_str());
+
         ImGui::EndTable();
     }
+
+
+void ImGuiHelper::TableBegin(const char* label, int columns, std::vector<std::string> columns_name, ImGuiTableFlags flags) {
+    if (ImGui::BeginTable(label, columns, flags)) {
+        for (int i = 0; i < columns; i++)
+        {
+            ImGui::TableSetupColumn(columns_name[i].c_str());
+        }
+        ImGui::TableHeadersRow();
+    }
 }
+
+void ImGuiHelper::TablesColumnsText(int columns, std::string text) {
+        ImGui::TableNextColumn();
+        ImGui::Text(text.c_str());
+}
+
+void ImGuiHelper::PopupOnItemOfTable(const char* text, Customer& val, int id) {
+    CustomerEditWindow customerEditWindow;
+
+    if (ImGui::BeginPopupContextItem()) {
+        ImGui::Text(text);
+        if (ImGui::SmallButton("Edit")) {
+            customerEditWindow.SetCustomerToEdit(&val, id);
+        }
+        if (ImGui::Button("Close"))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+    ImGui::SetItemTooltip("Right-click to open options");
+}
+

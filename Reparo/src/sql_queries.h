@@ -1,7 +1,7 @@
 #pragma once
 #include <sqlite3.h>
 #include "parts_stock.h"
-#include "input_field.h"
+#include "structs.h"
 #include <set>
 #include <sstream>
 #include <unordered_map>
@@ -18,6 +18,6 @@ public:
     void UpdateCustomer(int& rowToUpdate, Customer customerEdit);
     void InsertPart(Part part);
     void InsertCustomer(Customer customer);
-    int SearchForExsitingCustomers(Customer customer);
+    int SearchForCustomerSQL(Customer customer);
     void MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers);
 };
