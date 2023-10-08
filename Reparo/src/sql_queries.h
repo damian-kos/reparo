@@ -15,6 +15,7 @@ public:
     int GetIdForValue(const char* tableName, const char* columnName, const char* searchValue);
     int SearchForSimilarRecords(Part part);
     void Update(int& rowToUpdate);
+    void UpdateCustomer(int& rowToUpdate, Customer customerEdit);
     void InsertPart(Part part);
     void InsertCustomer(Customer customer);
     int SearchForExsitingCustomers(Customer customer);

@@ -273,9 +273,8 @@ void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unorder
     // Prepare the SQL statement.
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(partsStock.db, queryByPhone, -1, &stmt, NULL) == SQLITE_OK) {
-        std::string phonePattern = "%" + partial_phone_number;
+        std::string phonePattern = "%" + partial_phone_number + "%";
         customers.clear();
-        std::cout << phonePattern << std::endl;
         sqlite3_bind_text(stmt, 1, phonePattern.c_str(), -1, SQLITE_STATIC);
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             Customer customer;
@@ -284,11 +283,7 @@ void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unorder
             customer.email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
             customer.phone_number = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
             customers[(sqlite3_column_int(stmt, 0))] = customer;
-            //const char* firstName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-            //const char* lastName = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
-            //const char* email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
-            //const char* phoneNumber = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4));
-            //customers.push_back(customer);
+           
         }
     }
     else {
@@ -298,4 +293,36 @@ void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unorder
     }
     sqlite3_finalize(stmt);
     sqlite3_close(partsStock.db);
+}
+
+void SQLQuery::UpdateCustomer(int& rowToUpdate, Customer customerEdit) {
+    partsStock.OpenPartsStockDb();
+
+    std::string updateQuery = "UPDATE customers SET name = ?, surname = ?, email=?, phone=? WHERE customer_id = ?";
+    sqlite3_stmt* updateStmt;
+    if (sqlite3_prepare_v2(partsStock.db, updateQuery.c_str(), -1, &updateStmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_int(updateStmt, 5, rowToUpdate);
+        sqlite3_bind_text(updateStmt, 1, customerEdit.name.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(updateStmt, 2, customerEdit.surname.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(updateStmt, 3, customerEdit.email.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(updateStmt, 4, customerEdit.phone_number.c_str(), -1, SQLITE_STATIC);
+
+
+        // Execute the update query
+        int rc = sqlite3_step(updateStmt);
+        if (rc == SQLITE_DONE) {
+            // Update successful
+            std::cout << "Customer sucessfully updated." << std::endl;
+        }
+        else {
+            std::cerr << "Error updating record: " << sqlite3_errmsg(partsStock.db) << std::endl;
+        }
+        // Finalize the update statement
+        sqlite3_finalize(updateStmt);
+        sqlite3_close(partsStock.db);
+    }
+    else {
+        std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
+    }
+    return;
 }

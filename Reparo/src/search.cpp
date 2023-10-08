@@ -45,13 +45,13 @@ void Search() {
     if (searchResultsBox) {
 
         static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-        if (ImGui::BeginTable("table1", 5, flags))
+        if (ImGui::BeginTable("table1", 4, flags))
         {
             ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Phone", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("Email", ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed);
+            //ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed);
 
             ImGui::TableHeadersRow();
             int index = 0;
@@ -66,18 +66,33 @@ void Search() {
 
                 if (ImGui::Selectable(label, selected[index], ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
                     if (ImGui::IsMouseDoubleClicked(0)) {
-                        std::cout << "After: " << currentlySelectedRow << std::endl;
-
+                        //ImGui::OpenPopup("popup");
                         for (int i = 0; i < 10; i++) {
                             selected[i] = false;
                         }
                         selected[index] = !selected[index];
 
-                        currentlySelectedRow = index;
-                        std::cout << "After: " << currentlySelectedRow << std::endl;
+                        customerEditWindow.SetCustomerToEdit(&val, key);
+                        customerEditWindow.DataToFields();
+                        customerEditWindow.SetShouldRender(true);
 
+                        currentlySelectedRow = index;
                     }
                 }
+
+                if (ImGui::BeginPopupContextItem()) // <-- use last item id as popup id
+                {
+                    ImGui::Text("This a popup for \"%s\"!", val.name.c_str());
+                    if (ImGui::SmallButton("Edit")) {
+                        customerEditWindow.SetCustomerToEdit(&val, key);
+                        customerEditWindow.DataToFields();
+                        customerEditWindow.SetShouldRender(true);
+                    }
+                    if (ImGui::Button("Close"))
+                        ImGui::CloseCurrentPopup();
+                    ImGui::EndPopup();
+                    }
+                ImGui::SetItemTooltip("Right-click to open options");
 
                 // Column 1: Name
                 ImGui::TableNextColumn();
@@ -90,24 +105,7 @@ void Search() {
                 //Column 3: Email
                 ImGui::TableNextColumn();
                 ImGui::Text("%s", val.email.c_str());
-
-                ImGui::TableNextColumn();
-                {
-                    if (ImGui::SmallButton("Edit")) {
-                        std::cout << "Edit: " << val.name << std::endl;
-                        customerEditWindow.SetCustomerToEdit(&val, key);
-                        customerEditWindow.DataToFields();
-                        customerEditWindow.SetShouldRender(true);
-
-                    }
-                    ImGui::SameLine();
-                    ImGui::Text("/");
-                    ImGui::SameLine();
-                    if (ImGui::SmallButton("Add repair"))
-                    {
-                        std::cout << "Add repair" << std::endl;
-                    }
-                }
+          
                 
                 index++;
                 ImGui::PopID();
@@ -131,7 +129,7 @@ void SearchField(const char* searchQuery) {
 
         sqlSearch.MatchingCustomers(strSearchQuery, customers);
       
-        retreived = true;
+        //retreived = true;
         //std::cout << "retreiving..." << std::endl;
     }
     else if(strlen(searchQuery) < 3) {

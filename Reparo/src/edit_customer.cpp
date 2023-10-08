@@ -16,6 +16,7 @@ InputField editFields[4] = {
 };
 
 Customer customerDataToEdit;
+int idToEdit;
 
 void CustomerEditWindow::Render() {
     if (shouldRender) {
@@ -26,15 +27,13 @@ void CustomerEditWindow::Render() {
         }
         ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(7.0f, 0.6f, 0.6f));
         if (ImGui::Button("Update Customer Data")){
-            /*const int& id = customerDataToEdit["ID"];*/
-
-            /*if (InputsHandler::HandleInputsFromFields(editFields, sizeof(editFields) / sizeof(editFields[0]), &idx))  {
-      
-            }
-            else {
-                ModalController modalController;
-                modalController.RenderErrorModal("Missing values");
-            }*/
+            Customer editedCustomer;
+            editedCustomer.name = editFields[0].buffer;
+            editedCustomer.surname = editFields[1].buffer;
+            editedCustomer.email = editFields[2].buffer;
+            editedCustomer.phone_number = editFields[3].buffer;
+            SQLQuery sql;
+            sql.UpdateCustomer(idToEdit, editedCustomer);
         }
         modalController.GetErrorState("Missing values", "All values in fields must be not empty!");
         ImGui::PopStyleColor(1);
@@ -52,8 +51,8 @@ void CustomerEditWindow::DataToFields()
     
 }
 void CustomerEditWindow::SetCustomerToEdit(Customer* customerData, int id) {
-    std::cout << customerData << std::endl;
-
+    std::cout << customerData->name << " " << id << std::endl;
+    idToEdit = id;
     customerDataToEdit = *customerData;
 
 }
