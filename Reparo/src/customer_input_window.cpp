@@ -5,6 +5,7 @@ char surname[128] = "";
 char email[128] = "";
 char phoneNumber[128] = "";
 int phoneNumberIndex = -1; // Initialize to an invalid index
+std::string errorMessage = "";
 
 SQLQuery sql;
 Search search;
@@ -24,6 +25,8 @@ void CustomerInputWindow::Render() {
         ImGui::Spacing();
         if(ImGui::Button("Submit Customer Details"))
             Submit(inputFields, customer);
+        modalController.GetErrorState("Missing values", errorMessage.c_str());
+
         ImGui::Spacing();
         PassSearchQuery();
         ImGui::End();
@@ -44,11 +47,16 @@ void CustomerInputWindow::CreateInputFields()
 void CustomerInputWindow::Submit(std::vector<InputField>& input, Customer& cust)
 {
     // Pass filled input fields to the handler.
-
-        cust.phone_number = input[0].buffer;
+                cust.phone_number = input[0].buffer;
         cust.name = input[1].buffer;
         cust.surname = input[2].buffer;
         cust.email = input[3].buffer;
+        if (cust.phone_number.empty()){
+            //ModalController modalController;
+                modalController.RenderErrorModal("Missing values");
+                errorMessage = "Phone number can't be empty. It is used to identify customers.";
+                return;
+        }
         int test = sql.SearchForCustomerSQL(cust);
         if (test == 0) {
             sql.InsertCustomer(cust);
@@ -56,12 +64,12 @@ void CustomerInputWindow::Submit(std::vector<InputField>& input, Customer& cust)
             memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
             }
         }
-        else {
-            ModalController modalController;
+        else if (test == -1) {
+            errorMessage = "There is a problem with inputting customers. Please contact support team.";
+            /*ModalController modalController*/;
             modalController.RenderErrorModal("Missing values");
         }
 
-modalController.GetErrorState("Missing values", "All fields must be filled, please try again.");
 
     
 

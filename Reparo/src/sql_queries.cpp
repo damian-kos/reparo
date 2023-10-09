@@ -231,10 +231,11 @@ int SQLQuery::SearchForCustomerSQL(Customer customer) {
         // Handle the error
         std::cerr << "Error preparing SQL statement Search For Customers: " << sqlite3_errmsg(partsStock.db) << std::endl;
         sqlite3_close(partsStock.db); // Close the database in case of an error
+        return -1;
+
     }
 
     // Return 0 in case of an error
-    return 0;
 }
 
 
