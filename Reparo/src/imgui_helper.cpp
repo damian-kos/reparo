@@ -76,7 +76,8 @@ void ImGuiHelper::PartTableStockWindow(Part& part) {
 
 
 void ImGuiHelper::TableBegin(const char* label, int columns, std::vector<std::string> columns_name, ImGuiTableFlags flags) {
-    if (ImGui::BeginTable(label, columns, flags)) {
+    const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
+    if (ImGui::BeginTable(label, columns, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 5))) {
         for (int i = 0; i < columns; i++)
         {
             ImGui::TableSetupColumn(columns_name[i].c_str());

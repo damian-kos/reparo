@@ -22,11 +22,13 @@ void CustomerInputWindow::Render() {
         ImGui::PushItemWidth(-1);
         CreateInputFields();
         ImGui::Spacing();
-        Submit();
+        if(ImGui::Button("Submit Customer Details"))
+            Submit(inputFields, customer);
         ImGui::Spacing();
         PassSearchQuery();
         ImGui::End();
-        }
+     
+}
 
 void CustomerInputWindow::CreateInputFields()
 {
@@ -39,27 +41,31 @@ void CustomerInputWindow::CreateInputFields()
     }
 }
 
-void CustomerInputWindow::Submit()
+void CustomerInputWindow::Submit(std::vector<InputField>& input, Customer& cust)
 {
     // Pass filled input fields to the handler.
-    if (ImGui::Button("Submit Customer Details")) {
-        customer.phone_number = inputFields[0].buffer;
-        customer.name = inputFields[1].buffer;
-        customer.surname = inputFields[2].buffer;
-        customer.email = inputFields[3].buffer;
-        int test = sql.SearchForCustomerSQL(customer);
+
+        cust.phone_number = input[0].buffer;
+        cust.name = input[1].buffer;
+        cust.surname = input[2].buffer;
+        cust.email = input[3].buffer;
+        int test = sql.SearchForCustomerSQL(cust);
         if (test == 0) {
-            sql.InsertCustomer(customer);
-            for (InputField& field : inputFields) {
+            sql.InsertCustomer(cust);
+            for (InputField& field : input) {
             memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
             }
         }
         else {
             ModalController modalController;
-            modalController.RenderErrorModal("Customer with this phone number already exists.");
+            modalController.RenderErrorModal("Missing values");
         }
-    }
-    modalController.GetErrorState("Missing values", "All fields must be filled, please try again.");
+
+modalController.GetErrorState("Missing values", "All fields must be filled, please try again.");
+
+    
+
+
 }
 
 

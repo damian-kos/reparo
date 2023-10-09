@@ -12,7 +12,7 @@ public:
     ModalController modalController;
     void Render();
     void CreateInputFields();
-    void Submit();
+    void Submit(std::vector<InputField>& inputFields, Customer& customer);
     Customer customer;
     void PassSearchQuery();
 

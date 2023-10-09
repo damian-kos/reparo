@@ -19,7 +19,7 @@ void Search::ForEdit() {
     static bool selected[10] = {};
     if (searchResultsBox) {
         std::vector<std::string> names = { "ID", "Name", "Phone", "Email" };
-        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg |  ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
         imguiHelper.TableBegin("Customers", 4, names, flags);
             int index = 0;
             for (auto& [key, val] : customers){
@@ -84,7 +84,7 @@ void Search::ForAdd(std::vector<InputField>& fields) {
     static bool selected[10] = {};
     if (searchResultsBox) {
         std::vector<std::string> names = { "ID", "Name", "Phone", "Email" };
-        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
         imguiHelper.TableBegin("Customers", 4, names, flags);
         int index = 0;
         for (auto& [key, val] : customers) {
