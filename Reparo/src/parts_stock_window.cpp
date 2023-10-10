@@ -22,17 +22,17 @@ void PartsStockWindow::Render() {
     ResetOnBrandChange();
 
     if (part.brand.current_id != -1) {
-        GetModels();
+        GetModels(part.model.data, part.brand.current_id);
     }
 
     imguiHelper.PopulateListBox("##Models", part.model.data, part.model.current_id, part.model.name);
-    ResetOnModelChange();
+    ResetOnModelChange(part.model, part.color, previous_model_id);
     
     if (part.model.current_id != -1) {
-        GetCategories();
+        GetCategories(part.category.data);
         if (part.category.current_id+1 == 1 || part.category.current_id + 1 == 4)  {
 
-            GetColorsForModel();
+            GetColorsForModel(part.color.data,part.model.data, part.model.current_id);
         }
         else {
             part.color.current_id = -1;
@@ -77,20 +77,28 @@ void PartsStockWindow::GetBrands() {
     }
 }
 
-void PartsStockWindow::GetModels() {
+void PartsStockWindow::GetModels(std::vector<std::string>& data ,int selected_brand_id) {
     if (!part.model.retreived) {
-        const char* currentBrand = part.brand.data[part.brand.current_id].c_str();
+        const char* currentBrand = part.brand.data[selected_brand_id].c_str();
         int brand_id = sqlQuery.GetIdForValue("brands", "brand", currentBrand);
         const char* modelsQuery = "SELECT model FROM models WHERE brand_id = ?";
-        sqlQuery.OnID(modelsQuery, part.model.data, brand_id);
+        sqlQuery.OnID(modelsQuery, data, brand_id);
         part.model.retreived = true;
     }
 }
 
-void PartsStockWindow::GetCategories() {
+void PartsStockWindow::GetModels(std::vector<std::string>& data) {
+    if (!part.model.retreived) {
+        const char* modelsQuery = "SELECT model FROM models";
+        sqlQuery.OnID(modelsQuery, data);
+        part.model.retreived = true;
+    }
+}
+
+void PartsStockWindow::GetCategories(std::vector<std::string>& data) {
     if (!part.category.retreived) {
         const char* categoriesQuery = "SELECT category FROM categories";
-        sqlQuery.AllFromTable(categoriesQuery, part.category.data);
+        sqlQuery.AllFromTable(categoriesQuery, data);
         part.category.retreived = true;
     }
 }
@@ -103,12 +111,12 @@ void PartsStockWindow::GetQualities() {
     }
 }
 
-void PartsStockWindow::GetColorsForModel() {
+void PartsStockWindow::GetColorsForModel(std::vector<std::string>& data, std::vector<std::string>& model_data, int selected_model_id) {
     if (!part.color.retreived) {
-        const char* currentModel = part.model.data[part.model.current_id].c_str();
+        const char* currentModel = model_data[selected_model_id].c_str();
         int model_id = sqlQuery.GetIdForValue("models", "model", currentModel);
         const char* colorsQuery = "SELECT color FROM colors WHERE color_id IN (SELECT color_id FROM model_color WHERE model_id = ?)";
-        sqlQuery.OnID(colorsQuery, part.color.data, model_id);
+        sqlQuery.OnID(colorsQuery, data, model_id);
         part.color.retreived = true;
     }
 }
@@ -120,18 +128,20 @@ void ClearPart(PartData& part) {
     part.retreived = false;
 }
 
-void PartsStockWindow::ResetOnModelChange() {
-    if (part.model.current_id != previous_model_id) {
-        std::cout << "RESET" << std::endl;
-        ClearPart(part.color);
-        GetColorsForModel();
-        previous_model_id = part.model.current_id;
+void PartsStockWindow::ResetOnModelChange(PartData& model, PartData& color, int& previous_id) {
+    if (model.current_id != previous_id) {
+        std::cout << "RESET ON MODEL CHANGE" << std::endl;
+        ClearPart(color);
+        previous_id = model.current_id;
+        if(model.current_id > -1)
+            GetColorsForModel(color.data, model.data, model.current_id);
+
     }
 }
 
 void PartsStockWindow::ResetOnBrandChange() {
     if (part.brand.current_id != previous_brand_id) {
-        std::cout << "RESET" << std::endl;
+        std::cout << "RESET ON BRAND CHANGE" << std::endl;
         previous_brand_id = part.brand.current_id;
 
         ClearPart(part.model);

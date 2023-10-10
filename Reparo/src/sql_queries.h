@@ -12,6 +12,7 @@ public:
     PartsStock partsStock;
     void AllFromTable(const char* query, std::vector<std::string>& vector);
     void OnID(const char* query, std::vector<std::string>& vector, int id);
+    void OnID(const char* query, std::vector<std::string>& vector);
     int GetIdForValue(const char* tableName, const char* columnName, const char* searchValue);
     int SearchForSimilarRecords(Part part);
     void Update(int& rowToUpdate);

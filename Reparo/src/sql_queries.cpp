@@ -45,7 +45,31 @@ void SQLQuery::OnID(const char* query, std::vector<std::string>& vector, int id)
         // Add logging / Crash report
     }
     sqlite3_close(partsStock.db);
+}
 
+void SQLQuery::OnID(const char* query, std::vector<std::string>& vector) {
+
+    partsStock.OpenPartsStockDb();
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, nullptr) == SQLITE_OK) {
+        // Bind the id parameter to the placeholder in query
+       
+        vector.clear();
+        // Execute the query
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            // Retrieve the model data from the result set
+            const char* record = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+            vector.emplace_back(record);
+        }
+
+        // Finalize the statement after use
+        sqlite3_finalize(stmt);
+    }
+    else {
+        // Add logging / Crash report
+    }
+    sqlite3_close(partsStock.db);
 }
 
 int SQLQuery::GetIdForValue(const char* tableName, const char* columnName, const char* searchValue) {

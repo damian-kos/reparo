@@ -17,13 +17,14 @@ public:
 	Part part;
 	void Render();
 	void ResetOnBrandChange();
-	void ResetOnModelChange();
+	void ResetOnModelChange(PartData& model, PartData& color, int& previous_id);
 
 	void AddPart();
 	void GetBrands();
-	void GetModels();
-	void GetCategories();
+	void GetModels(std::vector<std::string>& data, int selected_brand_id);
+	void GetModels(std::vector<std::string>& data);
+	void GetCategories(std::vector<std::string>& data);
 	void GetQualities();
-	void GetColorsForModel();
+	void GetColorsForModel(std::vector<std::string>& data, std::vector<std::string>& model_data, int selected_model_id);
 
 };

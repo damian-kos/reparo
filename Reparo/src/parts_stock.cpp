@@ -79,22 +79,22 @@ void PartsStock::CreateTable() {
     //const char* populateBrands = "INSERT INTO brands (brand) VALUES ('Apple'), ('Samsung'), ('Xiaomi'), ('Google')";
     //const char* populateModels = "INSERT INTO models (model, brand_id) VALUES  ('iPhone 13', 1)";
     //const char* populateCategories = "INSERT INTO categories (category) VALUES ('Screen'), ('Battery'), ('Charge Port'), ('Back Cover')";
-    //const char* populateColors = "INSERT INTO colors (color) VALUES ('Starlight'), ('Midnight'), ('Blue'), ('Pink'), ('Cosmic Grey'), ('Cloud Blue'), ('Cloud Pink'), ('Cloud White'), ('Aura Red')";
+    const char* populateColors = "INSERT INTO colors (color) VALUES ('Coral Green'), ('Twilight Grey'), ('Peach Gold')";
     //const char* popuulateQuality = "INSERT INTO qualities (quality) VALUES ('Pulled'), ('Refurbished'), ('Grade A'), ('Grade B'), ('Grade C'), ('Aftermarket'), ('Premium'), ('Budget'), ('Soft OLED'), ('Hard OLED'),('LCD')";
     // 
-    //const char* populateModelColors = "INSERT OR IGNORE INTO model_color (model_id, color_id) VALUES (5,5), (5,6), (5,7), (5,8), (3,9), (3,10), (3,11), (3,12), (3,13)";
+    const char* populateModelColors = "INSERT OR IGNORE INTO model_color (model_id, color_id) VALUES (4,14), (4,15), (4,16)";
 
     //const char* populatePart = "INSERT INTO parts (model_id, brand_id, category_id, color, quality) SELECT 2, brand_id, 1, 'black', 'genuine' FROM models WHERE model_id = 2";
-    const char* insertStates = "INSERT INTO repair_states (repair_state) VALUES ('To do'), ('Processing'), ('Warranty'), ('Waiting for parts')";
+    //const char* insertStates = "INSERT INTO repair_states (repair_state) VALUES ('To do'), ('Processing'), ('Warranty'), ('Waiting for parts')";
     //rc = sqlite3_exec(db, populateBrands, 0, 0, 0);
 
     //rc = sqlite3_exec(db, populateModels, 0, 0, 0);
     //rc = sqlite3_exec(db, populateCategories, 0, 0, 0);
     //rc = sqlite3_exec(db, populatePart, 0, 0, 0);
-    //rc = sqlite3_exec(db, populateColors, 0, 0, 0);
-    //rc = sqlite3_exec(db, populateModelColors, 0, 0, 0);
+    rc = sqlite3_exec(db, populateColors, 0, 0, 0);
+    rc = sqlite3_exec(db, populateModelColors, 0, 0, 0);
     //rc = sqlite3_exec(db, popuulateQuality, 0, 0, 0);
-    rc = sqlite3_exec(db, insertStates, 0, 0, 0);
+    //rc = sqlite3_exec(db, insertStates, 0, 0, 0);
 
 
     if (rc != SQLITE_OK) {

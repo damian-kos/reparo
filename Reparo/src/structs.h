@@ -16,7 +16,7 @@ struct PartData {
 	int current_id = -1;
 	std::vector<std::string> data;
 	std::string name = "";
-	bool retreived;
+	bool retreived = false;
 };
 
 
