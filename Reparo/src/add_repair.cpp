@@ -53,13 +53,16 @@ void AddRepair::AddRepairWindow() {
         ImGui::TableNextColumn();
         ImGui::SeparatorText("DEVICE:");
 
-        ComboModels(device);
- 
-        ComboCategories(device);
+        //ComboModels(device);
+        Combo(device, "##Models", device.model);
+        Combo(device, "##Categories", device.category);
+
+        //ComboCategories(device);
         if (device.model.current_id >= 0) {
             PartsStockWindow stock;
             stock.ResetOnModelChange(device.model, device.color, previos_model_id);
-            ComboColors(device);
+            //ComboColors(device);
+            Combo(device, "##Colors", device.color);
         }
         else {
             ImGui::Text("Choose model to show colors.");
@@ -95,7 +98,23 @@ void SearchForByPhone() {
     search.SearchField(repair_fields[0].buffer);
     search.ForAdd(repair_fields);
 }
-
+void Combo(Part& device, std::string label, PartData& attribute) {
+    if (!attribute.retreived) {
+        if (label == "##Models") {
+            stock.GetModels(device.model.data);
+        }
+        else if (label == "##Categories") {
+            stock.GetCategories(device.category.data);
+        }
+        else if (label == "##Colors") {
+            stock.GetColorsForModel(device.color.data, device.model.data, device.model.current_id);
+        }
+        attribute.current_id = 0;
+        attribute.retreived = true;
+    }
+    ImGuiHelper helper;
+    helper.ComboForDevice(label.c_str(), attribute);
+}
 void ComboModels(Part& device) {
  
     if (!device.model.retreived){
