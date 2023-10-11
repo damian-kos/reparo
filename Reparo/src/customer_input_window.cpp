@@ -9,6 +9,8 @@ std::string errorMessage = "";
 
 SQLQuery sql;
 Search search;
+using namespace std;
+
 
 std::vector<InputField> inputFields = {
     {"##PhoneNumber", "Phone Number..", phoneNumber, IM_ARRAYSIZE(phoneNumber), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank},

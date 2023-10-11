@@ -19,6 +19,12 @@ struct PartData {
 	bool retreived = false;
 };
 
+struct RepairData {
+	int current_id = -1;
+std::vector<std::string> data;
+std::string name = "";
+bool retreived = false;
+};
 
 struct PartQualityData {
 	bool selections[20] = {};

@@ -1044,6 +1044,7 @@ static void ShowDemoWindowWidgets()
             ImGui::Text("IsItemHovered: %d", ImGui::IsItemHovered());
             for (int i = 0; i < 5; i++)
                 ImGui::Text("More content %d", i);
+
         }
         /*
         if (ImGui::CollapsingHeader("Header with a bullet", ImGuiTreeNodeFlags_Bullet))

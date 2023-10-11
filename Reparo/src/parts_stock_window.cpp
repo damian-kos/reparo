@@ -111,6 +111,15 @@ void PartsStockWindow::GetQualities() {
     }
 }
 
+void PartsStockWindow::GetStates(RepairData& state) {
+    if (!state.retreived) {
+        const char* statesQuery = "SELECT repair_state FROM repair_states";
+        sqlQuery.AllFromTable(statesQuery, state.data);
+        state.retreived = true;
+    }
+}
+
+
 void PartsStockWindow::GetColorsForModel(std::vector<std::string>& data, std::vector<std::string>& model_data, int selected_model_id) {
     if (!part.color.retreived) {
         const char* currentModel = model_data[selected_model_id].c_str();

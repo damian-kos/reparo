@@ -7,10 +7,17 @@ char repair_name[128] = "";
 char repair_surname[128] = "";
 char repair_email[128] = "";
 char repair_phone[128] = "";
+char notes[512] = "";
+char notes_hidden[512] = "";
+float price = 0.00f;
 
-Part part;
+
+
+//Part device;
+RepairData state;
 int previos_model_id = 0;
 PartsStockWindow stock;
+Part device;
 
 
 InputField search_field = { "##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None };
@@ -46,17 +53,30 @@ void AddRepair::AddRepairWindow() {
         ImGui::TableNextColumn();
         ImGui::SeparatorText("DEVICE:");
 
-        ComboModels();
+        ComboModels(device);
  
-        ComboCategories();
-        if (part.model.current_id >= 0) {
+        ComboCategories(device);
+        if (device.model.current_id >= 0) {
             PartsStockWindow stock;
-            stock.ResetOnModelChange(part.model, part.color, previos_model_id);
-            ComboColors();
+            stock.ResetOnModelChange(device.model, device.color, previos_model_id);
+            ComboColors(device);
         }
         else {
             ImGui::Text("Choose model to show colors.");
         }
+
+        ImGui::SeparatorText("Notes:");
+        ImGui::InputTextWithHint("##Notes", "Notes visible for customer..", notes, IM_ARRAYSIZE(notes), ImGuiInputTextFlags_None);
+        ImGui::InputTextWithHint("##Notes_hidden", "Notes hidden from customer..", notes_hidden, IM_ARRAYSIZE(notes_hidden), ImGuiInputTextFlags_None);
+
+        ImGui::SeparatorText("Status:");
+        ComboStates(state);
+
+        ImGui::SeparatorText("Price:");
+        ImGui::InputFloat("input float", &price, 0.01f, 1.0f, "%.2f"); 
+
+
+
         ImGui::TableNextColumn();
 
         ImGui::EndTable();
@@ -76,72 +96,55 @@ void SearchForByPhone() {
     search.ForAdd(repair_fields);
 }
 
-void ComboModels() {
+void ComboModels(Part& device) {
  
-    if (!part.model.retreived){
-        std::cout << "COMBO " << std::endl;
-        stock.GetModels(part.model.data);
-        part.model.current_id = 0;
-        part.model.retreived = true;
+    if (!device.model.retreived){
+        stock.GetModels(device.model.data);
+        device.model.current_id = 0;
+        device.model.retreived = true;
       
     }
-    if (ImGui::BeginCombo("##Models", part.model.data[part.model.current_id].c_str()))
-    {
-        for (int n = 0; n < part.model.data.size(); n++)
-        {
-            const bool is_selected = (part.model.current_id == n);
-            if (ImGui::Selectable(part.model.data[n].c_str(), is_selected))
-                part.model.current_id = n;
-         
-            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();
-        }
-        ImGui::EndCombo();
-    }
+    ImGuiHelper imguiHelper;
+    imguiHelper.ComboForDevice("##Models", device.model);
 }
 
-void ComboCategories() {
+void ComboCategories(Part& device) {
 
-    if (!part.category.retreived) {
-        std::cout << "COMBO " << std::endl;
-        stock.GetCategories(part.category.data);
-        part.category.current_id = 0;
-        part.category.retreived = true;
-
-
+    if (!device.category.retreived) {
+        stock.GetCategories(device.category.data);
+        device.category.current_id = 0;
+        device.category.retreived = true;
     }
-    if (ImGui::BeginCombo("##Categories", part.category.data[part.category.current_id].c_str()))
-    {
-        for (int n = 0; n < part.category.data.size(); n++)
-        {
-            const bool is_selected = (part.category.current_id == n);
-            if (ImGui::Selectable(part.category.data[n].c_str(), is_selected))
-                part.category.current_id = n ;
+    ImGuiHelper imguiHelper;
+    imguiHelper.ComboForDevice("##Categories", device.category);
 
-            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();
-        }
-        ImGui::EndCombo();
-    }
 }
 
-void ComboColors() {
+void ComboColors(Part& device) {
 
-    if (!part.color.retreived) {
-        std::cout << "COMBO " << std::endl;
-        stock.GetColorsForModel(part.color.data,part.model.data, part.model.current_id);
-        part.color.current_id = 0;
-        part.color.retreived = true;
+    if (!device.color.retreived) {
+        stock.GetColorsForModel(device.color.data,device.model.data, device.model.current_id);
+        device.color.current_id = 0;
+        device.color.retreived = true;
     }
-    if (ImGui::BeginCombo("##Colors", part.color.data[part.color.current_id].c_str()))
+    ImGuiHelper imguiHelper;
+    imguiHelper.ComboForDevice("##Colors", device.color);
+}
+
+void ComboStates(RepairData& state) {
+
+    if (!state.retreived) {
+        stock.GetStates(state);
+        state.current_id = 0;
+        state.retreived = true;
+    }
+    if (ImGui::BeginCombo("##States", state.data[state.current_id].c_str()))
     {
-        for (int n = 0; n < part.color.data.size(); n++)
+        for (int n = 0; n < state.data.size(); n++)
         {
-            const bool is_selected = (part.color.current_id == n);
-            if (ImGui::Selectable(part.color.data[n].c_str(), is_selected))
-                part.color.current_id = n;
+            const bool is_selected = (state.current_id == n);
+            if (ImGui::Selectable(state.data[n].c_str(), is_selected))
+                state.current_id = n;
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)
                 ImGui::SetItemDefaultFocus();

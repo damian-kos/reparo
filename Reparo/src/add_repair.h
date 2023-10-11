@@ -6,12 +6,12 @@
 
 void SearchForCustomers();
 void SearchForByPhone();
-void ComboModels();
-void ComboCategories();
-void ComboColors();
+void ComboModels(Part& device);
+void ComboCategories(Part& device);
+void ComboColors(Part& device);
+void ComboStates(RepairData& state);
 
 class AddRepair {
 public:
-
     void AddRepairWindow();
 };

@@ -13,5 +13,6 @@ public:
     void TableBegin(const char* label, int columns, std::vector<std::string> columns_name, ImGuiTableFlags flags);
     void TablesColumnsText(int column, std::string text);
     void PopupOnItemOfTable(const char* text, Customer& val, int id);
+    void ComboForDevice(const char* label, PartData& device);
 };
 

@@ -106,3 +106,18 @@ void ImGuiHelper::PopupOnItemOfTable(const char* text, Customer& val, int id) {
     ImGui::SetItemTooltip("Right-click to open options");
 }
 
+void ImGuiHelper::ComboForDevice(const char* label, PartData& attribute) {
+    if (ImGui::BeginCombo(label, attribute.data[attribute.current_id].c_str()))
+    {
+        for (int n = 0; n < attribute.data.size(); n++)
+        {
+            const bool is_selected = (attribute.current_id == n);
+            if (ImGui::Selectable(attribute.data[n].c_str(), is_selected))
+                attribute.current_id = n;
+            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+}
