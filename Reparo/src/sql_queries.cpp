@@ -390,7 +390,7 @@ void SQLQuery::UpdateCustomer(int& rowToUpdate, Customer customerEdit) {
     return;
 }
 
-void SQLQuery::AddRepair(const Repair& repair, int customerID) {
+void SQLQuery::AddRepair(Repair& repair, int customerID) {
     int lastInsertedID = -1;
     partsStock.OpenPartsStockDb();
 
@@ -413,13 +413,13 @@ void SQLQuery::AddRepair(const Repair& repair, int customerID) {
 
     // Bind values to the placeholders
     sqlite3_bind_int(stmt, 1, customerID);
-    sqlite3_bind_int(stmt, 2, repair.model.current_id);
-    sqlite3_bind_int(stmt, 3, repair.category.current_id);
-    sqlite3_bind_int(stmt, 4, repair.color.current_id);
+    sqlite3_bind_int(stmt, 2, repair.model.IDinDB);
+    sqlite3_bind_int(stmt, 3, repair.category.IDinDB);
+    sqlite3_bind_int(stmt, 4, repair.color.IDinDB);
     sqlite3_bind_text(stmt, 5, repair.note.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 6, repair.note_hidden.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_double(stmt, 7, repair.price);
-    sqlite3_bind_int(stmt, 8, repair.state.current_id);
+    sqlite3_bind_int(stmt, 8, repair.state.IDinDB);
 
 
     // Execute the statement

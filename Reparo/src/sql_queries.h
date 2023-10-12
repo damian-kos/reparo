@@ -21,5 +21,5 @@ public:
     int InsertCustomer(Customer customer);
     int SearchForCustomerSQL(Customer customer);
     void MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers);
-    void AddRepair(const Repair& repair, int customerID);
+    void AddRepair(Repair& repair, int customerID);
 };

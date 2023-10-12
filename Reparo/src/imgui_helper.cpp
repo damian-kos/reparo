@@ -112,8 +112,12 @@ void ImGuiHelper::ComboForDevice(const char* label, PartData& attribute) {
         for (int n = 0; n < attribute.data.size(); n++)
         {
             const bool is_selected = (attribute.current_id == n);
-            if (ImGui::Selectable(attribute.data[n].c_str(), is_selected))
+            if (ImGui::Selectable(attribute.data[n].c_str(), is_selected)) {
                 attribute.current_id = n;
+                attribute.name = attribute.data[n];
+                std::cout << attribute.name << std::endl;
+            }
+
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)
                 ImGui::SetItemDefaultFocus();

@@ -78,7 +78,7 @@ void AddRepair::AddRepairWindow() {
         ImGui::EndTable();
         if (ImGui::Button("Add repair")) {
             std::cout << device.model.current_id << std::endl;
-            //SubmitRepair(this->errorMessage);
+            SubmitRepair(this->errorMessage);
         }
      
         modalController.GetErrorState("Repair Input Feedback", this->errorMessage.c_str());
@@ -106,6 +106,10 @@ void AddRepair::SubmitRepair(std::string& message) {
     if (submit == 0) { // Here if customer does not exist we add him to database, and we are adding repair after.
         device.note = notes;
         device.note_hidden = notes_hidden;
+        device.model.IDinDB = sql.GetIdForValue("models", "model", device.model.name.c_str());
+        device.category.IDinDB = sql.GetIdForValue("categories", "category", device.category.name.c_str());
+        device.color.IDinDB = sql.GetIdForValue("colors", "color", device.color.name.c_str());
+        device.state.IDinDB = sql.GetIdForValue("repair_states", "repair_state", device.state.name.c_str());
         int cust_ID = sql.InsertCustomer(repair_customer);
         sql.AddRepair(device, cust_ID);
         for (InputField& field : repair_fields) {
@@ -122,6 +126,10 @@ void AddRepair::SubmitRepair(std::string& message) {
     else { // Here we take this customer ID and add repair with this id.
         device.note = notes;
         device.note_hidden = notes_hidden;
+        device.model.IDinDB = sql.GetIdForValue("models", "model", device.model.name.c_str());
+        device.category.IDinDB = sql.GetIdForValue("categories", "category", device.category.name.c_str());
+        device.color.IDinDB = sql.GetIdForValue("colors", "color", device.color.name.c_str());
+        device.state.IDinDB = sql.GetIdForValue("repair_states", "repair_state", device.state.name.c_str());
         sql.AddRepair(device, submit);
         //modalController.RenderErrorModal("Repair Input Feedback");
         //message = "Customer with this phone number already exists. \nYou can edit his details. Right click on customer in table view and click a button.";
