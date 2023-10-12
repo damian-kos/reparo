@@ -17,7 +17,7 @@ void PartsStockWindow::Render() {
     imguiHelper.PartTableStockWindow(part);
 
     ImGui::PushItemWidth(128);
-    imguiHelper.PopulateListBox("##Brand", part.brand.data, part.brand.current_id, part.brand.name);
+    imguiHelper.PopulateListBox("##Brand", part.brand);
 
     ResetOnBrandChange();
 
@@ -25,7 +25,7 @@ void PartsStockWindow::Render() {
         GetModels(part.model.data, part.brand.current_id);
     }
 
-    imguiHelper.PopulateListBox("##Models", part.model.data, part.model.current_id, part.model.name);
+    imguiHelper.PopulateListBox("##Models", part.model);
     ResetOnModelChange(part.model, part.color, previous_model_id);
     
     if (part.model.current_id != -1) {
@@ -41,8 +41,8 @@ void PartsStockWindow::Render() {
         }
     }
 
-    imguiHelper.PopulateListBox("##Categories", part.category.data, part.category.current_id, part.category.name);
-    imguiHelper.PopulateListBox("##Colors", part.color.data, part.color.current_id, part.color.name);
+    imguiHelper.PopulateListBox("##Categories", part.category);
+    imguiHelper.PopulateListBox("##Colors",part.color);
 
     if (part.category.current_id != -1) {
         GetQualities();
@@ -58,12 +58,16 @@ void PartsStockWindow::Render() {
 void PartsStockWindow::AddPart()
 {
     if (part.brand.current_id == -1 || part.model.current_id == -1 || part.category.current_id == -1) { return; }
+    part.model.IDinDB = sqlQuery.GetIdForValue("models", "model", part.model.name.c_str());
+    part.brand.IDinDB = sqlQuery.GetIdForValue("brands", "brand", part.brand.name.c_str());
+    part.category.IDinDB = sqlQuery.GetIdForValue("categories", "category", part.category.name.c_str());
+    part.color.IDinDB = sqlQuery.GetIdForValue("colors", "color", part.color.name.c_str());
     int rowToUpdate = sqlQuery.SearchForSimilarRecords(part);
-    std::cout << "ROW TO UPDATE: " << rowToUpdate << std::endl;
     if (rowToUpdate > 0) {
         sqlQuery.Update(rowToUpdate);
     }
     else {
+
         sqlQuery.InsertPart(part);
     }
 }
@@ -111,7 +115,7 @@ void PartsStockWindow::GetQualities() {
     }
 }
 
-void PartsStockWindow::GetStates(RepairData& state) {
+void PartsStockWindow::GetStates(PartData& state) {
     if (!state.retreived) {
         const char* statesQuery = "SELECT repair_state FROM repair_states";
         sqlQuery.AllFromTable(statesQuery, state.data);

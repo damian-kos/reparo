@@ -18,7 +18,7 @@ public:
 	void Render();
 	void ResetOnBrandChange();
 	void ResetOnModelChange(PartData& model, PartData& color, int& previous_id);
-	void GetStates(RepairData& data);
+	void GetStates(PartData& data);
 	void AddPart();
 	void GetBrands();
 	void GetModels(std::vector<std::string>& data, int selected_brand_id);

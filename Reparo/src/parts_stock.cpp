@@ -15,7 +15,7 @@ void PartsStock::CreateTable() {
     OpenPartsStockDb();
     //const char* createTableSQL = "CREATE TABLE IF NOT EXISTS brands (ID INTEGER PRIMARY KEY, Brand TEXT, Make TEXT, Model TEXT, Part TEXT, Color TEXT, Quality TEXT, Quantity INTEGER, Supplier TEXT, SupplierSKU TEXT, OwnSKU TEXT, BuyPriceIncVAT REAL, BuyPriceExcVAT REAL, Location TEXT, BoughtDate TEXT)";
     // 
-    //const char* createPartTable = "CREATE TABLE IF NOT EXISTS part (part_id INTEGER PRIMARY KEY, brand_id INTEGER, model_id INTEGER, amount INTEGER, category INTEGER, category_id INTEGER, quality TEXT, color TEXT, FOREIGN KEY (model_id) REFERENCES models (model_id), FOREIGN KEY (category) REFERENCES categories (category_id))";
+    const char* createPartTable = "CREATE TABLE IF NOT EXISTS part (part_id INTEGER PRIMARY KEY, brand_id INTEGER, model_id INTEGER, amount INTEGER, category INTEGER, category_id INTEGER, quality TEXT, color TEXT, FOREIGN KEY (model_id) REFERENCES models (model_id), FOREIGN KEY (category) REFERENCES categories (category_id))";
     // 
     //const char* createCategoryTable = "CREATE TABLE IF NOT EXISTS categories (category_id INTEGER PRIMARY KEY, category TEXT UNIQUE)";
     // 
@@ -37,17 +37,17 @@ void PartsStock::CreateTable() {
     const char* createRepairsPartsTable = "CREATE TABLE IF NOT EXISTS repairs_parts (repair_id INTEGER, part_id INTEGER, PRIMARY KEY (repair_id, part_id), FOREIGN KEY (repair_id) REFERENCES repairs (repair_id), FOREIGN KEY (part_id) REFERENCES parts (part_id))";
     const char* createRepairStatesTable = "CREATE TABLE IF NOT EXISTS repair_states (repair_state_id INTEGER PRIMARY KEY, repair_state TEXT UNIQUE NOT NULL)";
     //const char* createCategoriesTable = "CREATE TABLE IF NOT EXISTS categories (category_id INTEGER PRIMARY KEY, category TEXT UNIQUE)";
-    //const char* createPartsTable = "CREATE TABLE IF NOT EXISTS parts("
-        //"part_id INTEGER PRIMARY KEY,"
-        //"brand_id INTEGER NOT NULL,"
-        //"model_id INTEGER NOT NULL,"
-        //"category_id INTEGER NOT NULL,"
-        //"color INTEGER NOT NULL,"
-        //"quality TEXT,"
-        //"quantity INTEGER NOT NULL,"
-        //"FOREIGN KEY(model_id) REFERENCES models(model_id),"
-        //"FOREIGN KEY(category_id) REFERENCES categories(category_id))";
-        // 
+    const char* createPartsTable = "CREATE TABLE IF NOT EXISTS parts("
+        "part_id INTEGER PRIMARY KEY,"
+        "brand_id INTEGER NOT NULL,"
+        "model_id INTEGER NOT NULL,"
+        "category_id INTEGER NOT NULL,"
+        "color INTEGER NOT NULL,"
+        "quality TEXT,"
+        "quantity INTEGER NOT NULL,"
+        "FOREIGN KEY(model_id) REFERENCES models(model_id),"
+        "FOREIGN KEY(category_id) REFERENCES categories(category_id))";
+         
     //const char* createColorsTable = "CREATE TABLE IF NOT EXISTS colors (color_id INTEGER PRIMARY KEY, color TEXT UNIQUE)";
     // 
     //const char* createModelColorTable =
@@ -65,7 +65,7 @@ void PartsStock::CreateTable() {
     int rc = sqlite3_exec(db, createBrandTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createModelTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createCategoriesTable, 0, 0, 0);
-    //rc = sqlite3_exec(db, createPartsTable, 0, 0, 0);
+    rc = sqlite3_exec(db, createPartsTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createColorsTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createModelColorTable, 0, 0, 0);
     //rc = sqlite3_exec(db, createQualityTable, 0, 0, 0);

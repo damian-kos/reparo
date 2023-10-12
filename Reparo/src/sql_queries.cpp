@@ -129,10 +129,10 @@ int SQLQuery::SearchForSimilarRecords(Part part) {
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(partsStock.db, sqlQuery, -1, &stmt, NULL) == SQLITE_OK) {
         // Bind the parameter values to the placeholders in the query
-        int brandId = part.brand.current_id + 1;
-        int modelId = part.model.current_id + 1;
-        int categoryId = part.category.current_id + 1;
-        int colorId = part.color.current_id + 1;
+        int brandId = part.brand.IDinDB;
+        int modelId = part.model.IDinDB;
+        int categoryId = part.category.IDinDB;
+        int colorId = part.color.IDinDB;
 
         sqlite3_bind_int(stmt, 1, brandId);
         sqlite3_bind_int(stmt, 2, modelId);
@@ -198,27 +198,45 @@ void SQLQuery::Update(int& rowToUpdate) {
     return;
 }
 
-void SQLQuery::InsertPart(Part part) {
-        partsStock.OpenPartsStockDb(); 
+void SQLQuery::InsertPart(Part& part) {
+    partsStock.OpenPartsStockDb();
+    //part.model.IDinDB = GetIdForValue("models", "model", part.model.name.c_str());
+    //part.brand.IDinDB = GetIdForValue("brands", "brand", part.brand.name.c_str());
+    //part.category.IDinDB = GetIdForValue("categories", "category", part.category.name.c_str());
+    //part.color.IDinDB = GetIdForValue("colors", "color", part.color.name.c_str());
 
-        //Construct the SQL query to insert data into the 'parts' table
-        std::string sqlInsert = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (";
-        sqlInsert += std::to_string(part.model.current_id + 1) + ", ";
-        sqlInsert += std::to_string(part.brand.current_id + 1) + ", ";
-        sqlInsert += std::to_string(part.category.current_id + 1) + ", ";
-        sqlInsert += std::to_string(part.color.current_id + 1) + ", ";
-        sqlInsert += "'" + part.quality.desc + "', "; // Assuming quality is TEXT
-        sqlInsert += "1)"; // Assuming quantity is initialized to 0
-        int rc = sqlite3_exec(partsStock.db, sqlInsert.c_str(), 0, 0, 0);
-        if (rc != SQLITE_OK) {
-            fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(partsStock.db));
-        }
-        if (rc == SQLITE_DONE) {
-            // Update successful
-        }
-        std::cout << "Part added to stock." << std::endl;
 
+
+    // Prepare the SQL query with placeholders for parameter binding
+    const char* sqlInsert = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (?, ?, ?, ?, ?, 1)";
+
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_prepare_v2(partsStock.db, sqlInsert, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL prepare error: %s\n", sqlite3_errmsg(partsStock.db));
         sqlite3_close(partsStock.db);
+        return;
+    }
+
+    // Bind parameters to the placeholders
+    sqlite3_bind_int(stmt, 1, part.model.IDinDB);
+    sqlite3_bind_int(stmt, 2, part.brand.IDinDB);
+    sqlite3_bind_int(stmt, 3, part.category.IDinDB);
+    sqlite3_bind_int(stmt, 4, part.color.IDinDB);
+    sqlite3_bind_text(stmt, 5, part.quality.desc.c_str(), -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "SQL step error: %s\n", sqlite3_errmsg(partsStock.db));
+    }
+    else {
+        // Insert successful
+        std::cout << "Part added to stock." << std::endl;
+    }
+
+    // Finalize the statement and close the database
+    sqlite3_finalize(stmt);
+    sqlite3_close(partsStock.db);
 }
 
 int SQLQuery::SearchForCustomerSQL(Customer customer) {
@@ -263,27 +281,46 @@ int SQLQuery::SearchForCustomerSQL(Customer customer) {
 }
 
 
-void SQLQuery::InsertCustomer(Customer customer) {
+int SQLQuery::InsertCustomer(Customer customer) {
+    int lastInsertedID = -1;
     partsStock.OpenPartsStockDb();
-    std::cout << customer.name << " " << customer.phone_number << std::endl;
-    ////Construct the SQL query to insert data into the 'parts' table
-    std::string sqlInsert = "INSERT INTO customers (name, surname, email, phone) VALUES (";
-    sqlInsert += "'" + customer.name + "', ";
-    sqlInsert += "'" + customer.surname + "', ";
-    sqlInsert += "'" + customer.email + "', ";
-    sqlInsert += "'" + customer.phone_number + "')";
 
-    int rc = sqlite3_exec(partsStock.db, sqlInsert.c_str(), 0, 0, 0);
+    // Prepare the SQL INSERT statement with placeholders
+    std::string sqlInsert = "INSERT INTO customers (name, surname, email, phone) VALUES (?, ?, ?, ?)";
+
+    // Prepare the statement
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_prepare_v2(partsStock.db, sqlInsert.c_str(), -1, &stmt, nullptr);
+
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(partsStock.db));
+        sqlite3_finalize(stmt); // Clean up the statement
+        sqlite3_close(partsStock.db);
+        return 0; // Exit if an error occurred
     }
-    if (rc == SQLITE_DONE) {
-       // Update successful
-    }
-    std::cout << "Customer added." << std::endl;
 
+    // Bind values to the placeholders
+    sqlite3_bind_text(stmt, 1, customer.name.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, customer.surname.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, customer.email.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, customer.phone_number.c_str(), -1, SQLITE_STATIC);
+
+    // Execute the statement
+    rc = sqlite3_step(stmt);
+
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "SQL execution error: %s\n", sqlite3_errmsg(partsStock.db));
+        return 0;
+    }
+    else {
+       // Insertion successful
+        lastInsertedID  = sqlite3_last_insert_rowid(partsStock.db);
+    }
+
+    // Finalize the statement and close the database
+    sqlite3_finalize(stmt);
     sqlite3_close(partsStock.db);
-
+    return lastInsertedID;
 }
 
 void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers) {
@@ -351,4 +388,53 @@ void SQLQuery::UpdateCustomer(int& rowToUpdate, Customer customerEdit) {
         std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
     }
     return;
+}
+
+void SQLQuery::AddRepair(const Repair& repair, int customerID) {
+    int lastInsertedID = -1;
+    partsStock.OpenPartsStockDb();
+
+
+    // Prepare the SQL INSERT statement with placeholders
+    std::string sqlInsert = "INSERT INTO repairs"
+        "(customer_id, model_id, category_id, color_id, repair_desc, repair_desc_hidden, price, repair_state_id) "
+        "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+
+
+    // Prepare the statement
+    sqlite3_stmt* stmt;
+    int rc = sqlite3_prepare_v2(partsStock.db, sqlInsert.c_str(), -1, &stmt, nullptr);
+
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "SQL error: %s\n", sqlite3_errmsg(partsStock.db));
+        sqlite3_finalize(stmt); // Clean up the statement
+        sqlite3_close(partsStock.db);
+    }
+
+    // Bind values to the placeholders
+    sqlite3_bind_int(stmt, 1, customerID);
+    sqlite3_bind_int(stmt, 2, repair.model.current_id);
+    sqlite3_bind_int(stmt, 3, repair.category.current_id);
+    sqlite3_bind_int(stmt, 4, repair.color.current_id);
+    sqlite3_bind_text(stmt, 5, repair.note.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 6, repair.note_hidden.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 7, repair.price);
+    sqlite3_bind_int(stmt, 8, repair.state.current_id);
+
+
+    // Execute the statement
+    rc = sqlite3_step(stmt);
+
+    if (rc != SQLITE_DONE) {
+        fprintf(stderr, "SQL execution error repair: %s\n", sqlite3_errmsg(partsStock.db));
+
+    }
+    else {
+        std::cout << "Repair added success!" << std::endl;
+    }
+
+    // Finalize the statement and close the database
+    sqlite3_finalize(stmt);
+    sqlite3_close(partsStock.db);
+
 }

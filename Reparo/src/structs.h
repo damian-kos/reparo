@@ -16,14 +16,19 @@ struct PartData {
 	int current_id = -1;
 	std::vector<std::string> data;
 	std::string name = "";
+	int IDinDB;
 	bool retreived = false;
 };
 
-struct RepairData {
-	int current_id = -1;
-std::vector<std::string> data;
-std::string name = "";
-bool retreived = false;
+
+struct Repair {
+	PartData model;
+	PartData category;
+	PartData color;
+	PartData state;
+	std::string note = "";
+	std::string note_hidden = ""; 
+	float price;
 };
 
 struct PartQualityData {

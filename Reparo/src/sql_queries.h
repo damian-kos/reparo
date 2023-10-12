@@ -17,8 +17,9 @@ public:
     int SearchForSimilarRecords(Part part);
     void Update(int& rowToUpdate);
     void UpdateCustomer(int& rowToUpdate, Customer customerEdit);
-    void InsertPart(Part part);
-    void InsertCustomer(Customer customer);
+    void InsertPart(Part& part);
+    int InsertCustomer(Customer customer);
     int SearchForCustomerSQL(Customer customer);
     void MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers);
+    void AddRepair(const Repair& repair, int customerID);
 };

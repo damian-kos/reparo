@@ -1,5 +1,5 @@
 #include "error_handler.h"
-
+#include <iostream>
 bool errorPresent = false;
 
 void ModalController::RenderErrorModal(const char* errorName) {
@@ -14,6 +14,7 @@ void ModalController::GetErrorState(const char* errorName, const char* errorMess
 
     if (ImGui::BeginPopupModal(errorName, NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
+
         ImGui::Text(errorMessage);
         ImGui::Separator();
         if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }

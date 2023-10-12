@@ -40,6 +40,8 @@ CustomerEditWindow customerEditWindow;
 ModalController modalController;
 PartsStockWindow partsStockWindow;
 PartsStock partsStock;
+AddRepair repair;
+
 
 
 int main(int, char**)
@@ -233,7 +235,6 @@ int main(int, char**)
         if(customerEditWindow.GetShouldRender())
             customerEditWindow.Render();
 
-        AddRepair repair;
         repair.AddRepairWindow();
 
 

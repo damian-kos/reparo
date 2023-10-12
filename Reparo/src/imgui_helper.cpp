@@ -1,13 +1,13 @@
 #include "imgui_helper.h"
 #include <iostream>
 
-void ImGuiHelper::PopulateListBox(const char* label, std::vector<std::string>& vector, int& selectable, std::string& text) {
+void ImGuiHelper::PopulateListBox(const char* label, PartData& part) {
     if (ImGui::BeginListBox(label)) {
-        for (int n = 0; n < vector.size(); n++) {
-            const bool is_selected = (selectable == n);
-            if (ImGui::Selectable(vector[n].c_str(), is_selected)) {
-                selectable = n;
-                text = vector[n].c_str();
+        for (int n = 0; n < part.data.size(); n++) {
+            const bool is_selected = (part.current_id == n);
+            if (ImGui::Selectable(part.data[n].c_str(), is_selected)) {
+                part.current_id = n;
+                part.name = part.data[n].c_str();
             }
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)
@@ -21,7 +21,7 @@ void ImGuiHelper::PopulateListBox(const char* label, std::vector<std::string>& v
 void ImGuiHelper::PopulateListBoxMulti(const char* label, PartQualityData& quality) {
     if (ImGui::BeginListBox(label)) {
         for (int n = 0; n < quality.data.size(); n++) {
-            if (ImGui::Selectable(quality.data[n].c_str(), quality.selections[n])) { // Removed .c_str()
+            if (ImGui::Selectable(quality.data[n].c_str(), quality.selections[n])) { 
                 quality.selections[n] = !quality.selections[n];
                 if (quality.selections[n]) {
                     quality.order.push_back(n);
