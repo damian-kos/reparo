@@ -56,7 +56,7 @@ void CustomerInputWindow::Submit()
         return;
      }
     if (submit == 0) {
-        sql.InsertCustomer(customer);
+        int placeholder = sql.InsertCustomer(customer);
         for (InputField& field : inputFields) {
             memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
         }

@@ -1,13 +1,22 @@
 ﻿#include "search.h"
 #include <iostream>
 #include <unordered_map>
+#include <cstring>
+
 
 bool searchResultsBox = false;
 
 SQLQuery sqlSearch;
 int previousLen = 0;
+int previousModelLen = 0;
 bool retreived = false;
+bool model_retreived = false;
+int selected_model = -1;
+
 std::unordered_map<int, Customer> customers;
+
+std::vector<std::string> found_models;
+
 int currentlySelectedRow = -1;
 //bool shortcuts[5] = {};
 
@@ -137,3 +146,67 @@ void Search::ForAdd(std::vector<InputField>& fields) {
     }
 }
 
+
+const char** vectorToCharArray(const std::vector<std::string>& strings) {
+    const char** charArray = new const char* [strings.size()];
+
+    for (size_t i = 0; i < strings.size(); ++i) {
+        charArray[i] = strings[i].c_str();
+    }
+
+    return charArray;
+}
+
+bool Search::SearchModel(PopupInput& popup, std::vector<std::string>& vector) {
+    if (popup.previous_len != strlen(popup.input)) {
+        model_retreived = false;
+        popup.previous_len = strlen(popup.input);
+        return false;
+    }
+    if (strlen(popup.input) >= 3 && !model_retreived) {
+        searchResultsBox = true;
+        popup.previous_len = strlen(popup.input);
+        return true;
+    }
+    else if (strlen(popup.input) < 3) {
+        vector.clear();
+        searchResultsBox = false;
+        popup.previous_len = strlen(popup.input);
+        return false;
+    }
+    return false;
+}
+
+void Search::PopupModels(PopupInput& input, PartData& attribute, const char* label) {
+    input.is_input_text_active = ImGui::IsItemActive();
+    input.is_input_text_activated = ImGui::IsItemActivated();
+    const char** autocomplete = vectorToCharArray(attribute.data);
+
+    if (input.is_input_text_activated)
+        ImGui::OpenPopup(label);
+    {
+        ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
+        //ImGui::SetNextWindowSize({ ImGui::GetItemRectSize().x, 0 });
+        if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
+        {
+
+            for (int i = 0; i < attribute.data.size(); i++)
+            {
+             /*   if (strstr(autocomplete[i], input) == NULL)
+                    continue;*/
+                if (ImGui::Selectable(autocomplete[i]))
+                {
+                    //ImGui::ClearActiveID();
+                    strcpy(input.input, autocomplete[i]);
+                    attribute.name = attribute.data[i];
+                    attribute.current_id = 1;
+                }
+            }
+
+            if (input.is_input_enter_pressed || (!input.is_input_text_active && !ImGui::IsWindowFocused()))
+                ImGui::CloseCurrentPopup();
+
+            ImGui::EndPopup();
+        }
+    }
+}

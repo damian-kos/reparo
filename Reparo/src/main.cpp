@@ -206,6 +206,8 @@ int main(int, char**)
             ImGui::End();
         }
 
+
+
         ImGui::Begin("Main Menu");
 
         // Window for Adding Customers

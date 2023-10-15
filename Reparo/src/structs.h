@@ -28,7 +28,7 @@ struct Repair {
 	PartData state;
 	std::string note = "";
 	std::string note_hidden = ""; 
-	float price;
+	double price;
 };
 
 struct PartQualityData {
@@ -53,4 +53,12 @@ struct Customer {
 	std::string surname;
 	std::string email;
 	std::string phone_number;
+};
+
+struct PopupInput {
+	char input[128] = { "" };
+	bool is_input_enter_pressed;
+	int previous_len;
+	bool is_input_text_active;
+	bool is_input_text_activated;
 };

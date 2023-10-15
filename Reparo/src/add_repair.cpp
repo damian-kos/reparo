@@ -1,6 +1,7 @@
 #include "add_repair.h"
 #include <iostream> // delete later
-using namespace std;
+
+
 char searchQuery[128] = "";
 
 char repair_name[128] = "";
@@ -10,15 +11,15 @@ char repair_phone[128] = "";
 char notes[512] = "";
 char notes_hidden[512] = "";
 
+char input_model[64] = { "" };
+bool is_input_model_enter_pressed;
+
 
 Customer repair_customer;
 int previos_model_id = 0;
 PartsStockWindow stock;
 Repair device;
 
-
-
-InputField search_field = { "##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None };
 
 std::vector<InputField> repair_fields = {
 {"##PhoneNumber", "Phone Number..", repair_phone, IM_ARRAYSIZE(repair_phone), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank},
@@ -41,7 +42,7 @@ void AddRepair::AddRepairWindow() {
         }
 
         ImGui::TableNextColumn();
-        ImGui::InputTextWithHint(search_field.label, search_field.hint, search_field.buffer, search_field.bufferSize, search_field.flags);
+        ImGui::InputTextWithHint("##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None);
         SearchForCustomers();
         SearchForByPhone();
 
@@ -49,20 +50,14 @@ void AddRepair::AddRepairWindow() {
         ImGui::TableNextColumn();
         ImGui::SeparatorText("DEVICE:");
 
-        Combo(device, "##Models", device.model);
-        Combo(device, "##Categories", device.category);
+        pop_model.is_input_enter_pressed = ImGui::InputTextWithHint("##Model_search", "Model..", pop_model.input, IM_ARRAYSIZE(pop_model.input), ImGuiInputTextFlags_EnterReturnsTrue);
+        Models();
+        pop_category.is_input_enter_pressed = ImGui::InputTextWithHint("##Category_search", "Type..", pop_category.input, IM_ARRAYSIZE(pop_category.input), ImGuiInputTextFlags_EnterReturnsTrue);
+        Categories();
 
-     
-        if (device.model.current_id >= 0) {
-            PartsStockWindow stock;
-            stock.ResetOnModelChange(device.model, device.color, previos_model_id);
- 
-            Combo(device, "##Colors", device.color);
-        }
-        else {
-            ImGui::Text("Choose model to show colors.");
-        }
-        
+        pop_color.is_input_enter_pressed = ImGui::InputTextWithHint("##Color", "Color..", pop_color.input, IM_ARRAYSIZE(pop_color.input), ImGuiInputTextFlags_EnterReturnsTrue);
+        Colors();
+
         ImGui::SeparatorText("Notes:");
         ImGui::InputTextWithHint("##Notes", "Notes visible for customer..", notes, IM_ARRAYSIZE(notes), ImGuiInputTextFlags_None);
         ImGui::InputTextWithHint("##Notes_hidden", "Notes hidden from customer..", notes_hidden, IM_ARRAYSIZE(notes_hidden), ImGuiInputTextFlags_None);
@@ -71,7 +66,7 @@ void AddRepair::AddRepairWindow() {
         Combo(device, "##States", device.state);
 
         ImGui::SeparatorText("Price:");
-        ImGui::InputFloat("input float", &device.price, 0.1f, 1.0f, "%.2f"); 
+        ImGui::InputDouble("input float", &device.price, 0.1f, 1.0f, "%.2f"); 
 
         ImGui::TableNextColumn();
 
@@ -80,14 +75,9 @@ void AddRepair::AddRepairWindow() {
             std::cout << device.model.current_id << std::endl;
             SubmitRepair(this->errorMessage);
         }
-     
         modalController.GetErrorState("Repair Input Feedback", this->errorMessage.c_str());
-
         if (ImGui::Button("test")) {
-            for (int i = 0; i < device.model.data.size() ; i++)
-            {
-                std::cout << device.model.data[i] << std::endl;
-            }
+            sql.Prices();
         }
     }
     ImGui::End();
@@ -104,12 +94,7 @@ void AddRepair::SubmitRepair(std::string& message) {
         return;
     }
     if (submit == 0) { // Here if customer does not exist we add him to database, and we are adding repair after.
-        device.note = notes;
-        device.note_hidden = notes_hidden;
-        device.model.IDinDB = sql.GetIdForValue("models", "model", device.model.name.c_str());
-        device.category.IDinDB = sql.GetIdForValue("categories", "category", device.category.name.c_str());
-        device.color.IDinDB = sql.GetIdForValue("colors", "color", device.color.name.c_str());
-        device.state.IDinDB = sql.GetIdForValue("repair_states", "repair_state", device.state.name.c_str());
+        GetIDs(sql);
         int cust_ID = sql.InsertCustomer(repair_customer);
         sql.AddRepair(device, cust_ID);
         for (InputField& field : repair_fields) {
@@ -124,46 +109,73 @@ void AddRepair::SubmitRepair(std::string& message) {
 
     }
     else { // Here we take this customer ID and add repair with this id.
-        device.note = notes;
-        device.note_hidden = notes_hidden;
-        device.model.IDinDB = sql.GetIdForValue("models", "model", device.model.name.c_str());
-        device.category.IDinDB = sql.GetIdForValue("categories", "category", device.category.name.c_str());
-        device.color.IDinDB = sql.GetIdForValue("colors", "color", device.color.name.c_str());
-        device.state.IDinDB = sql.GetIdForValue("repair_states", "repair_state", device.state.name.c_str());
+        GetIDs(sql);
         sql.AddRepair(device, submit);
-        //modalController.RenderErrorModal("Repair Input Feedback");
-        //message = "Customer with this phone number already exists. \nYou can edit his details. Right click on customer in table view and click a button.";
         return;
     }
+}
 
+void GetIDs(SQLQuery& sql) {
+    device.note = notes;
+    device.note_hidden = notes_hidden;
+    std::string query = "SELECT model_id FROM models WHERE model = ? ";
+    device.model.IDinDB = sql.GetIdForValue(query, device.model.name.c_str());
+    query = "SELECT category_id FROM categories WHERE category = ? ";
+    device.category.IDinDB = sql.GetIdForValue(query, device.category.name.c_str());
+    query = "SELECT color_id FROM colors WHERE color = ? ";
+    device.color.IDinDB = sql.GetIdForValue(query, device.color.name.c_str());
+    query = "SELECT repair_state_id FROM repair_states WHERE repair_state = ? ";
+    device.state.IDinDB = sql.GetIdForValue(query, device.state.name.c_str());
 }
 
 void SearchForCustomers() {
     Search search;
-    search.SearchField(search_field.buffer);
+    search.SearchField(searchQuery);
     search.ForAdd(repair_fields);
 }
+
 void SearchForByPhone() {
     Search search;
     ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Looks like this customer already exists. \nDouble click on him to copy data over.");
     search.SearchField(repair_fields[0].buffer);
     search.ForAdd(repair_fields);
 }
+
+void AddRepair::Models() {
+    Search search;
+    if (search.SearchModel(pop_model, device.model.data)) {
+        std::string strSearchQuery(pop_model.input);
+        sql.MatchingModels(strSearchQuery, device.model.data, "models");
+    }    
+    const char* label = "##model";
+    search.PopupModels(pop_model, device.model, label);
+}
+
+void AddRepair::Categories() {
+    Search search;
+    if (search.SearchModel(pop_category, device.category.data)) {
+        std::string strSearchQuery(pop_category.input);
+        sql.MatchingModels(strSearchQuery, device.category.data, "categories");
+    }
+    const char* label = "##cat";
+    search.PopupModels(pop_category, device.category, label);
+}
+
+void AddRepair::Colors() {
+    Search search;
+    PartsStockWindow parts;
+    const char* label = "##color";
+    search.PopupModels(pop_color, device.color, label);
+}
+
+
 void Combo(Repair& device, std::string label, PartData& attribute) {
     if (!attribute.retreived) {
-        if (label == "##Models") {
-            stock.GetModels(device.model.data);
-        }
-        else if (label == "##Categories") {
-            stock.GetCategories(device.category.data);
-        }
-        else if (label == "##Colors") {
-            stock.GetColorsForModel(device.color.data, device.model.data, device.model.current_id);
-        }
-        else if (label == "##States") {
+        if (label == "##States") {
             stock.GetStates(device.state);
         }
         attribute.current_id = 0;
+        attribute.name = attribute.data[attribute.current_id];
         attribute.retreived = true;
     }
     ImGuiHelper helper;

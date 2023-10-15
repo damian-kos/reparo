@@ -33,9 +33,9 @@ void PartsStock::CreateTable() {
     // 
     const char* createBrandTable = "CREATE TABLE IF NOT EXISTS brands (brand_id INTEGER PRIMARY KEY, brand TEXT UNIQUE)";
     //const char* createModelTable = "CREATE TABLE IF NOT EXISTS models (model_id INTEGER PRIMARY KEY, model TEXT UNIQUE, brand_id INTEGER, FOREIGN KEY (brand_id) REFERENCES brands (brand_id))";
-    const char* createRepairsTable = "CREATE TABLE IF NOT EXISTS repairs (repair_id INTEGER PRIMARY KEY, customer_id INTEGER NOT NULL, model_id INTEGER NOT NULL, category_id INTEGER, color_id INTEGER, repair_desc TEXT NOT NULL, repair_desc_hidden TEXT, price DECIMAL(10,2) NOT NULL, repair_state_id INTEGER NOT NULL, FOREIGN KEY (customer_id) REFERENCES customers (customer_id), FOREIGN KEY (repair_state_id) REFERENCES repair_states (repair_state_id))";
+    const char* createRepairsTable = "CREATE TABLE IF NOT EXISTS repairs (repair_id INTEGER PRIMARY KEY, customer_id INTEGER NOT NULL, model_id INTEGER NOT NULL, category_id INTEGER, color_id INTEGER, repair_desc TEXT NOT NULL, repair_desc_hidden TEXT, price REAL(10,2) NOT NULL, repair_state_id INTEGER NOT NULL, FOREIGN KEY (customer_id) REFERENCES customers (customer_id), FOREIGN KEY (repair_state_id) REFERENCES repair_states (repair_state_id))";
     const char* createRepairsPartsTable = "CREATE TABLE IF NOT EXISTS repairs_parts (repair_id INTEGER, part_id INTEGER, PRIMARY KEY (repair_id, part_id), FOREIGN KEY (repair_id) REFERENCES repairs (repair_id), FOREIGN KEY (part_id) REFERENCES parts (part_id))";
-    const char* createRepairStatesTable = "CREATE TABLE IF NOT EXISTS repair_states (repair_state_id INTEGER PRIMARY KEY, repair_state TEXT UNIQUE NOT NULL)";
+    //const char* createRepairStatesTable = "CREATE TABLE IF NOT EXISTS repair_states (repair_state_id INTEGER PRIMARY KEY, repair_state TEXT UNIQUE NOT NULL)";
     //const char* createCategoriesTable = "CREATE TABLE IF NOT EXISTS categories (category_id INTEGER PRIMARY KEY, category TEXT UNIQUE)";
     const char* createPartsTable = "CREATE TABLE IF NOT EXISTS parts("
         "part_id INTEGER PRIMARY KEY,"
@@ -72,7 +72,7 @@ void PartsStock::CreateTable() {
     //rc = sqlite3_exec(db, createCustomerTable, 0, 0, 0);
     rc = sqlite3_exec(db, createRepairsTable, 0, 0, 0);
     rc = sqlite3_exec(db, createRepairsPartsTable, 0, 0, 0);
-    rc = sqlite3_exec(db, createRepairStatesTable, 0, 0, 0);
+    //rc = sqlite3_exec(db, createRepairStatesTable, 0, 0, 0);
 
 
     // 

@@ -6,6 +6,7 @@ void SQLQuery::AllFromTable(const char* query, std::vector<std::string>& vector)
     sqlite3_stmt* stmt;
 
     int rc = sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, nullptr);
+    //ex. "SELECT brand FROM brands";
     if (rc != SQLITE_OK) {
         // Add logging / Crash report
     }
@@ -23,22 +24,19 @@ void SQLQuery::AllFromTable(const char* query, std::vector<std::string>& vector)
 }
 
 void SQLQuery::OnID(const char* query, std::vector<std::string>& vector, int id) {
-
+    // ex.  "SELECT model FROM models WHERE brand_id = ?";
     partsStock.OpenPartsStockDb();
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, nullptr) == SQLITE_OK) {
-        // Bind the id parameter to the placeholder in query
         sqlite3_bind_int(stmt, 1, id);
-        vector.clear();
+        vector.clear(); // so it is not written on top of previous data
         // Execute the query
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            // Retrieve the model data from the result set
             const char* record = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
             vector.emplace_back(record);
         }
 
-        // Finalize the statement after use
         sqlite3_finalize(stmt);
     }
     else {
@@ -47,37 +45,11 @@ void SQLQuery::OnID(const char* query, std::vector<std::string>& vector, int id)
     sqlite3_close(partsStock.db);
 }
 
-void SQLQuery::OnID(const char* query, std::vector<std::string>& vector) {
-
+int SQLQuery::GetIdForValue(std::string query, const char* searchValue) {
     partsStock.OpenPartsStockDb();
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, nullptr) == SQLITE_OK) {
-        // Bind the id parameter to the placeholder in query
-       
-        vector.clear();
-        // Execute the query
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-            // Retrieve the model data from the result set
-            const char* record = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-            vector.emplace_back(record);
-        }
-
-        // Finalize the statement after use
-        sqlite3_finalize(stmt);
-    }
-    else {
-        // Add logging / Crash report
-    }
-    sqlite3_close(partsStock.db);
-}
-
-int SQLQuery::GetIdForValue(const char* tableName, const char* columnName, const char* searchValue) {
-
-    partsStock.OpenPartsStockDb();
-
     // Construct the SQL query as a string
-    std::string sql = "SELECT " + std::string(columnName) + "_id FROM " + std::string(tableName) + " WHERE " + std::string(columnName) + " = ? ";
+    //ex. "SELECT " + std::string(columnName) + "_id FROM " + std::string(tableName) + " WHERE " + std::string(columnName) + " = ? ";
+    std::string sql = query;
     sqlite3_stmt* stmt;
 
     int rc = sqlite3_prepare_v2(partsStock.db, sql.c_str(), -1, &stmt, nullptr);
@@ -129,15 +101,11 @@ int SQLQuery::SearchForSimilarRecords(Part part) {
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(partsStock.db, sqlQuery, -1, &stmt, NULL) == SQLITE_OK) {
         // Bind the parameter values to the placeholders in the query
-        int brandId = part.brand.IDinDB;
-        int modelId = part.model.IDinDB;
-        int categoryId = part.category.IDinDB;
-        int colorId = part.color.IDinDB;
 
-        sqlite3_bind_int(stmt, 1, brandId);
-        sqlite3_bind_int(stmt, 2, modelId);
-        sqlite3_bind_int(stmt, 3, categoryId);
-        sqlite3_bind_int(stmt, 4, colorId);
+        sqlite3_bind_int(stmt, 1, part.brand.IDinDB);
+        sqlite3_bind_int(stmt, 2, part.model.IDinDB);
+        sqlite3_bind_int(stmt, 3, part.category.IDinDB);
+        sqlite3_bind_int(stmt, 4, part.color.IDinDB);
 
         // Execute the query
         while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -170,7 +138,7 @@ int SQLQuery::SearchForSimilarRecords(Part part) {
 
 }
 
-void SQLQuery::Update(int& rowToUpdate) {
+void SQLQuery::Update(int& rowToUpdate) {  // Update parts quantity
     partsStock.OpenPartsStockDb();
 
     std::string updateQuery = "UPDATE parts SET quantity = quantity + 1 WHERE part_id = ?";
@@ -198,16 +166,8 @@ void SQLQuery::Update(int& rowToUpdate) {
     return;
 }
 
-void SQLQuery::InsertPart(Part& part) {
+void SQLQuery::InsertPart(Part& part) {  // Insert parts if doesn't already exist
     partsStock.OpenPartsStockDb();
-    //part.model.IDinDB = GetIdForValue("models", "model", part.model.name.c_str());
-    //part.brand.IDinDB = GetIdForValue("brands", "brand", part.brand.name.c_str());
-    //part.category.IDinDB = GetIdForValue("categories", "category", part.category.name.c_str());
-    //part.color.IDinDB = GetIdForValue("colors", "color", part.color.name.c_str());
-
-
-
-    // Prepare the SQL query with placeholders for parameter binding
     const char* sqlInsert = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (?, ?, ?, ?, ?, 1)";
 
     sqlite3_stmt* stmt;
@@ -277,9 +237,7 @@ int SQLQuery::SearchForCustomerSQL(Customer customer) {
 
     }
 
-    // Return 0 in case of an error
 }
-
 
 int SQLQuery::InsertCustomer(Customer customer) {
     int lastInsertedID = -1;
@@ -328,7 +286,6 @@ void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unorder
     // Define the SQL query with a parameterized query.
     const char* query = "SELECT * FROM customers WHERE name LIKE ? OR surname LIKE ? OR email LIKE ? OR phone LIKE ?";
 
-    //std::cout << "WE ARE HERE " << std::endl;
     // Prepare the SQL statement.
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, NULL) == SQLITE_OK) {
@@ -354,6 +311,47 @@ void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unorder
         std::cerr << "Error preparing SQL statement MatchingCustomers: " << sqlite3_errmsg(partsStock.db) << std::endl;
         sqlite3_close(partsStock.db); // Close the database in case of an error
     }
+    sqlite3_finalize(stmt);
+    sqlite3_close(partsStock.db);
+}
+
+void SQLQuery::MatchingModels(std::string& model_query, std::vector<std::string>& vector, std::string label) {
+    partsStock.OpenPartsStockDb();
+
+    const char* query = nullptr;  // Declare the query variable
+
+    if (label == "models") {
+        query = "SELECT model FROM models WHERE model LIKE ?";
+    }
+    else if (label == "categories") {
+        query = "SELECT category FROM categories WHERE category LIKE ?";
+    }
+    else if (label == "colors") {
+        query = "SELECT color FROM categories";
+    }
+    else {
+        return;
+    }
+
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, NULL) == SQLITE_OK) {
+
+        std::string like_query = "%" + model_query + "%";
+        sqlite3_bind_text(stmt, 1, like_query.c_str(), -1, SQLITE_STATIC);
+
+        vector.clear();
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            vector.emplace_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+        }
+        for (size_t i = 0; i < vector.size(); i++) {
+            std::cout << vector[i] << std::endl;
+        }
+    }
+    else {
+        std::cerr << "Error preparing SQL statement MatchingModels: " << sqlite3_errmsg(partsStock.db) << std::endl;
+    }
+
     sqlite3_finalize(stmt);
     sqlite3_close(partsStock.db);
 }
@@ -418,9 +416,9 @@ void SQLQuery::AddRepair(Repair& repair, int customerID) {
     sqlite3_bind_int(stmt, 4, repair.color.IDinDB);
     sqlite3_bind_text(stmt, 5, repair.note.c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 6, repair.note_hidden.c_str(), -1, SQLITE_STATIC);
+    std::cout << repair.price << std::endl;
     sqlite3_bind_double(stmt, 7, repair.price);
     sqlite3_bind_int(stmt, 8, repair.state.IDinDB);
-
 
     // Execute the statement
     rc = sqlite3_step(stmt);
@@ -437,4 +435,22 @@ void SQLQuery::AddRepair(Repair& repair, int customerID) {
     sqlite3_finalize(stmt);
     sqlite3_close(partsStock.db);
 
+}
+
+void SQLQuery::Prices() {
+    partsStock.OpenPartsStockDb();
+    const char* query = "SELECT price FROM repairs";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(partsStock.db) << std::endl;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        double price = sqlite3_column_double(stmt, 0); // Index 0 for the "price" column
+        std::cout << "Price: " << price << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(partsStock.db);
 }

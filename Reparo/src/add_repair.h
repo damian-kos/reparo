@@ -11,11 +11,20 @@
 void SearchForCustomers();
 void SearchForByPhone();
 void Combo(Repair& device, std::string label, PartData& attribute);
+void GetIDs(SQLQuery& sql);
 
 class AddRepair {
 public:
-    std::string errorMessage;
+    void Models();
+    void Categories();
+    void Colors();
+    SQLQuery sql;
 
+    PopupInput pop_model;
+    PopupInput pop_category;
+    PopupInput pop_color;
+
+    std::string errorMessage;
     void AddRepairWindow();
     void SubmitRepair(std::string& message);
     ModalController modalController;
