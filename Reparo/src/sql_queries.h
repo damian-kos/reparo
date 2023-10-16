@@ -14,14 +14,14 @@ public:
     void AllFromTable(const char* query, std::vector<std::string>& vector); // Takes all names from table
     void OnID(const char* query, std::vector<std::string>& vector, int id); // Takes all names from table WHERE id = ?
     int GetIdForValue(std::string query, const char* searchValue); // Returns if for a given value
-    int SearchForSimilarRecords(Part part); // Check if part we are about to add is alread
-    void Update(int& rowToUpdate);
-    void UpdateCustomer(int& rowToUpdate, Customer customerEdit);
-    void InsertPart(Part& part);
-    int InsertCustomer(Customer customer);
-    int SearchForCustomerSQL(Customer customer);
-    void MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers);
-    void MatchingModels(std::string& model, std::vector<std::string>& vector, std::string label);
+    int SearchForSimilarRecords(Part part); // Check if quality of part we are about to add already exists
+    void Update(int& rowToUpdate); // Updates the quantity of the exactly same part by 1
+    void InsertPart(Part& part); // Insert part if one does not exist w/ quantity of 1
+    int SearchForCustomerSQL(Customer customer); // Seearch for a customer with exact given number
+    int InsertCustomer(Customer customer); // Insert new customer and returns ID it was inserted with
+    void UpdateCustomer(int& rowToUpdate, Customer customerEdit); // Upadtes customer data wtih given ID
+    void MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers); // Search for customers according to name/email/phone/surname
+    void MatchingModels(std::string& model, std::vector<std::string>& vector, std::string label);  
     void AddRepair(Repair& repair, int customerID);
     void Prices();
 };

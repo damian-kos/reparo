@@ -166,7 +166,7 @@ void SQLQuery::Update(int& rowToUpdate) {  // Update parts quantity
     return;
 }
 
-void SQLQuery::InsertPart(Part& part) {  // Insert parts if doesn't already exist
+void SQLQuery::InsertPart(Part& part) {  
     partsStock.OpenPartsStockDb();
     const char* sqlInsert = "INSERT INTO parts (model_id, brand_id, category_id, color, quality, quantity) VALUES (?, ?, ?, ?, ?, 1)";
 
@@ -281,6 +281,38 @@ int SQLQuery::InsertCustomer(Customer customer) {
     return lastInsertedID;
 }
 
+void SQLQuery::UpdateCustomer(int& rowToUpdate, Customer customerEdit) {
+    partsStock.OpenPartsStockDb();
+
+    std::string updateQuery = "UPDATE customers SET name = ?, surname = ?, email=?, phone=? WHERE customer_id = ?";
+    sqlite3_stmt* updateStmt;
+    if (sqlite3_prepare_v2(partsStock.db, updateQuery.c_str(), -1, &updateStmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_int(updateStmt, 5, rowToUpdate);
+        sqlite3_bind_text(updateStmt, 1, customerEdit.name.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(updateStmt, 2, customerEdit.surname.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(updateStmt, 3, customerEdit.email.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(updateStmt, 4, customerEdit.phone_number.c_str(), -1, SQLITE_STATIC);
+
+
+        // Execute the update query
+        int rc = sqlite3_step(updateStmt);
+        if (rc == SQLITE_DONE) {
+            // Update successful
+            std::cout << "Customer sucessfully updated." << std::endl;
+        }
+        else {
+            std::cerr << "Error updating record: " << sqlite3_errmsg(partsStock.db) << std::endl;
+        }
+        // Finalize the update statement
+        sqlite3_finalize(updateStmt);
+        sqlite3_close(partsStock.db);
+    }
+    else {
+        std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
+    }
+    return;
+}
+
 void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers) {
     partsStock.OpenPartsStockDb();
     // Define the SQL query with a parameterized query.
@@ -315,78 +347,46 @@ void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unorder
     sqlite3_close(partsStock.db);
 }
 
-void SQLQuery::MatchingModels(std::string& model_query, std::vector<std::string>& vector, std::string label) {
-    partsStock.OpenPartsStockDb();
-
-    const char* query = nullptr;  // Declare the query variable
-
-    if (label == "models") {
-        query = "SELECT model FROM models WHERE model LIKE ?";
-    }
-    else if (label == "categories") {
-        query = "SELECT category FROM categories WHERE category LIKE ?";
-    }
-    else if (label == "colors") {
-        query = "SELECT color FROM categories";
-    }
-    else {
-        return;
-    }
-
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, NULL) == SQLITE_OK) {
-
-        std::string like_query = "%" + model_query + "%";
-        sqlite3_bind_text(stmt, 1, like_query.c_str(), -1, SQLITE_STATIC);
-
-        vector.clear();
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-            vector.emplace_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
-        }
-        for (size_t i = 0; i < vector.size(); i++) {
-            std::cout << vector[i] << std::endl;
-        }
-    }
-    else {
-        std::cerr << "Error preparing SQL statement MatchingModels: " << sqlite3_errmsg(partsStock.db) << std::endl;
-    }
-
-    sqlite3_finalize(stmt);
-    sqlite3_close(partsStock.db);
-}
-
-void SQLQuery::UpdateCustomer(int& rowToUpdate, Customer customerEdit) {
-    partsStock.OpenPartsStockDb();
-
-    std::string updateQuery = "UPDATE customers SET name = ?, surname = ?, email=?, phone=? WHERE customer_id = ?";
-    sqlite3_stmt* updateStmt;
-    if (sqlite3_prepare_v2(partsStock.db, updateQuery.c_str(), -1, &updateStmt, NULL) == SQLITE_OK) {
-        sqlite3_bind_int(updateStmt, 5, rowToUpdate);
-        sqlite3_bind_text(updateStmt, 1, customerEdit.name.c_str(), -1, SQLITE_STATIC);
-        sqlite3_bind_text(updateStmt, 2, customerEdit.surname.c_str(), -1, SQLITE_STATIC);
-        sqlite3_bind_text(updateStmt, 3, customerEdit.email.c_str(), -1, SQLITE_STATIC);
-        sqlite3_bind_text(updateStmt, 4, customerEdit.phone_number.c_str(), -1, SQLITE_STATIC);
-
-
-        // Execute the update query
-        int rc = sqlite3_step(updateStmt);
-        if (rc == SQLITE_DONE) {
-            // Update successful
-            std::cout << "Customer sucessfully updated." << std::endl;
-        }
-        else {
-            std::cerr << "Error updating record: " << sqlite3_errmsg(partsStock.db) << std::endl;
-        }
-        // Finalize the update statement
-        sqlite3_finalize(updateStmt);
-        sqlite3_close(partsStock.db);
-    }
-    else {
-        std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(partsStock.db) << std::endl;
-    }
-    return;
-}
+//void SQLQuery::MatchingModels(std::string& model_query, std::vector<std::string>& vector, std::string label) {
+//    partsStock.OpenPartsStockDb();
+//
+//    const char* query = nullptr;  // Declare the query variable
+//
+//    if (label == "models") {
+//        query = "SELECT model FROM models WHERE model LIKE ?";
+//    }
+//    else if (label == "categories") {
+//        query = "SELECT category FROM categories WHERE category LIKE ?";
+//    }
+//    else if (label == "colors") {
+//        query = "SELECT color FROM categories";
+//    }
+//    else {
+//        return;
+//    }
+//
+//    sqlite3_stmt* stmt;
+//
+//    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, NULL) == SQLITE_OK) {
+//
+//        std::string like_query = "%" + model_query + "%";
+//        sqlite3_bind_text(stmt, 1, like_query.c_str(), -1, SQLITE_STATIC);
+//
+//        vector.clear();
+//        while (sqlite3_step(stmt) == SQLITE_ROW) {
+//            vector.emplace_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+//        }
+//        for (size_t i = 0; i < vector.size(); i++) {
+//            std::cout << vector[i] << std::endl;
+//        }
+//    }
+//    else {
+//        std::cerr << "Error preparing SQL statement MatchingModels: " << sqlite3_errmsg(partsStock.db) << std::endl;
+//    }
+//
+//    sqlite3_finalize(stmt);
+//    sqlite3_close(partsStock.db);
+//}
 
 void SQLQuery::AddRepair(Repair& repair, int customerID) {
     int lastInsertedID = -1;
