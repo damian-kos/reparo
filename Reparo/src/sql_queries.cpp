@@ -347,46 +347,43 @@ void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unorder
     sqlite3_close(partsStock.db);
 }
 
-//void SQLQuery::MatchingModels(std::string& model_query, std::vector<std::string>& vector, std::string label) {
-//    partsStock.OpenPartsStockDb();
-//
-//    const char* query = nullptr;  // Declare the query variable
-//
-//    if (label == "models") {
-//        query = "SELECT model FROM models WHERE model LIKE ?";
-//    }
-//    else if (label == "categories") {
-//        query = "SELECT category FROM categories WHERE category LIKE ?";
-//    }
-//    else if (label == "colors") {
-//        query = "SELECT color FROM categories";
-//    }
-//    else {
-//        return;
-//    }
-//
-//    sqlite3_stmt* stmt;
-//
-//    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, NULL) == SQLITE_OK) {
-//
-//        std::string like_query = "%" + model_query + "%";
-//        sqlite3_bind_text(stmt, 1, like_query.c_str(), -1, SQLITE_STATIC);
-//
-//        vector.clear();
-//        while (sqlite3_step(stmt) == SQLITE_ROW) {
-//            vector.emplace_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
-//        }
-//        for (size_t i = 0; i < vector.size(); i++) {
-//            std::cout << vector[i] << std::endl;
-//        }
-//    }
-//    else {
-//        std::cerr << "Error preparing SQL statement MatchingModels: " << sqlite3_errmsg(partsStock.db) << std::endl;
-//    }
-//
-//    sqlite3_finalize(stmt);
-//    sqlite3_close(partsStock.db);
-//}
+void SQLQuery::MatchingModels(std::string& model_query, std::vector<std::string>& vector, std::string label) {
+    partsStock.OpenPartsStockDb();
+
+    const char* query = nullptr;  // Declare the query variable
+
+    if (label == "models") {
+        query = "SELECT model FROM models WHERE model LIKE ?";
+    }
+    else if (label == "categories") {
+        query = "SELECT category FROM categories WHERE category LIKE ?";
+    }
+    else {
+        return;
+    }
+
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, NULL) == SQLITE_OK) {
+
+        std::string like_query = "%" + model_query + "%";
+        sqlite3_bind_text(stmt, 1, like_query.c_str(), -1, SQLITE_STATIC);
+
+        vector.clear();
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            vector.emplace_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
+        }
+        for (size_t i = 0; i < vector.size(); i++) {
+            std::cout << vector[i] << std::endl;
+        }
+    }
+    else {
+        std::cerr << "Error preparing SQL statement MatchingModels: " << sqlite3_errmsg(partsStock.db) << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(partsStock.db);
+}
 
 void SQLQuery::AddRepair(Repair& repair, int customerID) {
     int lastInsertedID = -1;
@@ -435,6 +432,30 @@ void SQLQuery::AddRepair(Repair& repair, int customerID) {
     sqlite3_finalize(stmt);
     sqlite3_close(partsStock.db);
 
+}
+
+void SQLQuery::GetAllToDoRepairs(Repair& repair) {
+    partsStock.OpenPartsStockDb();
+    const char* query = "SELECT * FROM repairs WHERE repair_state_id = 1";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(partsStock.db) << std::endl;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int customer_id = sqlite3_column_int(stmt, 1);
+        repair.model.IDinDB = sqlite3_column_int(stmt, 2);
+        repair.category.IDinDB = sqlite3_column_int(stmt, 3);
+        repair.color.IDinDB = sqlite3_column_int(stmt, 4);
+        repair.note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        repair.note_hidden = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+        repair.price = sqlite3_column_double(stmt, 7); // Index 0 for the "price" column
+        std::cout << repair.note << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(partsStock.db);
 }
 
 void SQLQuery::Prices() {

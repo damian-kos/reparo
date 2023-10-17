@@ -159,6 +159,9 @@
     <ClInclude Include="vendor\sqlite3\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\repairs.cpp" />
+    <ClCompile Include="src\repairs_states.h" />
+    <ClCompile Include="src\repairs_states.cpp" />
     <ClCompile Include="src\add_repair.cpp" />
     <ClCompile Include="src\customer_fields.cpp" />
     <ClCompile Include="src\imgui_helper.cpp" />

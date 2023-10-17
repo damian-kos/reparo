@@ -9,6 +9,7 @@
 #include "helpmarker.h"
 #include "parts_stock_window.h"
 #include "add_repair.h"
+#include "repairs_states.h"
 
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -41,6 +42,7 @@ ModalController modalController;
 PartsStockWindow partsStockWindow;
 PartsStock partsStock;
 AddRepair repair;
+RepairMenu repair_menu;
 
 
 
@@ -222,6 +224,9 @@ int main(int, char**)
         if(ImGui::Button("Print data")) {
             //partsStock.PrintOutData();
         }
+
+        repair_menu.RepairMainWin();
+
         ImGui::End();
         
         if (show_add_customer_window) {

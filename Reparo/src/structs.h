@@ -21,15 +21,7 @@ struct PartData {
 };
 
 
-struct Repair {
-	PartData model;
-	PartData category;
-	PartData color;
-	PartData state;
-	std::string note = "";
-	std::string note_hidden = ""; 
-	double price;
-};
+
 
 struct PartQualityData {
 	bool selections[20] = {};
@@ -39,13 +31,14 @@ struct PartQualityData {
 	bool retreived = false;
 };
 
+
+
 struct Part {
 	PartData brand;
 	PartData model;
 	PartData category;
 	PartData color;
 	PartQualityData quality;
- 
 };
 
 struct Customer {
@@ -53,6 +46,17 @@ struct Customer {
 	std::string surname;
 	std::string email;
 	std::string phone_number;
+};
+
+struct Repair {
+	PartData model;
+	PartData category;
+	PartData color;
+	PartData state;
+	std::string note = "";
+	std::string note_hidden = "";
+	double price;
+	Customer customer;
 };
 
 struct PopupInput {

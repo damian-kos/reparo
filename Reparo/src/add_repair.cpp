@@ -15,10 +15,11 @@ char input_model[64] = { "" };
 bool is_input_model_enter_pressed;
 
 
-Customer repair_customer;
+//Customer repair_customer;
 int previos_model_id = 0;
 PartsStockWindow stock;
 Repair device;
+
 
 
 std::vector<InputField> repair_fields = {
@@ -29,9 +30,13 @@ std::vector<InputField> repair_fields = {
 };
 
 void AddRepair::AddRepairWindow() {
+
     ImGui::Begin("Add Repair");
-    
-    if (ImGui::BeginTable("Add repair table", 2)) {
+    ImGuiStyle& style = ImGui::GetStyle();
+
+
+    if (ImGui::BeginTable("Add repair table", 2, ImGuiTableFlags_Borders | ImGuiTableColumnFlags_IsHovered)) {
+
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-1);
@@ -40,7 +45,8 @@ void AddRepair::AddRepairWindow() {
         for (int i = 0; i < repair_fields.size() ; ++i) {
             ImGui::InputTextWithHint(repair_fields[i].label, repair_fields[i].hint, repair_fields[i].buffer, repair_fields[i].bufferSize, repair_fields[i].flags);
         }
-
+        
+        //std::cout << row << std::endl;
         ImGui::TableNextColumn();
         ImGui::InputTextWithHint("##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None);
         SearchForCustomers();
@@ -48,7 +54,16 @@ void AddRepair::AddRepairWindow() {
 
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
+
+        //if (test) {
+        //    ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+        //}
+        //else {
+        //    ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+        //}
         ImGui::SeparatorText("DEVICE:");
+        //ImGui::PopStyleColor(1);
+
 
         pop_model.is_input_enter_pressed = ImGui::InputTextWithHint("##Model_search", "Model..", pop_model.input, IM_ARRAYSIZE(pop_model.input), ImGuiInputTextFlags_EnterReturnsTrue);
         Models();
@@ -85,7 +100,7 @@ void AddRepair::AddRepairWindow() {
 
 void AddRepair::SubmitRepair(std::string& message) {
     CustomerPopulate customer;
-    int submit = customer.Submit(repair_fields, repair_customer);
+    int submit = customer.Submit(repair_fields, device.customer);
     SQLQuery sql;
 
     if (submit == -2) {
@@ -95,7 +110,7 @@ void AddRepair::SubmitRepair(std::string& message) {
     }
     if (submit == 0) { // Here if customer does not exist we add him to database, and we are adding repair after.
         GetIDs(sql);
-        int cust_ID = sql.InsertCustomer(repair_customer);
+        int cust_ID = sql.InsertCustomer(device.customer);
         sql.AddRepair(device, cust_ID);
         for (InputField& field : repair_fields) {
             memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
@@ -164,6 +179,7 @@ void AddRepair::Categories() {
 void AddRepair::Colors() {
     Search search;
     PartsStockWindow parts;
+    parts.GetColorsForModel(device.color.data, device.model.data, device.model.name);
     const char* label = "##color";
     search.PopupModels(pop_color, device.color, label);
 }

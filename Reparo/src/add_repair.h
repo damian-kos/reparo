@@ -23,7 +23,7 @@ public:
     PopupInput pop_model;
     PopupInput pop_category;
     PopupInput pop_color;
-
+    
     std::string errorMessage;
     void AddRepairWindow();
     void SubmitRepair(std::string& message);

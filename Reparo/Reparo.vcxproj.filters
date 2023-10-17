@@ -152,6 +152,15 @@
     <ClCompile Include="src\customer_fields.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\repairs_states.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\repairs_states.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\repairs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="devices.json" />
