@@ -436,7 +436,11 @@ void SQLQuery::AddRepair(Repair& repair, int customerID) {
 
 void SQLQuery::GetAllToDoRepairs(Repair& repair) {
     partsStock.OpenPartsStockDb();
-    const char* query = "SELECT * FROM repairs WHERE repair_state_id = 1";
+    const char* query = "SELECT r.*, c.category, m.model, co.color FROM repairs r "
+        "LEFT JOIN categories c ON r.category_id = c.category_id "
+        "LEFT JOIN models m ON r.model_id = m.model_id "
+        "LEFT JOIN colors co ON r.color_id = co.color_id "
+        "WHERE r.repair_state_id = 1";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, nullptr) != SQLITE_OK) {
@@ -450,13 +454,23 @@ void SQLQuery::GetAllToDoRepairs(Repair& repair) {
         repair.color.IDinDB = sqlite3_column_int(stmt, 4);
         repair.note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
         repair.note_hidden = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
-        repair.price = sqlite3_column_double(stmt, 7); // Index 0 for the "price" column
-        std::cout << repair.note << std::endl;
+        repair.price = sqlite3_column_double(stmt, 7);
+
+        // Additional data from related tables
+        repair.category.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
+        repair.model.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10));
+        repair.color.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11));
+
+        std::cout << "Note: " << repair.note << std::endl;
+        std::cout << "Category: " << repair.category.name << std::endl;
+        std::cout << "Model: " << repair.model.name << std::endl;
+        std::cout << "Color: " << repair.color.name << std::endl;
     }
 
     sqlite3_finalize(stmt);
     sqlite3_close(partsStock.db);
 }
+
 
 void SQLQuery::Prices() {
     partsStock.OpenPartsStockDb();
