@@ -21,7 +21,7 @@ int currentlySelectedRow = -1;
 //bool shortcuts[5] = {};
 
 
-void Search::ForEdit() {
+void Search::CustomerTableWEdit() {
     CustomerEditWindow customerEditWindow;
     ImGuiHelper imguiHelper;
     

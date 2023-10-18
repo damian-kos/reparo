@@ -131,6 +131,7 @@ int main(int, char**)
     bool show_another_window = false;
     bool show_add_customer_window = false;
     bool add_part_to_stock_window = false;
+    bool show_add_repair_window = false;
 
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -217,6 +218,9 @@ int main(int, char**)
         ImGui::SameLine(); HelpMarker("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer");
         ImGui::Checkbox("Add part to stock", &add_part_to_stock_window);
         ImGui::SameLine(); HelpMarker("Adding new part \nSearching for parts to update \nEditing existings ones");
+        if (ImGui::Button("Add repair"))
+            show_add_repair_window = !show_add_repair_window;
+
         if (ImGui::Button("Create database")) {
             //partsStock.OpenPartsStockDb();
             partsStock.CreateTable();
@@ -242,7 +246,8 @@ int main(int, char**)
         if(customerEditWindow.GetShouldRender())
             customerEditWindow.Render();
 
-        repair.AddRepairWindow();
+        if(show_add_repair_window)
+            repair.AddRepairWindow();
 
 
 

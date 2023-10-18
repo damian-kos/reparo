@@ -1,5 +1,5 @@
 #include "repairs_states.h"
 
 void Repairs::AllToDoRepairs() {
-    sql.GetAllToDoRepairs(repair);
+    to_do_repairs = sql.GetAllToDoRepairs();
 }

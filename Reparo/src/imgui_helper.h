@@ -15,5 +15,6 @@ public:
     void TablesColumnsText(int column, std::string text);
     void PopupOnItemOfTable(const char* text, Customer& val, int id);
     void ComboForDevice(const char* label, PartData& device);
+    void RepairStatesTable(std::vector<Repair>& repairs, int& selected);
 };
 

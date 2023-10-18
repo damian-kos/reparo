@@ -49,6 +49,7 @@ struct Customer {
 };
 
 struct Repair {
+	int id;
 	PartData model;
 	PartData category;
 	PartData color;

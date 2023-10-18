@@ -7,13 +7,17 @@
 class Repairs {
 public:
     void AllToDoRepairs();
-
+    std::vector<Repair> to_do_repairs;
 private:
-    Repair repair;
+
     SQLQuery sql;
 };
 
 class RepairMenu {
 public:
     void RepairMainWin();
+    Repairs repairs;
+
+private:
+    ImGuiHelper helper;
 };

@@ -9,7 +9,7 @@
 
 class Search {
 public:
-    void ForEdit();
+    void CustomerTableWEdit();
     void SearchField(const char* searchQuery);
     void ForAdd(std::vector<InputField>& fields);
     bool SearchModel(PopupInput& popup, std::vector<std::string>& vector);

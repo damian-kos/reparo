@@ -1,4 +1,4 @@
-#include "imgui_helper.h"
+﻿#include "imgui_helper.h"
 #include <iostream>
 
 void ImGuiHelper::PopulateListBox(const char* label, PartData& part) {
@@ -123,5 +123,57 @@ void ImGuiHelper::ComboForDevice(const char* label, PartData& attribute) {
                 ImGui::SetItemDefaultFocus();
         }
         ImGui::EndCombo();
+    }
+}
+
+void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected) {
+    //const bool item_is_selected = repairs.
+    int currentlySelectedRow = - 1;
+
+    static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+    if (ImGui::BeginTable("##states", 6, flags)) {
+        ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Model", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Color", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Price", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Note", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableHeadersRow();
+        for (int row = 0; row < repairs.size(); row++)
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            char label[32];
+
+            ImGui::PushID(row);
+            sprintf_s(label, "%d", repairs[row].id); // Format as 5-digit string with leading zeros
+
+            if (ImGui::Selectable(label, selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
+                if (ImGui::IsMouseDoubleClicked(0)) {
+
+
+                    //customerEditWindow.SetCustomerToEdit(&val, key); //To be replaced with customer details, repair history etc.
+                    //currentlySelectedRow = selected;
+                }
+            }
+            //ImGui::Text("%d", repairs[row].id);
+            ImGui::TableNextColumn();
+            ImGui::Text(repairs[row].model.name.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text(repairs[row].category.name.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text(repairs[row].color.name.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text("%.2f", repairs[row].price);
+            ImGui::TableNextColumn();
+            ImGui::Text(repairs[row].note.c_str());
+
+
+
+            ImGui::PopID();
+        
+        }
+        ImGui::EndTable();
+
     }
 }

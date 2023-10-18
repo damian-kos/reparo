@@ -434,20 +434,26 @@ void SQLQuery::AddRepair(Repair& repair, int customerID) {
 
 }
 
-void SQLQuery::GetAllToDoRepairs(Repair& repair) {
+std::vector<Repair> SQLQuery::GetAllToDoRepairs() {
     partsStock.OpenPartsStockDb();
-    const char* query = "SELECT r.*, c.category, m.model, co.color FROM repairs r "
+    std::vector<Repair> repairs;
+    const char* query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.* FROM repairs r "
         "LEFT JOIN categories c ON r.category_id = c.category_id "
         "LEFT JOIN models m ON r.model_id = m.model_id "
         "LEFT JOIN colors co ON r.color_id = co.color_id "
+        "LEFT JOIN repair_states rs ON r.repair_state_id = rs.repair_state_id "
+        "LEFT JOIN customers cu ON r.customer_id = cu.customer_id "
         "WHERE r.repair_state_id = 1";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(partsStock.db, query, -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "SQL error: " << sqlite3_errmsg(partsStock.db) << std::endl;
+        return {};
     }
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
+        Repair repair;
+        repair.id = sqlite3_column_int(stmt, 0);
         int customer_id = sqlite3_column_int(stmt, 1);
         repair.model.IDinDB = sqlite3_column_int(stmt, 2);
         repair.category.IDinDB = sqlite3_column_int(stmt, 3);
@@ -460,13 +466,24 @@ void SQLQuery::GetAllToDoRepairs(Repair& repair) {
         repair.category.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9));
         repair.model.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10));
         repair.color.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11));
+        repair.state.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12));
+        repair.customer.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 14));
+        repair.customer.surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 15));
+        repair.customer.email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
+        repair.customer.phone_number = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
 
-        std::cout << "Note: " << repair.note << std::endl;
-        std::cout << "Category: " << repair.category.name << std::endl;
-        std::cout << "Model: " << repair.model.name << std::endl;
-        std::cout << "Color: " << repair.color.name << std::endl;
+
+        repairs.emplace_back(repair);
+
+
+        //std::cout << "Note: " << repair.note << std::endl;
+        //std::cout << "Category: " << repair.category.name << std::endl;
+        //std::cout << "Model: " << repair.model.name << std::endl;
+        //std::cout << "Color: " << repair.color.name << std::endl;
+        //std::cout << "State: " << repair.state.name << std::endl;
+        //std::cout << "Customer: " << repair.customer.name << std::endl;
     }
-
+    return repairs;
     sqlite3_finalize(stmt);
     sqlite3_close(partsStock.db);
 }

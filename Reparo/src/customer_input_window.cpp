@@ -83,7 +83,7 @@ void CustomerInputWindow::PassSearchQuery()
         search.SearchField(inputFields[phoneNumberIndex].buffer);
     }
 
-    search.ForEdit();
+    search.CustomerTableWEdit();
 }
 
 
