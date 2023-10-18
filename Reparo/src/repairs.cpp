@@ -1,9 +1,9 @@
 #include "repairs_states.h"
 
+int selected = -1;
 
 
 void RepairMenu::RepairMainWin() {
-    int selected = -1;
     ImGui::Begin("Repairs");
     repairs.AllToDoRepairs();
     helper.RepairStatesTable(repairs.to_do_repairs, selected);

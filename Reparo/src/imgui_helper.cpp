@@ -125,10 +125,10 @@ void ImGuiHelper::ComboForDevice(const char* label, PartData& attribute) {
         ImGui::EndCombo();
     }
 }
+int poop = -1;
 
 void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected) {
     //const bool item_is_selected = repairs.
-    int currentlySelectedRow = - 1;
 
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
     if (ImGui::BeginTable("##states", 6, flags)) {
@@ -141,6 +141,7 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
         ImGui::TableHeadersRow();
         for (int row = 0; row < repairs.size(); row++)
         {
+            const bool test = (selected == row);
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             char label[32];
@@ -148,15 +149,12 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
             ImGui::PushID(row);
             sprintf_s(label, "%d", repairs[row].id); // Format as 5-digit string with leading zeros
 
-            if (ImGui::Selectable(label, selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
-                if (ImGui::IsMouseDoubleClicked(0)) {
-
-
-                    //customerEditWindow.SetCustomerToEdit(&val, key); //To be replaced with customer details, repair history etc.
-                    //currentlySelectedRow = selected;
-                }
+            if (ImGui::Selectable(label, test, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
+                
+                    selected = row;
+                
             }
-            //ImGui::Text("%d", repairs[row].id);
+   
             ImGui::TableNextColumn();
             ImGui::Text(repairs[row].model.name.c_str());
             ImGui::TableNextColumn();
