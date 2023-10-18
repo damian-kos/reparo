@@ -21,7 +21,7 @@ struct PartData {
 };
 
 
-
+typedef int CustomerInputFlags;
 
 struct PartQualityData {
 	bool selections[20] = {};

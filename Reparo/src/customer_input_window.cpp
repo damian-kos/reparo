@@ -12,32 +12,33 @@ Search search;
 using namespace std;
 
 
-std::vector<InputField> inputFields = {
-    {"##PhoneNumber", "Phone Number..", phoneNumber, IM_ARRAYSIZE(phoneNumber), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank},
-    {"##Name", "Name..", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_None},
-    {"##Surname", "Surname..", surname, IM_ARRAYSIZE(surname), ImGuiInputTextFlags_None},
-    {"##Email", "Email..", email, IM_ARRAYSIZE(email), ImGuiInputTextFlags_None},
-};
-
-
-void CustomerInputWindow::Render() {
-        ImGui::Begin("Add customer");
+void CustomerInputWindow::Render(CustomerInputFlags flags) {
+        
         ImGui::PushItemWidth(-1);
         CreateInputFields();
         ImGui::Spacing();
-        if(ImGui::Button("Submit Customer Details"))
-            Submit();
+        if (flags & CustomerInputFlags_SubmitButton) {
+            if (ImGui::Button("Submit Customer Details")) {
+                Submit();
+            }
+        }
         modalController.GetErrorState("Customer Input Feedback", errorMessage.c_str());
         ImGui::Spacing();
-        PassSearchQuery();
-        ImGui::End();
+        if (flags & CustomerInputFlags_SearchResultsOnPhoneNo) 
+            PassSearchQuery();
      
 }
 
 void CustomerInputWindow::CreateInputFields()
 {
     // Create input fields
-    for (int i = 0; i < inputFields.size(); ++i) {
+    for (int i = 0; i < inputFields.size(); i++) {
+        if (flags & CustomerInputFlags_NoSurnameField) {
+            if (i == 2) {
+                continue;
+            }
+        }
+       
         ImGui::InputTextWithHint(inputFields[i].label, inputFields[i].hint, inputFields[i].buffer, inputFields[i].bufferSize, inputFields[i].flags);
         if (std::strcmp(inputFields[i].label, "##PhoneNumber") == 0) {
             phoneNumberIndex = i; // Store the index of the phoneNumber field
@@ -45,10 +46,19 @@ void CustomerInputWindow::CreateInputFields()
     }
 }
 
+Customer CustomerInputWindow::FieldsToCustomer() {
+	customer.phone_number = inputFields[0].buffer;
+	customer.name = inputFields[1].buffer;
+	customer.surname = inputFields[2].buffer;
+	customer.email = inputFields[3].buffer;
+    return customer;
+}
+
 void CustomerInputWindow::Submit()
 {
     CustomerPopulate populate;
-    int submit = populate.Submit(inputFields, customer);
+    Customer curr_customer = FieldsToCustomer();
+    int submit = populate.Submit(curr_customer);
 
     if (submit == -2){
         modalController.RenderErrorModal("Customer Input Feedback");
@@ -56,7 +66,7 @@ void CustomerInputWindow::Submit()
         return;
      }
     if (submit == 0) {
-        int placeholder = sql.InsertCustomer(customer);
+        int placeholder = sql.InsertCustomer(curr_customer);
         for (InputField& field : inputFields) {
             memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
         }
@@ -82,7 +92,6 @@ void CustomerInputWindow::PassSearchQuery()
     if (phoneNumberIndex != -1) {
         search.SearchField(inputFields[phoneNumberIndex].buffer);
     }
-
     search.CustomerTableWEdit();
 }
 

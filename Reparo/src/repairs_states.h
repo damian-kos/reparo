@@ -8,6 +8,7 @@ class Repairs {
 public:
     void AllToDoRepairs();
     std::vector<Repair> to_do_repairs;
+    bool to_do_retreived;
 private:
 
     SQLQuery sql;

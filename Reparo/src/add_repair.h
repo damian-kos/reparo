@@ -6,10 +6,10 @@
 #include "customer_fields.h"
 #include "error_handler.h"
 #include "sql_queries.h"
+#include "customer_input_window.h"
 
 
 void SearchForCustomers();
-void SearchForByPhone();
 void Combo(Repair& device, std::string label, PartData& attribute);
 void GetIDs(SQLQuery& sql);
 
@@ -26,7 +26,11 @@ public:
     
     std::string errorMessage;
     void AddRepairWindow();
+    CustomerInputWindow customerInput;
+
     void SubmitRepair(std::string& message);
     ModalController modalController;
+private:
+    void SearchForByPhone();
 
 };

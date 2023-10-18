@@ -8,5 +8,5 @@
 class CustomerPopulate {
 public:
     void PopulteCustomerFields(std::vector<InputField>& fields, Customer& customer);
-    int Submit(std::vector<InputField>& input, Customer& cust);
+    int Submit(Customer& cust);
 };

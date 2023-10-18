@@ -9,11 +9,7 @@ void CustomerPopulate::PopulteCustomerFields(std::vector<InputField>& fields, Cu
 		strncpy_s(fields[3].buffer, fields[3].bufferSize, customer.email.c_str(), _TRUNCATE);
 }
 
-int CustomerPopulate::Submit(std::vector<InputField>& input, Customer& cust) {
-	cust.phone_number = input[0].buffer;
-	cust.name = input[1].buffer;
-	cust.surname = input[2].buffer;
-	cust.email = input[3].buffer;
+int CustomerPopulate::Submit(Customer& cust) {
 	SQLQuery sql;
 	int result = sql.SearchForCustomerSQL(cust);
 	if (cust.phone_number.empty()) {

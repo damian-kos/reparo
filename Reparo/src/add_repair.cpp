@@ -32,7 +32,6 @@ std::vector<InputField> repair_fields = {
 void AddRepair::AddRepairWindow() {
 
     ImGui::Begin("Add Repair");
-    ImGuiStyle& style = ImGui::GetStyle();
 
 
     if (ImGui::BeginTable("Add repair table", 2, ImGuiTableFlags_Borders | ImGuiTableColumnFlags_IsHovered)) {
@@ -40,20 +39,10 @@ void AddRepair::AddRepairWindow() {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-1);
+
         ImGui::SeparatorText("CUSTOMER:");
-
-        for (int i = 0; i < repair_fields.size() ; ++i) {
-            ImGui::InputTextWithHint(repair_fields[i].label, repair_fields[i].hint, repair_fields[i].buffer, repair_fields[i].bufferSize, repair_fields[i].flags);
-        }
-        
-        //std::cout << row << std::endl;
-        ImGui::TableNextColumn();
-        ImGui::InputTextWithHint("##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None);
-        SearchForCustomers();
-        SearchForByPhone();
-
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
+        //CustomerInputWindow customerInput;
+        customerInput.Render(CustomerInputFlags_NoSurnameField);
 
         //if (test) {
         //    ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
@@ -63,6 +52,7 @@ void AddRepair::AddRepairWindow() {
         //}
         ImGui::SeparatorText("DEVICE:");
         //ImGui::PopStyleColor(1);
+
 
 
         pop_model.is_input_enter_pressed = ImGui::InputTextWithHint("##Model_search", "Model..", pop_model.input, IM_ARRAYSIZE(pop_model.input), ImGuiInputTextFlags_EnterReturnsTrue);
@@ -81,26 +71,34 @@ void AddRepair::AddRepairWindow() {
         Combo(device, "##States", device.state);
 
         ImGui::SeparatorText("Price:");
-        ImGui::InputDouble("input float", &device.price, 0.1f, 1.0f, "%.2f"); 
+        ImGui::InputDouble("input float", &device.price, 0.1f, 1.0f, "%.2f");
 
-        ImGui::TableNextColumn();
-
-        ImGui::EndTable();
         if (ImGui::Button("Add repair")) {
-            std::cout << device.model.current_id << std::endl;
             SubmitRepair(this->errorMessage);
         }
         modalController.GetErrorState("Repair Input Feedback", this->errorMessage.c_str());
         if (ImGui::Button("test")) {
             sql.Prices();
         }
+        //std::cout << row << std::endl;
+        ImGui::TableNextColumn();
+        ImGui::InputTextWithHint("##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None);
+        SearchForCustomers();
+        SearchForByPhone();
+
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+
+        ImGui::EndTable();
+
     }
     ImGui::End();
 }
 
 void AddRepair::SubmitRepair(std::string& message) {
     CustomerPopulate customer;
-    int submit = customer.Submit(repair_fields, device.customer);
+    device.customer = customerInput.FieldsToCustomer();
+    int submit = customer.Submit(device.customer);
     SQLQuery sql;
 
     if (submit == -2) {
@@ -108,6 +106,7 @@ void AddRepair::SubmitRepair(std::string& message) {
         message = "Phone number can't be empty. It is used to identify customers.";
         return;
     }
+
     if (submit == 0) { // Here if customer does not exist we add him to database, and we are adding repair after.
         GetIDs(sql);
         int cust_ID = sql.InsertCustomer(device.customer);
@@ -149,11 +148,11 @@ void SearchForCustomers() {
     search.ForAdd(repair_fields);
 }
 
-void SearchForByPhone() {
+void AddRepair::SearchForByPhone() {
     Search search;
     ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Looks like this customer already exists. \nDouble click on him to copy data over.");
-    search.SearchField(repair_fields[0].buffer);
-    search.ForAdd(repair_fields);
+    search.SearchField(customerInput.inputFields[0].buffer);
+    search.ForAdd(customerInput.inputFields);
 }
 
 void AddRepair::Models() {

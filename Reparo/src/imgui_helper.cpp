@@ -141,7 +141,7 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
         ImGui::TableHeadersRow();
         for (int row = 0; row < repairs.size(); row++)
         {
-            const bool test = (selected == row);
+            const bool is_selected = (selected == row);
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             char label[32];
@@ -149,10 +149,8 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
             ImGui::PushID(row);
             sprintf_s(label, "%d", repairs[row].id); // Format as 5-digit string with leading zeros
 
-            if (ImGui::Selectable(label, test, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
-                
+            if (ImGui::Selectable(label, is_selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {                
                     selected = row;
-                
             }
    
             ImGui::TableNextColumn();

@@ -1,5 +1,8 @@
 #include "repairs_states.h"
 
 void Repairs::AllToDoRepairs() {
-    to_do_repairs = sql.GetAllToDoRepairs();
+    if (!to_do_retreived) {
+        to_do_repairs = sql.GetAllToDoRepairs();
+        to_do_retreived = true;
+    }
 }

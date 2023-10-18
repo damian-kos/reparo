@@ -36,8 +36,8 @@ void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
-CustomerInputWindow inputWindow;
-CustomerEditWindow customerEditWindow;
+CustomerInputWindow addCustomerWin;
+CustomerEditWindow customerEditWin;
 ModalController modalController;
 PartsStockWindow partsStockWindow;
 PartsStock partsStock;
@@ -130,8 +130,9 @@ int main(int, char**)
     bool show_demo_window = true;
     bool show_another_window = false;
     bool show_add_customer_window = false;
-    bool add_part_to_stock_window = false;
+    bool show_add_part_to_stock_window = false;
     bool show_add_repair_window = false;
+    bool show_repair_states_window = false;
 
 
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -166,6 +167,13 @@ int main(int, char**)
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
+        ImGuiStyle* style = &ImGui::GetStyle();
+        style->FrameRounding = 6.0f;
+        style->WindowRounding = 6.0f;
+        style->PopupRounding = 6.0f;
+        style->ScrollbarRounding = 6.0f;
+        style->GrabRounding = 3.0f;
+
 
         //std::cout << "Name: " << std::endl;
 
@@ -212,14 +220,21 @@ int main(int, char**)
 
 
         ImGui::Begin("Main Menu");
-
         // Window for Adding Customers
-        ImGui::Checkbox("Add customer", &show_add_customer_window); 
+        if (ImGui::Button("Add customer"))
+            show_add_customer_window = !show_add_customer_window;
         ImGui::SameLine(); HelpMarker("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer");
-        ImGui::Checkbox("Add part to stock", &add_part_to_stock_window);
+        if (ImGui::Button("Add part to stock"))
+            show_add_part_to_stock_window = !show_add_part_to_stock_window;
         ImGui::SameLine(); HelpMarker("Adding new part \nSearching for parts to update \nEditing existings ones");
+
         if (ImGui::Button("Add repair"))
             show_add_repair_window = !show_add_repair_window;
+        ImGui::SameLine(); HelpMarker("Adding new repair \nAdd new or chose existing customer details \n");
+
+        if (ImGui::Button("Repairs TO DO"))
+            show_repair_states_window = !show_repair_states_window;
+        ImGui::SameLine(); HelpMarker("Repairs to do \nCurrent tickets which are not progressing yet \n");
 
         if (ImGui::Button("Create database")) {
             //partsStock.OpenPartsStockDb();
@@ -228,27 +243,23 @@ int main(int, char**)
         if(ImGui::Button("Print data")) {
             //partsStock.PrintOutData();
         }
-
-        repair_menu.RepairMainWin();
-
         ImGui::End();
-        
-        if (show_add_customer_window) {
-        inputWindow.Render();
-        }
-        if (add_part_to_stock_window) {
+
+        if (show_add_customer_window) 
+            addCustomerWin.Render(CustomerInputFlags_NoSurnameField | CustomerInputFlags_SubmitButton);
+        if (show_add_part_to_stock_window) {
             partsStockWindow.GetBrands();
             partsStockWindow.Render();
         }
 
         DebugWindow();
         
-        if(customerEditWindow.GetShouldRender())
-            customerEditWindow.Render();
-
+        if(customerEditWin.GetShouldRender())
+            customerEditWin.Render();
         if(show_add_repair_window)
             repair.AddRepairWindow();
-
+        if(show_repair_states_window)
+            repair_menu.RepairMainWin();
 
 
         // Rendering
