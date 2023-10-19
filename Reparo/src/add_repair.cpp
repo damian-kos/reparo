@@ -15,7 +15,7 @@ char input_model[64] = { "" };
 bool is_input_model_enter_pressed;
 
 
-//Customer repair_customer;
+
 int previos_model_id = 0;
 PartsStockWindow stock;
 Repair device;
@@ -32,8 +32,6 @@ std::vector<InputField> repair_fields = {
 void AddRepair::AddRepairWindow() {
 
     ImGui::Begin("Add Repair");
-
-
     if (ImGui::BeginTable("Add repair table", 2, ImGuiTableFlags_Borders | ImGuiTableColumnFlags_IsHovered)) {
 
         ImGui::TableNextRow();
@@ -52,8 +50,6 @@ void AddRepair::AddRepairWindow() {
         //}
         ImGui::SeparatorText("DEVICE:");
         //ImGui::PopStyleColor(1);
-
-
 
         pop_model.is_input_enter_pressed = ImGui::InputTextWithHint("##Model_search", "Model..", pop_model.input, IM_ARRAYSIZE(pop_model.input), ImGuiInputTextFlags_EnterReturnsTrue);
         Models();
@@ -74,9 +70,19 @@ void AddRepair::AddRepairWindow() {
         ImGui::InputDouble("input float", &device.price, 0.1f, 1.0f, "%.2f");
 
         if (ImGui::Button("Add repair")) {
-            SubmitRepair(this->errorMessage);
+            SubmitRepair();
+            if (customerInput.TestSubmitCall("Repair Input Feedback", CustomerSubmissionFlags_RepairAdd)) {
+                GetIDs();
+                if (customerInput.submit_customer_result == AddNewCustomer) {
+                    int cust_ID = sql.InsertCustomer(device.customer);
+                    sql.AddRepair(device, cust_ID);
+                }
+                else {
+                    sql.AddRepair(device, customerInput.submit_customer_result);
+                }
+            }
         }
-        modalController.GetErrorState("Repair Input Feedback", this->errorMessage.c_str());
+        //modalController.GetErrorState("Repair Input Feedback", this->errorMessage.c_str(), );
         if (ImGui::Button("test")) {
             sql.Prices();
         }
@@ -95,68 +101,43 @@ void AddRepair::AddRepairWindow() {
     ImGui::End();
 }
 
-void AddRepair::SubmitRepair(std::string& message) {
-    CustomerPopulate customer;
-    device.customer = customerInput.FieldsToCustomer();
-    int submit = customer.Submit(device.customer);
-    SQLQuery sql;
-
-    if (submit == -2) {
-        modalController.RenderErrorModal("Repair Input Feedback");
-        message = "Phone number can't be empty. It is used to identify customers.";
-        return;
-    }
-
-    if (submit == 0) { // Here if customer does not exist we add him to database, and we are adding repair after.
-        GetIDs(sql);
-        int cust_ID = sql.InsertCustomer(device.customer);
-        sql.AddRepair(device, cust_ID);
-        for (InputField& field : repair_fields) {
-            memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
-        }
-        return;
-    }
-    if (submit == -1) {
-        modalController.RenderErrorModal("Repair Input Feedback");
-        message = "There is a problem with inputting customers. Please contact support team.";
-        return;
-
-    }
-    else { // Here we take this customer ID and add repair with this id.
-        GetIDs(sql);
-        sql.AddRepair(device, submit);
-        return;
-    }
+void AddRepair::SubmitRepair() {
+    //device.customer = customerInput.FieldsToCustomer();
+    submit = sql.SearchForCustomerSQL(device.customer);
 }
 
-void GetIDs(SQLQuery& sql) {
-    device.note = notes;
-    device.note_hidden = notes_hidden;
-    std::string query = "SELECT model_id FROM models WHERE model = ? ";
-    device.model.IDinDB = sql.GetIdForValue(query, device.model.name.c_str());
-    query = "SELECT category_id FROM categories WHERE category = ? ";
-    device.category.IDinDB = sql.GetIdForValue(query, device.category.name.c_str());
-    query = "SELECT color_id FROM colors WHERE color = ? ";
-    device.color.IDinDB = sql.GetIdForValue(query, device.color.name.c_str());
-    query = "SELECT repair_state_id FROM repair_states WHERE repair_state = ? ";
-    device.state.IDinDB = sql.GetIdForValue(query, device.state.name.c_str());
-}
+void AddRepair::ProcessSubmission() {
+    //if (submit == PhoneNumberIsEmpty) {
+    //    modalController.RenderErrorModal("Repair Input Feedback");
+    //    error_message = "Phone number can't be empty. It is used to identify customers.";
+    //    return;
+    //}
 
-void SearchForCustomers() {
-    Search search;
-    search.SearchField(searchQuery);
-    search.ForAdd(repair_fields);
-}
+    //if (submit == AddNewCustomer) { // Here if customer does not exist we add him to database, and we are adding repair after.
+    //    GetIDs();
+    //    int cust_ID = sql.InsertCustomer(device.customer);
+    //    sql.AddRepair(device, cust_ID);
+    //    for (InputField& field : repair_fields) {
+    //        memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
+    //    }
+    //    return;
+    //}
 
-void AddRepair::SearchForByPhone() {
-    Search search;
-    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Looks like this customer already exists. \nDouble click on him to copy data over.");
-    search.SearchField(customerInput.inputFields[0].buffer);
-    search.ForAdd(customerInput.inputFields);
+    //if (submit == WrongQuery) {
+    //    modalController.RenderErrorModal("Repair Input Feedback");
+    //    error_message = "There is a problem with inputting customers. Please contact support team.";
+    //    return;
+
+    //}
+    //else { // Here we take this customer ID and add repair with this id.
+    //    GetIDs();
+    //    sql.AddRepair(device, submit);
+    //    return;
+    //}
 }
 
 void AddRepair::Models() {
-    Search search;
+    //Search search;
     if (search.SearchModel(pop_model, device.model.data)) {
         std::string strSearchQuery(pop_model.input);
         sql.MatchingModels(strSearchQuery, device.model.data, "models");
@@ -166,7 +147,7 @@ void AddRepair::Models() {
 }
 
 void AddRepair::Categories() {
-    Search search;
+    //Search search;
     if (search.SearchModel(pop_category, device.category.data)) {
         std::string strSearchQuery(pop_category.input);
         sql.MatchingModels(strSearchQuery, device.category.data, "categories");
@@ -176,13 +157,25 @@ void AddRepair::Categories() {
 }
 
 void AddRepair::Colors() {
-    Search search;
+    //Search search;
     PartsStockWindow parts;
     parts.GetColorsForModel(device.color.data, device.model.data, device.model.name);
     const char* label = "##color";
     search.PopupModels(pop_color, device.color, label);
 }
 
+void AddRepair::SearchForByPhone() {
+    //Search search;
+    ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Looks like this customer already exists. \nDouble click on him to copy data over.");
+    search.SearchField(searchQuery);
+    search.ForAdd(customerInput.inputFields, SearchFlags_CopyToFields);
+}
+
+void AddRepair::SearchForCustomers() {
+    //Search search;
+    search.SearchField(customerInput.inputFields[0].buffer);
+    search.ForAdd(customerInput.inputFields, SearchFlags_CopyToFields | SearchFlags_EditCustomer);
+}
 
 void Combo(Repair& device, std::string label, PartData& attribute) {
     if (!attribute.retreived) {
@@ -197,3 +190,15 @@ void Combo(Repair& device, std::string label, PartData& attribute) {
     helper.ComboForDevice(label.c_str(), attribute);
 }
 
+void AddRepair::GetIDs() {
+    device.note = notes;
+    device.note_hidden = notes_hidden;
+    std::string query = "SELECT model_id FROM models WHERE model = ? ";
+    device.model.IDinDB = sql.GetIdForValue(query, device.model.name.c_str());
+    query = "SELECT category_id FROM categories WHERE category = ? ";
+    device.category.IDinDB = sql.GetIdForValue(query, device.category.name.c_str());
+    query = "SELECT color_id FROM colors WHERE color = ? ";
+    device.color.IDinDB = sql.GetIdForValue(query, device.color.name.c_str());
+    query = "SELECT repair_state_id FROM repair_states WHERE repair_state = ? ";
+    device.state.IDinDB = sql.GetIdForValue(query, device.state.name.c_str());
+}

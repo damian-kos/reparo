@@ -33,7 +33,7 @@ void CustomerEditWindow::Render() {
             SQLQuery sql;
             sql.UpdateCustomer(idToEdit, editedCustomer);
         }
-        modalController.GetErrorState("Missing values", "All values in fields must be not empty!");
+        //modalController.GetErrorState("Missing values", "All values in fields must be not empty!");
         ImGui::PopStyleColor(1);
         ImGui::End();
     }

@@ -4,6 +4,10 @@
 #include <vector>
 #include <string>
 
+typedef int CustomerInputFlags;
+typedef int SearchFlags;
+typedef int CustomerSubmissionFlags;
+
 struct InputField {
     const char* label;
     const char* hint;
@@ -20,9 +24,6 @@ struct PartData {
 	bool retreived = false;
 };
 
-
-typedef int CustomerInputFlags;
-
 struct PartQualityData {
 	bool selections[20] = {};
 	std::vector<std::string> data;
@@ -30,8 +31,6 @@ struct PartQualityData {
 	std::string desc = "";
 	bool retreived = false;
 };
-
-
 
 struct Part {
 	PartData brand;
@@ -66,4 +65,32 @@ struct PopupInput {
 	int previous_len;
 	bool is_input_text_active;
 	bool is_input_text_activated;
+};
+
+enum CustomerSubmissionState_ {
+	NotSubmitted = -3,
+	PhoneNumberIsEmpty = -2,
+	WrongQuery = -1,
+	AddNewCustomer = 0,
+};
+
+enum CustomerSubmissionFlags_ {
+	CustomerSubmissionFlags_None = 0,
+	CustomerSubmissionFlags_SimpleAdd = 1 << 0,
+	CustomerSubmissionFlags_RepairAdd = 1 << 1,
+};
+
+enum SearchFlags_ {
+	SearchFlags_None = 0,
+	SearchFlags_EditCustomer = 1 << 1,
+	SearchFlags_CopyToFields = 1 << 2,
+};
+
+enum CustomerInputFlags_ {
+	CustomerInputFlags_None = 0,
+	CustomerInputFlags_SubmitButton = 1 << 0,
+	CustomerInputFlags_NameField = 1 << 1,
+	CustomerInputFlags_NoSurnameField = 1 << 2,
+	CustomerInputFlags_EmailField = 1 << 3,
+	CustomerInputFlags_SearchResultsOnPhoneNo = 1 << 4,
 };

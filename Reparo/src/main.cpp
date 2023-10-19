@@ -245,8 +245,11 @@ int main(int, char**)
         }
         ImGui::End();
 
-        if (show_add_customer_window) 
-            addCustomerWin.Render(CustomerInputFlags_NoSurnameField | CustomerInputFlags_SubmitButton);
+        if (show_add_customer_window) {
+            ImGui::Begin("Add customer");
+            addCustomerWin.Render(CustomerInputFlags_SubmitButton | CustomerInputFlags_SearchResultsOnPhoneNo);
+            ImGui::End();
+        }
         if (show_add_part_to_stock_window) {
             partsStockWindow.GetBrands();
             partsStockWindow.Render();

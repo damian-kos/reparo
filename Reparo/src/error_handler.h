@@ -2,6 +2,8 @@
 
 #include <string>
 #include "imgui.h"
+#include "structs.h"
+
 
 class ModalController {
 public:
@@ -16,5 +18,5 @@ public:
     }
 
     void RenderErrorModal(const char* errorName);
-    void GetErrorState(const char* errorName, const char* errorMessage);
+    void GetErrorState(const char* errorName, const char* errorMessage, int& state);
 };

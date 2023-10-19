@@ -18,57 +18,6 @@ std::unordered_map<int, Customer> customers;
 std::vector<std::string> found_models;
 
 int currentlySelectedRow = -1;
-//bool shortcuts[5] = {};
-
-
-void Search::CustomerTableWEdit() {
-    CustomerEditWindow customerEditWindow;
-    ImGuiHelper imguiHelper;
-    
-    static bool selected[10] = {};
-    if (searchResultsBox) {
-        std::vector<std::string> names = { "ID", "Name", "Phone", "Email" };
-        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg |  ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-        imguiHelper.TableBegin("Customers", 4, names, flags);
-            int index = 0;
-            for (auto& [key, val] : customers){
-                char label[32];
-
-                ImGui::PushID(index);
-                sprintf_s(label, "%d", index+1); // Format as 5-digit string with leading zeros
-
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                if (ImGui::Selectable(label, selected[index], ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
-                    if (ImGui::IsMouseDoubleClicked(0)) {
-                        for (int i = 0; i < 10; i++) {
-                            selected[i] = false;
-                        }
-                        selected[index] = !selected[index];
-                        //customerEditWindow.SetCustomerToEdit(&val, key); //To be replaced with customer details, repair history etc.
-                        currentlySelectedRow = index;
-                    }
-                }
-                imguiHelper.PopupOnItemOfTable(("Customer: \"%s\".", val.name.c_str()), val, key);
-                // Column 1: Name
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", val.name.c_str());
-
-                // Column 2: Phone
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", val.phone_number.c_str());
-
-                //Column 3: Email
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", val.email.c_str());       
-                index++;
-                ImGui::PopID();
-            }
-
-        ImGui::EndTable();
-        }
-    }
-
 
 void Search::SearchField(const char* searchQuery) {
     if (previousLen != strlen(searchQuery)) {
@@ -86,10 +35,12 @@ void Search::SearchField(const char* searchQuery) {
     }
 }
 
-void Search::ForAdd(std::vector<InputField>& fields) {
+
+
+void Search::ForAdd(std::vector<InputField>& fields, SearchFlags reparo_flags) {
     CustomerEditWindow customerEditWindow;
     ImGuiHelper imguiHelper;
-
+   
     static bool selected[10] = {};
     if (searchResultsBox) {
         std::vector<std::string> names = { "ID", "Name", "Phone", "Email" };
@@ -110,20 +61,32 @@ void Search::ForAdd(std::vector<InputField>& fields) {
                         selected[i] = false;
                     }
                     selected[index] = !selected[index];
-                    CustomerPopulate populate;
-                    populate.PopulteCustomerFields(fields, val);
+
+                    if (reparo_flags & SearchFlags_CopyToFields) {
+                        CustomerPopulate populate;
+                        populate.PopulteCustomerFields(fields, val);
+                    }
+
                     currentlySelectedRow = index;
                 }
             }
-
             if (ImGui::BeginPopupContextItem()) {
                 ImGui::Text(("Customer: \"%s\".", val.name.c_str()));
-                if (ImGui::SmallButton("Copy Over ")) {
-                    CustomerPopulate populate;
-                    populate.PopulteCustomerFields(fields, val);
-                }
-                if (ImGui::Button("Close"))
+                //if (reparo_flags & SearchFlags_EditCustomer) {
+                    std::cout << val.name << std::endl;
+                    if (ImGui::SmallButton("Edit")) {
+                        customerEditWindow.SetCustomerToEdit(&val, key);
+                    }
+                //}
+               /* if (reparo_flags & SearchFlags_CopyToFields) {
+                    if (ImGui::Button("Copy Over ")) {
+                        CustomerPopulate populate;
+                        populate.PopulteCustomerFields(fields, val);
+                    }
+                }*/
+                if (ImGui::Button("Close")) {
                     ImGui::CloseCurrentPopup();
+                }
                 ImGui::EndPopup();
             }
             ImGui::SetItemTooltip("Right-click to open options");
@@ -145,7 +108,6 @@ void Search::ForAdd(std::vector<InputField>& fields) {
         ImGui::EndTable();
     }
 }
-
 
 const char** vectorToCharArray(const std::vector<std::string>& strings) {
     const char** charArray = new const char* [strings.size()];

@@ -91,21 +91,6 @@ void ImGuiHelper::TablesColumnsText(int columns, std::string text) {
         ImGui::Text(text.c_str());
 }
 
-void ImGuiHelper::PopupOnItemOfTable(const char* text, Customer& val, int id) {
-    CustomerEditWindow customerEditWindow;
-
-    if (ImGui::BeginPopupContextItem()) {
-        ImGui::Text(text);
-        if (ImGui::SmallButton("Edit")) {
-            customerEditWindow.SetCustomerToEdit(&val, id);
-        }
-        if (ImGui::Button("Close"))
-            ImGui::CloseCurrentPopup();
-        ImGui::EndPopup();
-    }
-    ImGui::SetItemTooltip("Right-click to open options");
-}
-
 void ImGuiHelper::ComboForDevice(const char* label, PartData& attribute) {
     if (ImGui::BeginCombo(label, attribute.data[attribute.current_id].c_str()))
     {

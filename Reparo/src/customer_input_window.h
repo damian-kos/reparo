@@ -7,36 +7,32 @@
 #include "sql_queries.h"
 #include "customer_fields.h"
 
-enum CustomerInputFlags_ {
-    CustomerInputFlags_None = 0,
-    CustomerInputFlags_SubmitButton = 1 << 0,
-    CustomerInputFlags_NameField = 1 << 2,
-    CustomerInputFlags_NoSurnameField = 1 << 3,
-    CustomerInputFlags_EmailField = 1 << 4,
-    CustomerInputFlags_SearchResultsOnPhoneNo = 1 << 5,
-};
+
 
 
 class CustomerInputWindow {
+public:
 
 public:
     void Render(CustomerInputFlags = 0);
-    void CreateInputFields();
+    void CreateInputFields(CustomerInputFlags flags=0);
     Customer FieldsToCustomer();
     void Submit();
-    void PassSearchQuery();
-
+    bool TestSubmitCall(std::string popup_title, CustomerSubmissionFlags = 0);
     std::vector<InputField> inputFields = {
     {"##PhoneNumber", "Phone Number..", phoneNumber, IM_ARRAYSIZE(phoneNumber), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank},
     {"##Name", "Name..", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_None},
     {"##Surname", "Surname..", surname, IM_ARRAYSIZE(surname), ImGuiInputTextFlags_None},
     {"##Email", "Email..", email, IM_ARRAYSIZE(email), ImGuiInputTextFlags_None},
     };
-    int flags;
-    ModalController modalController;
     Customer customer;
+    int submit_customer_result = NotSubmitted;
 
 private:
+    SQLQuery sql;
+    ModalController modalController;
+private:
+    void PassSearchQuery();
     char name[128] = "";
     char surname[128] = "";
     char email[128] = "";

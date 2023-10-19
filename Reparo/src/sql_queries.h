@@ -10,6 +10,8 @@ std::set<std::string> TokenizeAndStore(const std::string& input);
 
 class SQLQuery {
 public:
+
+public:
     PartsStock partsStock;
     void AllFromTable(const char* query, std::vector<std::string>& vector); // Takes all names from table
     void OnID(const char* query, std::vector<std::string>& vector, int id); // Takes all names from table WHERE id = ?

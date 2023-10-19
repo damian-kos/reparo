@@ -200,8 +200,9 @@ void SQLQuery::InsertPart(Part& part) {
 }
 
 int SQLQuery::SearchForCustomerSQL(Customer customer) {
+    if (customer.phone_number.empty())
+        return -2;
     partsStock.OpenPartsStockDb();
-
     std::set<std::string> words1 = TokenizeAndStore(customer.phone_number);
     const char* sqlQuery = "SELECT customer_id, phone FROM customers WHERE phone = ?";
     sqlite3_stmt* stmt;
@@ -234,9 +235,7 @@ int SQLQuery::SearchForCustomerSQL(Customer customer) {
         std::cerr << "Error preparing SQL statement Search For Customers: " << sqlite3_errmsg(partsStock.db) << std::endl;
         sqlite3_close(partsStock.db); // Close the database in case of an error
         return -1;
-
     }
-
 }
 
 int SQLQuery::InsertCustomer(Customer customer) {
