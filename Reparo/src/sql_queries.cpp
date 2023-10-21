@@ -372,9 +372,7 @@ void SQLQuery::MatchingModels(std::string& model_query, std::vector<std::string>
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             vector.emplace_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0)));
         }
-        for (size_t i = 0; i < vector.size(); i++) {
-            std::cout << vector[i] << std::endl;
-        }
+
     }
     else {
         std::cerr << "Error preparing SQL statement MatchingModels: " << sqlite3_errmsg(partsStock.db) << std::endl;

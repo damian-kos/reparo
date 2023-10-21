@@ -10,6 +10,7 @@ static int previous_model_id = -1;
 void PartsStockWindow::Render() {
   
     ImGui::Begin("Add part to stock");
+  
     ImGui::InputTextWithHint(
         "##SearchPart", "Part to search... ", partQuery, 
         IM_ARRAYSIZE(partQuery), ImGuiInputTextFlags_ReadOnly);

@@ -4,10 +4,8 @@
 #include <cstring>
 
 
-bool searchResultsBox = false;
 
-SQLQuery sqlSearch;
-int previousLen = 0;
+size_t previousLen = 0;
 int previousModelLen = 0;
 bool retreived = false;
 bool model_retreived = false;
@@ -35,22 +33,32 @@ void Search::SearchField(const char* searchQuery) {
     }
 }
 
+void Search::TestCust() {
+    if (ImGui::Button("Customers")) 
+        for (auto& pair : customers) {
+            std::cout << "Key: " << pair.first << ", Value: " << pair.second.name << std::endl;
+        }
 
+    
+}
 
-void Search::ForAdd(std::vector<InputField>& fields, SearchFlags reparo_flags) {
+void Search::ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags reparo_flags) {
     CustomerEditWindow customerEditWindow;
     ImGuiHelper imguiHelper;
-   
+    const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
+    
     static bool selected[10] = {};
-    if (searchResultsBox) {
+    //if (searchResultsBox) {
         std::vector<std::string> names = { "ID", "Name", "Phone", "Email" };
         static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-        imguiHelper.TableBegin("Customers", 4, names, flags);
+
+
+        imguiHelper.TableBegin("Customer", 4, names, label_int, flags);
         int index = 0;
         for (auto& [key, val] : customers) {
             char label[32];
 
-            ImGui::PushID(index);
+            //ImGui::PushID(index);
             sprintf_s(label, "%d", index + 1); // Format as 5-digit string with leading zeros
 
             ImGui::TableNextRow();
@@ -72,18 +80,18 @@ void Search::ForAdd(std::vector<InputField>& fields, SearchFlags reparo_flags) {
             }
             if (ImGui::BeginPopupContextItem()) {
                 ImGui::Text(("Customer: \"%s\".", val.name.c_str()));
-                //if (reparo_flags & SearchFlags_EditCustomer) {
+                if (reparo_flags & SearchFlags_EditCustomer) {
                     std::cout << val.name << std::endl;
                     if (ImGui::SmallButton("Edit")) {
                         customerEditWindow.SetCustomerToEdit(&val, key);
                     }
-                //}
-               /* if (reparo_flags & SearchFlags_CopyToFields) {
+                }
+                if (reparo_flags & SearchFlags_CopyToFields) {
                     if (ImGui::Button("Copy Over ")) {
                         CustomerPopulate populate;
                         populate.PopulteCustomerFields(fields, val);
                     }
-                }*/
+                }
                 if (ImGui::Button("Close")) {
                     ImGui::CloseCurrentPopup();
                 }
@@ -102,12 +110,13 @@ void Search::ForAdd(std::vector<InputField>& fields, SearchFlags reparo_flags) {
             ImGui::TableNextColumn();
             ImGui::Text("%s", val.email.c_str());
             index++;
-            ImGui::PopID();
+            //ImGui::PopID();
         }
-
+        customers.clear();
         ImGui::EndTable();
+        ImGui::PopID();
     }
-}
+//}
 
 const char** vectorToCharArray(const std::vector<std::string>& strings) {
     const char** charArray = new const char* [strings.size()];
@@ -115,7 +124,6 @@ const char** vectorToCharArray(const std::vector<std::string>& strings) {
     for (size_t i = 0; i < strings.size(); ++i) {
         charArray[i] = strings[i].c_str();
     }
-
     return charArray;
 }
 
@@ -125,12 +133,12 @@ bool Search::SearchModel(PopupInput& popup, std::vector<std::string>& vector) {
         popup.previous_len = strlen(popup.input);
         return false;
     }
-    if (strlen(popup.input) >= 3 && !model_retreived) {
+    if (strlen(popup.input) >= 1 && !model_retreived) {
         searchResultsBox = true;
         popup.previous_len = strlen(popup.input);
         return true;
     }
-    else if (strlen(popup.input) < 3) {
+    else if (strlen(popup.input) < 1) {
         vector.clear();
         searchResultsBox = false;
         popup.previous_len = strlen(popup.input);
@@ -164,10 +172,8 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
                     attribute.current_id = 1;
                 }
             }
-
             if (input.is_input_enter_pressed || (!input.is_input_text_active && !ImGui::IsWindowFocused()))
                 ImGui::CloseCurrentPopup();
-
             ImGui::EndPopup();
         }
     }

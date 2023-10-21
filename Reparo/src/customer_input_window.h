@@ -7,18 +7,17 @@
 #include "sql_queries.h"
 #include "customer_fields.h"
 
-
-
-
 class CustomerInputWindow {
 public:
-
+    CustomerInputWindow(std::string title) {
+        error_title = title;
+    }
 public:
     void Render(CustomerInputFlags = 0);
-    void CreateInputFields(CustomerInputFlags flags=0);
-    Customer FieldsToCustomer();
+    void CreateInputFields(CustomerInputFlags = 0);
+    Customer FieldsToCustomer(CustomerInputFlags = 0);
     void Submit();
-    bool TestSubmitCall(std::string popup_title, CustomerSubmissionFlags = 0);
+    bool TestSubmitCall(CustomerSubmissionFlags reparo_flags = 0);
     std::vector<InputField> inputFields = {
     {"##PhoneNumber", "Phone Number..", phoneNumber, IM_ARRAYSIZE(phoneNumber), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank},
     {"##Name", "Name..", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_None},
@@ -27,10 +26,10 @@ public:
     };
     Customer customer;
     int submit_customer_result = NotSubmitted;
+    ModalController modalController;
 
 private:
     SQLQuery sql;
-    ModalController modalController;
 private:
     void PassSearchQuery();
     char name[128] = "";
@@ -39,6 +38,9 @@ private:
     char phoneNumber[128] = "";
     int phoneNumberIndex = -1; // Initialize to an invalid index
     bool inputError = false;
-    std::string errorMessage = "";
+    std::string error_message = "";
+    std::string error_title = "";
 
 };
+
+

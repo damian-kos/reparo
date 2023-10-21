@@ -7,6 +7,8 @@
 typedef int CustomerInputFlags;
 typedef int SearchFlags;
 typedef int CustomerSubmissionFlags;
+typedef int CustomerSubmissionState;
+
 
 struct InputField {
     const char* label;
@@ -62,7 +64,7 @@ struct Repair {
 struct PopupInput {
 	char input[128] = { "" };
 	bool is_input_enter_pressed;
-	int previous_len;
+	size_t previous_len;
 	bool is_input_text_active;
 	bool is_input_text_activated;
 };
@@ -89,8 +91,8 @@ enum SearchFlags_ {
 enum CustomerInputFlags_ {
 	CustomerInputFlags_None = 0,
 	CustomerInputFlags_SubmitButton = 1 << 0,
-	CustomerInputFlags_NameField = 1 << 1,
+	CustomerInputFlags_NoNameField = 1 << 1,
 	CustomerInputFlags_NoSurnameField = 1 << 2,
-	CustomerInputFlags_EmailField = 1 << 3,
+	CustomerInputFlags_NoEmailField = 1 << 3,
 	CustomerInputFlags_SearchResultsOnPhoneNo = 1 << 4,
 };

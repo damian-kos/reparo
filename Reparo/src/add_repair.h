@@ -9,34 +9,35 @@
 #include "customer_input_window.h"
 
 
-void Combo(Repair& device, std::string label, PartData& attribute);
-
 
 class AddRepair {
 public:
-    void Models();
-    void Categories();
-    void Colors();
-
-    PopupInput pop_model;
-    PopupInput pop_category;
-    PopupInput pop_color;
-    
-    std::string error_message;
+    AddRepair() : customerInput("some text") {
+    }
     void AddRepairWindow();
-
-    void SubmitRepair();
-    void ProcessSubmission();
-    int submit;
+    std::string error_message;
     ModalController modalController;
 
 private:
+    char searchQuery[128] = "";
+    char notes[512] = "";
+    char notes_hidden[512] = "";
+private:
+    PopupInput pop_model;
+    PopupInput pop_category;
+    PopupInput pop_color;
     Search search;
     CustomerInputWindow customerInput;
-
     SQLQuery sql;
-    void GetIDs();
+private:
+    void SubmitRepair();
+    void Models();
+    void Categories();
+    void Colors();
     void SearchForByPhone();
     void SearchForCustomers();
+    void Combo(Repair& device, std::string label, PartData& attribute);
+    void GetIDs();
+
 
 };

@@ -46,7 +46,7 @@ void ImGuiHelper::PartTableStockWindow(Part& part) {
     std::vector<std::string> names = { "Brand", "Model", "Category", "Color(if any)", "Quality(if any)" };
     std::vector<std::string> texts = { part.brand.name, part.model.name, part.category.name, part.color.name};
     ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable;
-    TableBegin("To add", 5, names, flags);
+    TableBegin("To add", 5, names, 1, flags);
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::Text(part.brand.name.c_str());
@@ -75,8 +75,9 @@ void ImGuiHelper::PartTableStockWindow(Part& part) {
     }
 
 
-void ImGuiHelper::TableBegin(const char* label, int columns, std::vector<std::string> columns_name, ImGuiTableFlags flags) {
+void ImGuiHelper::TableBegin(const char* label, int columns, std::vector<std::string> columns_name, int i, ImGuiTableFlags flags) {
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
+    ImGui::PushID(i);
     if (ImGui::BeginTable(label, columns, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 5))) {
         for (int i = 0; i < columns; i++)
         {

@@ -36,14 +36,13 @@ void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
-CustomerInputWindow addCustomerWin;
+CustomerInputWindow addCustomerWin("Poop");
 CustomerEditWindow customerEditWin;
 ModalController modalController;
 PartsStockWindow partsStockWindow;
 PartsStock partsStock;
 AddRepair repair;
 RepairMenu repair_menu;
-
 
 
 int main(int, char**)
@@ -250,11 +249,13 @@ int main(int, char**)
             addCustomerWin.Render(CustomerInputFlags_SubmitButton | CustomerInputFlags_SearchResultsOnPhoneNo);
             ImGui::End();
         }
+
+        
         if (show_add_part_to_stock_window) {
             partsStockWindow.GetBrands();
             partsStockWindow.Render();
         }
-
+        //test.MyTest();
         DebugWindow();
         
         if(customerEditWin.GetShouldRender())

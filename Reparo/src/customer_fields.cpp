@@ -3,6 +3,9 @@
 #include <iostream>
 
 void CustomerPopulate::PopulteCustomerFields(std::vector<InputField>& fields, Customer& customer) {
+		for (InputField& field : fields) {
+			memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
+		}
 		strncpy_s(fields[0].buffer, fields[0].bufferSize, customer.phone_number.c_str(), _TRUNCATE);
 		strncpy_s(fields[1].buffer, fields[1].bufferSize, customer.name.c_str(), _TRUNCATE);
 		strncpy_s(fields[2].buffer, fields[2].bufferSize, customer.surname.c_str(), _TRUNCATE);

@@ -10,9 +10,12 @@
 
 class Search {
 public:
-    void CustomerTableWEdit();
+    
     void SearchField(const char* searchQuery);
-    void ForAdd(std::vector<InputField>& fields, SearchFlags = 0);
+    void ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags = 0);
+    SQLQuery sqlSearch;
+    bool searchResultsBox = false;
+    void TestCust();
     bool SearchModel(PopupInput& popup, std::vector<std::string>& vector);
     void PopupModels(PopupInput& input, PartData& attribute, const char* label);
 };

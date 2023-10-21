@@ -175,6 +175,7 @@
     <ClCompile Include="src\parts_stock_window.cpp" />
     <ClCompile Include="src\search.cpp" />
     <ClCompile Include="src\sql_queries.cpp" />
+    <ClCompile Include="src\test.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
