@@ -9,9 +9,11 @@
 
 class CustomerInputWindow {
 public:
-    CustomerInputWindow(std::string title) {
+    
+    CustomerInputWindow(std::string title) :  decorator(false){
         error_title = title;
     }
+
 public:
     void Render(CustomerInputFlags = 0);
     void CreateInputFields(CustomerInputFlags = 0);
@@ -30,7 +32,10 @@ public:
 
 private:
     SQLQuery sql;
+    ImGuiDecorator decorator;
+
 private:
+    bool test_bool;
     void PassSearchQuery();
     char name[128] = "";
     char surname[128] = "";

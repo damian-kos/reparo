@@ -1,6 +1,6 @@
 #pragma once
-
-//#include "imgui.h"
+// add_repair.h
+#include "imgui_helper.h"
 #include "search.h"
 #include "parts_stock_window.h"
 #include "customer_fields.h"
@@ -12,8 +12,9 @@
 
 class AddRepair {
 public:
-    AddRepair() : customerInput("some text") {
+    AddRepair() : customerInput("some text"), decorator(false) {
     }
+   
     void AddRepairWindow();
     std::string error_message;
     ModalController modalController;
@@ -27,6 +28,7 @@ private:
     PopupInput pop_category;
     PopupInput pop_color;
     Search search;
+    ImGuiDecorator decorator;
     CustomerInputWindow customerInput;
     SQLQuery sql;
 private:

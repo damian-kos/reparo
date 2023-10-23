@@ -49,11 +49,11 @@ void Search::ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags 
     
     static bool selected[10] = {};
     //if (searchResultsBox) {
-        std::vector<std::string> names = { "ID", "Name", "Phone", "Email" };
-        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+    std::vector<std::string> names = { "ID", "Name", "Phone", "Email" };
+    static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
 
-        imguiHelper.TableBegin("Customer", 4, names, label_int, flags);
+    if (imguiHelper.TableBegin("Customer", 4, names, label_int, flags)) {
         int index = 0;
         for (auto& [key, val] : customers) {
             char label[32];
@@ -112,11 +112,15 @@ void Search::ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags 
             index++;
             //ImGui::PopID();
         }
-        customers.clear();
-        ImGui::EndTable();
-        ImGui::PopID();
+        
+            ImGui::EndTable();
+
     }
-//}
+
+    customers.clear();
+    ImGui::PopID();
+}
+
 
 const char** vectorToCharArray(const std::vector<std::string>& strings) {
     const char** charArray = new const char* [strings.size()];
@@ -152,9 +156,11 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
     input.is_input_text_activated = ImGui::IsItemActivated();
     const char** autocomplete = vectorToCharArray(attribute.data);
 
-    if (input.is_input_text_activated)
+    if (input.is_input_text_activated) {
         ImGui::OpenPopup(label);
-    {
+        std::cout << "activated" << std::endl;
+    }
+    
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
         //ImGui::SetNextWindowSize({ ImGui::GetItemRectSize().x, 0 });
         if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
@@ -177,4 +183,3 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
             ImGui::EndPopup();
         }
     }
-}

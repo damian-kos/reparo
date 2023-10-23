@@ -133,7 +133,7 @@ int main(int, char**)
     bool show_add_repair_window = false;
     bool show_repair_states_window = false;
 
-
+    char test[128] = "";
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
@@ -167,11 +167,11 @@ int main(int, char**)
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
         ImGuiStyle* style = &ImGui::GetStyle();
-        style->FrameRounding = 6.0f;
-        style->WindowRounding = 6.0f;
-        style->PopupRounding = 6.0f;
-        style->ScrollbarRounding = 6.0f;
-        style->GrabRounding = 3.0f;
+        style->FrameRounding = 12.0f;
+        style->WindowRounding = 12.0f;
+        style->PopupRounding = 12.0f;
+        style->ScrollbarRounding = 12.0f;
+        style->GrabRounding = 12.0f;
 
 
         //std::cout << "Name: " << std::endl;
@@ -237,11 +237,17 @@ int main(int, char**)
 
         if (ImGui::Button("Create database")) {
             //partsStock.OpenPartsStockDb();
-            partsStock.CreateTable();
+            //partsStock.CreateTable();
         }
-        if(ImGui::Button("Print data")) {
-            //partsStock.PrintOutData();
+        ImGui::InputText("Print data", test, IM_ARRAYSIZE(test));
+        
+        if (ImGui::IsItemActivated()) {
+            ImGui::Text("Button Clicked!");
         }
+        if (ImGui::Button("Click Me")) {
+
+        }
+   
         ImGui::End();
 
         if (show_add_customer_window) {
@@ -255,7 +261,7 @@ int main(int, char**)
             partsStockWindow.GetBrands();
             partsStockWindow.Render();
         }
-        //test.MyTest();
+
         DebugWindow();
         
         if(customerEditWin.GetShouldRender())

@@ -72,19 +72,23 @@ void ImGuiHelper::PartTableStockWindow(Part& part) {
         ImGui::Text(part.quality.desc.c_str());
 
         ImGui::EndTable();
+        ImGui::PopID();
     }
 
 
-void ImGuiHelper::TableBegin(const char* label, int columns, std::vector<std::string> columns_name, int i, ImGuiTableFlags flags) {
+bool ImGuiHelper::TableBegin(const char* label, int columns, std::vector<std::string> columns_name, int i, ImGuiTableFlags flags) {
     const float TEXT_BASE_HEIGHT = ImGui::GetTextLineHeightWithSpacing();
     ImGui::PushID(i);
-    if (ImGui::BeginTable(label, columns, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 5))) {
+    if(ImGui::BeginTable(label, columns, flags, ImVec2(0.0f, TEXT_BASE_HEIGHT * 5))) {
         for (int i = 0; i < columns; i++)
         {
             ImGui::TableSetupColumn(columns_name[i].c_str());
         }
         ImGui::TableHeadersRow();
+        return true;
     }
+    else { return false; }
+    
 }
 
 void ImGuiHelper::TablesColumnsText(int columns, std::string text) {

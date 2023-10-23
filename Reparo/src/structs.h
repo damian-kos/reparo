@@ -16,6 +16,7 @@ struct InputField {
     char* buffer;
     int bufferSize;
     ImGuiInputTextFlags flags;
+	bool is_valid;
 };
 
 struct PartData {

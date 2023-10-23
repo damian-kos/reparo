@@ -2,8 +2,8 @@
 #include <iostream> // delete later
 
 
-
-
+bool ntest = false;
+bool test = true;
 Repair device;
 
 
@@ -16,18 +16,15 @@ void AddRepair::AddRepairWindow() {
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-1);
 
-        ImGui::SeparatorText("CUSTOMER:");
-  
+        //decorator.DecoratedSeparatorText("CUSTOMER:");
+        //decorator.SetTestValue(test);
         customerInput.Render(CustomerInputFlags_NoSurnameField);
+        if (ImGui::IsItemActive()) {
+            ImGui::Text("????");
+        }
 
-        //if (test) {
-        //    ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-        //}
-        //else {
-        //    ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-        //}
-        ImGui::SeparatorText("DEVICE:");
-        //ImGui::PopStyleColor(1);
+        decorator.SetTestValue(test);
+        decorator.DecoratedSeparatorText("DEVICE:");
 
         pop_model.is_input_enter_pressed = ImGui::InputTextWithHint("##Model_search", "Model..", pop_model.input, IM_ARRAYSIZE(pop_model.input), ImGuiInputTextFlags_EnterReturnsTrue);
         Models();
