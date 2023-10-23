@@ -23,7 +23,7 @@ void CustomerInputWindow::Render(CustomerInputFlags reparo_flags) {
         }
 }
 
-void InputValidation(InputField& input) {
+void CustomerInputWindow::InputValidation(InputField& input) {
     std::string label = input.buffer;
     if (input.label == "##PhoneNumber") {
         if (strlen(input.buffer) > 8) {
@@ -50,9 +50,9 @@ void InputValidation(InputField& input) {
         std::cout << input.label  << input.is_valid  << std::endl;
     }
 
-    if (input.label == "##Email") {
+    if (reparo_flags & CustomerInputFlags_NoSurnameField) {
         input.is_valid = true;
-        std::cout << input.label << input.is_valid << std::endl;
+        std::cout << input.label << reparo_flags << std::endl;
     }
 }
 
@@ -87,8 +87,6 @@ void CustomerInputWindow::CreateInputFields(CustomerInputFlags reparo_flags)
             test_bool = true;
         }
     }
-
-
 }
 
 Customer CustomerInputWindow::FieldsToCustomer(CustomerInputFlags reparo_flags) {

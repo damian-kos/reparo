@@ -12,7 +12,7 @@
 
 class AddRepair {
 public:
-    AddRepair() : customerInput("some text"), decorator(false) {
+    AddRepair() : customerInput("some text", CustomerInputFlags_NoSurnameField), decorator(false) {
     }
    
     void AddRepairWindow();

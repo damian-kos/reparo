@@ -13,9 +13,14 @@ public:
     CustomerInputWindow(std::string title) :  decorator(false){
         error_title = title;
     }
+    CustomerInputWindow(std::string title, CustomerInputFlags input_flags) : decorator(false) {
+        error_title = title;
+        reparo_flags = input_flags;
+    }
 
 public:
     void Render(CustomerInputFlags = 0);
+    void InputValidation(InputField& input);
     void CreateInputFields(CustomerInputFlags = 0);
     Customer FieldsToCustomer(CustomerInputFlags = 0);
     void Submit();
@@ -45,6 +50,7 @@ private:
     bool inputError = false;
     std::string error_message = "";
     std::string error_title = "";
+    CustomerInputFlags reparo_flags;
 
 };
 
