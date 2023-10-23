@@ -16,12 +16,7 @@ void AddRepair::AddRepairWindow() {
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-1);
 
-        //decorator.DecoratedSeparatorText("CUSTOMER:");
-        //decorator.SetTestValue(test);
-        customerInput.Render(CustomerInputFlags_NoSurnameField);
-        if (ImGui::IsItemActive()) {
-            ImGui::Text("????");
-        }
+        customerInput.Render();
 
         decorator.SetTestValue(test);
         decorator.DecoratedSeparatorText("DEVICE:");
@@ -75,7 +70,7 @@ void AddRepair::AddRepairWindow() {
 }
 
 void AddRepair::SubmitRepair() {
-    device.customer = customerInput.FieldsToCustomer(CustomerInputFlags_NoSurnameField);
+    device.customer = customerInput.FieldsToCustomer();
     customerInput.submit_customer_result = sql.SearchForCustomerSQL(device.customer);
 }
 

@@ -19,10 +19,12 @@ public:
     }
 
 public:
-    void Render(CustomerInputFlags = 0);
+    void Render();
     void InputValidation(InputField& input);
-    void CreateInputFields(CustomerInputFlags = 0);
-    Customer FieldsToCustomer(CustomerInputFlags = 0);
+    bool IsEmailValid(std::string email);
+    void CreateInputFields();
+    void ValidationCheck();
+    Customer FieldsToCustomer();
     void Submit();
     bool TestSubmitCall(CustomerSubmissionFlags reparo_flags = 0);
     std::vector<InputField> inputFields = {

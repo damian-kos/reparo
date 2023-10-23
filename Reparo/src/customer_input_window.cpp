@@ -1,17 +1,18 @@
 #include "customer_input_window.h"
 
 
-void CustomerInputWindow::Render(CustomerInputFlags reparo_flags) {
+void CustomerInputWindow::Render() {
         ImGui::PushItemWidth(-1);
         decorator.SetTestValue(test_bool);
         decorator.DecoratedSeparatorText("CUSTOMER:");
-        CreateInputFields(reparo_flags);
+        CreateInputFields();
         ImGui::Spacing();
         if (reparo_flags & CustomerInputFlags_SubmitButton) {
             if (ImGui::Button("Submit Customer Details")) {
                 Submit();
                 if (TestSubmitCall()) {
                     int var = sql.InsertCustomer(customer);
+                    ValidationCheck();
                 }
             }
         }
@@ -23,73 +24,59 @@ void CustomerInputWindow::Render(CustomerInputFlags reparo_flags) {
         }
 }
 
+
 void CustomerInputWindow::InputValidation(InputField& input) {
     std::string label = input.buffer;
-    if (input.label == "##PhoneNumber") {
-        if (strlen(input.buffer) > 8) {
-            input.is_valid = true;
-            std::cout << input.label << input.is_valid << std::endl;
-        }
-        else {
-            input.is_valid = false;
-            std::cout << input.label << input.is_valid << std::endl;
-        }
+    if (input.label == "##PhoneNumber")
+        input.is_valid = (strlen(input.buffer) > 8);
+    if (input.label == "##Name") 
+        input.is_valid = (strlen(input.buffer) > 3);
+    if (input.label == "##Email") {
+        std::string email = input.buffer;
+        input.is_valid = IsEmailValid(email);
     }
-    if (input.label == "##Name") {
-        if (strlen(input.buffer) > 3) {
-            input.is_valid = true;
-            std::cout << input.label << input.is_valid << std::endl;
-        }
-        else {
-            input.is_valid = false;
-            std::cout << input.label << input.is_valid << std::endl;
-        }
-    }
-    if (input.label == "##Surname") {
-        input.is_valid = true;
-        std::cout << input.label  << input.is_valid  << std::endl;
-    }
-
-    if (reparo_flags & CustomerInputFlags_NoSurnameField) {
-        input.is_valid = true;
-        std::cout << input.label << reparo_flags << std::endl;
-    }
+    if (input.label == "##Surname") 
+        input.is_valid = (strlen(input.buffer) > 3);
 }
 
+bool CustomerInputWindow::IsEmailValid(std::string email) {
 
-void CustomerInputWindow::CreateInputFields(CustomerInputFlags reparo_flags)
-{
-    // Create input fields
-    for (int i = 0; i < inputFields.size(); i++) {
+    size_t atPos = email.find('@');
+    size_t dotPos = email.find('.', atPos + 1);
 
-        if (reparo_flags & CustomerInputFlags_NoSurnameField) {
-            if (i == 2) { continue; }
+    return (atPos != std::string::npos && dotPos != std::string::npos);
+}
+
+void CustomerInputWindow::CreateInputFields() {
+    for (InputField& input : inputFields) {
+        if (reparo_flags & CustomerInputFlags_NoSurnameField && input.label == "##Surname") {
+            continue;
         }
-
-        ImGui::InputTextWithHint(inputFields[i].label, inputFields[i].hint, inputFields[i].buffer, inputFields[i].bufferSize, inputFields[i].flags);
-       
-        if (std::strcmp(inputFields[i].label, "##PhoneNumber") == 0) {
-            phoneNumberIndex = i; // Store the index of the phoneNumber field
-        }
+        ImGui::InputTextWithHint(input.label, input.hint, input.buffer, input.bufferSize, input.flags);
+    
         if (ImGui::IsItemDeactivated()) {
-            InputValidation(inputFields[i]);
-            std::cout << inputFields[i].buffer << std::endl;
-  
+            InputValidation(input);
+            std::cout << input.label << " " << input.is_valid << std::endl;
         }
-     
     }
-    for (int i = 0; i < inputFields.size(); i++) {
-        if (inputFields[i].is_valid == false) {
-            test_bool = false;
+    // Check if all of the input fields are valid.
+    ValidationCheck();
+}
+
+void CustomerInputWindow::ValidationCheck() {
+    bool allFieldsValid = true;
+    for (InputField& input : inputFields) {
+        if (reparo_flags & CustomerInputFlags_NoSurnameField && input.label == "##Surname")
+            continue;
+        if (!input.is_valid) {
+            allFieldsValid = false;
             break;
         }
-        else {
-            test_bool = true;
-        }
     }
+    test_bool = allFieldsValid;
 }
 
-Customer CustomerInputWindow::FieldsToCustomer(CustomerInputFlags reparo_flags) {
+Customer CustomerInputWindow::FieldsToCustomer() {
     const bool surname = (reparo_flags & CustomerInputFlags_NoSurnameField) != 0;
 	customer.phone_number = inputFields[0].buffer;
 	customer.name = inputFields[1].buffer;
