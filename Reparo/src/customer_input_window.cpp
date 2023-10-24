@@ -8,6 +8,9 @@ void CustomerInputWindow::Render() {
         CreateInputFields();
         ImGui::Spacing();
         if (reparo_flags & CustomerInputFlags_SubmitButton) {
+            if (!test_bool) {
+                ImGui::BeginDisabled(true);
+            }
             if (ImGui::Button("Submit Customer Details")) {
                 Submit();
                 if (TestSubmitCall()) {
@@ -15,7 +18,11 @@ void CustomerInputWindow::Render() {
                     ValidationCheck();
                 }
             }
+            if (!test_bool) {
+                ImGui::EndDisabled();
+            }
         }
+
         modalController.GetErrorState(error_title.c_str(), error_message.c_str(), submit_customer_result);
         ImGui::Spacing();
 
@@ -54,13 +61,14 @@ void CustomerInputWindow::CreateInputFields() {
         }
         ImGui::InputTextWithHint(input.label, input.hint, input.buffer, input.bufferSize, input.flags);
     
-        if (ImGui::IsItemDeactivated()) {
+        if (ImGui::IsItemEdited()) {
             InputValidation(input);
             std::cout << input.label << " " << input.is_valid << std::endl;
+            ValidationCheck();
+
         }
     }
-    // Check if all of the input fields are valid.
-    ValidationCheck();
+
 }
 
 void CustomerInputWindow::ValidationCheck() {

@@ -42,6 +42,7 @@ private:
     ImGuiDecorator decorator;
 
 private:
+    CustomerInputFlags reparo_flags;
     bool test_bool;
     void PassSearchQuery();
     char name[128] = "";
@@ -52,7 +53,6 @@ private:
     bool inputError = false;
     std::string error_message = "";
     std::string error_title = "";
-    CustomerInputFlags reparo_flags;
 
 };
 
