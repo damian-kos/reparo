@@ -3,34 +3,40 @@
 
 void CustomerInputWindow::Render() {
         ImGui::PushItemWidth(-1);
-        decorator.SetTestValue(test_bool);
+        decorator.SetTestValue(validated);
         decorator.DecoratedSeparatorText("CUSTOMER:");
+
+        ImGui::Text(validate_feedback.c_str());
         CreateInputFields();
         ImGui::Spacing();
         if (reparo_flags & CustomerInputFlags_SubmitButton) {
-            if (!test_bool) {
-                ImGui::BeginDisabled(true);
-            }
-            if (ImGui::Button("Submit Customer Details")) {
-                Submit();
-                if (TestSubmitCall()) {
-                    int var = sql.InsertCustomer(customer);
-                    ValidationCheck();
-                }
-            }
-            if (!test_bool) {
-                ImGui::EndDisabled();
-            }
+            SubmitCustomerButton();
         }
-
         modalController.GetErrorState(error_title.c_str(), error_message.c_str(), submit_customer_result);
         ImGui::Spacing();
-
         if (reparo_flags & CustomerInputFlags_SearchResultsOnPhoneNo) {
             PassSearchQuery();
         }
 }
 
+void CustomerInputWindow::SubmitCustomerButton() {
+    if (!validated) {
+        ImGui::BeginDisabled(true);
+
+    }
+    if (ImGui::Button("Submit Customer Details")) {
+        Submit();
+        if (TestSubmitCall()) {
+            int var = sql.InsertCustomer(customer);
+            ValidationCheck();
+        }
+    }
+    if (!validated) {
+        ImGui::EndDisabled();
+     
+
+    }
+}
 
 void CustomerInputWindow::InputValidation(InputField& input) {
     std::string label = input.buffer;
@@ -46,8 +52,23 @@ void CustomerInputWindow::InputValidation(InputField& input) {
         input.is_valid = (strlen(input.buffer) > 3);
 }
 
-bool CustomerInputWindow::IsEmailValid(std::string email) {
+void CustomerInputWindow::InputValidation() {
+    for (InputField& input : inputFields) {
+        std::string label = input.buffer;
+        if (input.label == "##PhoneNumber")
+            input.is_valid = (strlen(input.buffer) > 8);
+        if (input.label == "##Name")
+            input.is_valid = (strlen(input.buffer) > 3);
+        if (input.label == "##Email") {
+            std::string email = input.buffer;
+            input.is_valid = IsEmailValid(email);
+        }
+        if (input.label == "##Surname")
+            input.is_valid = (strlen(input.buffer) > 3);
+    }
+}
 
+bool CustomerInputWindow::IsEmailValid(std::string email) {
     size_t atPos = email.find('@');
     size_t dotPos = email.find('.', atPos + 1);
 
@@ -65,23 +86,38 @@ void CustomerInputWindow::CreateInputFields() {
             InputValidation(input);
             std::cout << input.label << " " << input.is_valid << std::endl;
             ValidationCheck();
-
         }
-    }
+        if (ImGui::IsItemDeactivated())
+            std::cout << "validate error i: " << validate_error << std::endl;
 
+            ValidationFeedback();
+    }
 }
 
 void CustomerInputWindow::ValidationCheck() {
     bool allFieldsValid = true;
-    for (InputField& input : inputFields) {
+    for (size_t i = 0; i < inputFields.size(); i++)
+    {
+        if (reparo_flags & CustomerInputFlags_NoSurnameField && inputFields[i].label == "##Surname")
+            continue;
+        if (!inputFields[i].is_valid) {
+            allFieldsValid = false;
+            std::cout << "validate ERROR i: " << validate_error << std::endl;
+
+            validate_error = i;
+            break;
+        }
+    }
+   /* for (InputField& input : inputFields) {
         if (reparo_flags & CustomerInputFlags_NoSurnameField && input.label == "##Surname")
             continue;
         if (!input.is_valid) {
             allFieldsValid = false;
             break;
         }
-    }
-    test_bool = allFieldsValid;
+    }*/
+    validated = allFieldsValid;
+    //validate_error = -1;
 }
 
 Customer CustomerInputWindow::FieldsToCustomer() {
@@ -98,6 +134,19 @@ Customer CustomerInputWindow::FieldsToCustomer() {
 void CustomerInputWindow::Submit() {
     Customer curr_customer = FieldsToCustomer();
     submit_customer_result = sql.SearchForCustomerSQL(curr_customer);
+}
+
+void CustomerInputWindow::ValidationFeedback() {
+    if (validate_error == -1)
+        validate_feedback = "";
+    if (validate_error == 0)
+        validate_feedback = "Wrong number format";
+    if(validate_error == 1)
+        validate_feedback = "Wrong name format";
+    if (validate_error == 2)
+        validate_feedback = "Wrong surname format";
+    if (validate_error == 3)
+        validate_feedback = "Wrong email format";
 }
 
 bool CustomerInputWindow::TestSubmitCall(CustomerSubmissionFlags reparo_flags) {

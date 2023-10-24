@@ -1,32 +1,41 @@
 #include "add_repair.h"
 #include <iostream> // delete later
 
-
-bool ntest = false;
-bool test = true;
-Repair device;
-
-
 void AddRepair::AddRepairWindow() {
 
     ImGui::Begin("Add Repair");
     if (ImGui::BeginTable("Add repair table", 2, ImGuiTableFlags_Borders | ImGuiTableColumnFlags_IsHovered)) {
-
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-1);
 
         customerInput.Render();
 
-        decorator.SetTestValue(test);
+        decorator.SetTestValue(device_validation);
         decorator.DecoratedSeparatorText("DEVICE:");
 
-        pop_model.is_input_enter_pressed = ImGui::InputTextWithHint("##Model_search", "Model..", pop_model.input, IM_ARRAYSIZE(pop_model.input), ImGuiInputTextFlags_EnterReturnsTrue);
+        pop_model.is_input_enter_pressed = ImGui::InputTextWithHint(
+            "##Model_search",
+            "Model..",
+            pop_model.input,
+            IM_ARRAYSIZE(pop_model.input),
+            ImGuiInputTextFlags_EnterReturnsTrue);
         Models();
-        pop_category.is_input_enter_pressed = ImGui::InputTextWithHint("##Category_search", "Type..", pop_category.input, IM_ARRAYSIZE(pop_category.input), ImGuiInputTextFlags_EnterReturnsTrue);
+
+        pop_category.is_input_enter_pressed = ImGui::InputTextWithHint(
+            "##Category_search",
+            "Type..",
+            pop_category.input,
+            IM_ARRAYSIZE(pop_category.input),
+            ImGuiInputTextFlags_EnterReturnsTrue);
         Categories();
 
-        pop_color.is_input_enter_pressed = ImGui::InputTextWithHint("##Color", "Color..", pop_color.input, IM_ARRAYSIZE(pop_color.input), ImGuiInputTextFlags_EnterReturnsTrue);
+        pop_color.is_input_enter_pressed = ImGui::InputTextWithHint(
+            "##Color",
+            "Color..",
+            pop_color.input,
+            IM_ARRAYSIZE(pop_color.input),
+            ImGuiInputTextFlags_EnterReturnsTrue);
         Colors();
 
         ImGui::SeparatorText("Notes:");
@@ -53,10 +62,6 @@ void AddRepair::AddRepairWindow() {
             }
         }
 
-        if (ImGui::Button("test")) {
-            sql.Prices();
-        }
-        //std::cout << row << std::endl;
         ImGui::TableNextColumn();
         ImGui::SeparatorText("GENERAL SEARCH:");
         ImGui::InputTextWithHint("##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None);
@@ -65,8 +70,11 @@ void AddRepair::AddRepairWindow() {
         SearchForByPhone();
         ImGui::EndTable();
     }
-    search.TestCust();
     ImGui::End();
+}
+
+void AddRepair::CheckDeviceInputs() {
+
 }
 
 void AddRepair::SubmitRepair() {
@@ -102,6 +110,11 @@ void AddRepair::Colors() {
 void AddRepair::SearchForByPhone() {
     search.SearchField(customerInput.inputFields[0].buffer);
     search.ForAdd(customerInput.inputFields, 2, SearchFlags_CopyToFields | SearchFlags_EditCustomer);
+    if (search.recently_populated) {
+        customerInput.InputValidation();
+        customerInput.ValidationCheck();
+        search.recently_populated = false;
+    }
 }
 
 void AddRepair::SearchForCustomers() {

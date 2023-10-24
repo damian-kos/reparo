@@ -23,6 +23,8 @@ private:
     char searchQuery[128] = "";
     char notes[512] = "";
     char notes_hidden[512] = "";
+    bool device_validation;
+
 private:
     PopupInput pop_model;
     PopupInput pop_category;
@@ -31,7 +33,10 @@ private:
     ImGuiDecorator decorator;
     CustomerInputWindow customerInput;
     SQLQuery sql;
+    Repair device;
+
 private:
+    void CheckDeviceInputs();
     void SubmitRepair();
     void Models();
     void Categories();
@@ -40,6 +45,5 @@ private:
     void SearchForCustomers();
     void Combo(Repair& device, std::string label, PartData& attribute);
     void GetIDs();
-
 
 };

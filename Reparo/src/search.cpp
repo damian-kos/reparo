@@ -33,14 +33,6 @@ void Search::SearchField(const char* searchQuery) {
     }
 }
 
-void Search::TestCust() {
-    if (ImGui::Button("Customers")) 
-        for (auto& pair : customers) {
-            std::cout << "Key: " << pair.first << ", Value: " << pair.second.name << std::endl;
-        }
-
-    
-}
 
 void Search::ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags reparo_flags) {
     CustomerEditWindow customerEditWindow;
@@ -73,6 +65,8 @@ void Search::ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags 
                     if (reparo_flags & SearchFlags_CopyToFields) {
                         CustomerPopulate populate;
                         populate.PopulteCustomerFields(fields, val);
+                        recently_populated = true;
+
                     }
 
                     currentlySelectedRow = index;
@@ -90,6 +84,7 @@ void Search::ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags 
                     if (ImGui::Button("Copy Over ")) {
                         CustomerPopulate populate;
                         populate.PopulteCustomerFields(fields, val);
+                        recently_populated = true;
                     }
                 }
                 if (ImGui::Button("Close")) {
@@ -155,10 +150,13 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
     input.is_input_text_active = ImGui::IsItemActive();
     input.is_input_text_activated = ImGui::IsItemActivated();
     const char** autocomplete = vectorToCharArray(attribute.data);
-
+    if (ImGui::IsItemEdited()) {
+        std::cout << input.input << std::endl;
+    }
     if (input.is_input_text_activated) {
+        
         ImGui::OpenPopup(label);
-        std::cout << "activated" << std::endl;
+       
     }
     
         ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
@@ -168,7 +166,7 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
 
             for (int i = 0; i < attribute.data.size(); i++)
             {
-             /*   if (strstr(autocomplete[i], input) == NULL)
+    /*            if (strstr(autocomplete[i], input.input) == NULL)
                     continue;*/
                 if (ImGui::Selectable(autocomplete[i]))
                 {

@@ -20,12 +20,15 @@ public:
 
 public:
     void Render();
+    void SubmitCustomerButton();
     void InputValidation(InputField& input);
+    void InputValidation();
     bool IsEmailValid(std::string email);
     void CreateInputFields();
     void ValidationCheck();
     Customer FieldsToCustomer();
     void Submit();
+    void ValidationFeedback();
     bool TestSubmitCall(CustomerSubmissionFlags reparo_flags = 0);
     std::vector<InputField> inputFields = {
     {"##PhoneNumber", "Phone Number..", phoneNumber, IM_ARRAYSIZE(phoneNumber), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank},
@@ -43,7 +46,9 @@ private:
 
 private:
     CustomerInputFlags reparo_flags;
-    bool test_bool;
+    int validate_error = -1;
+    std::string validate_feedback = "";
+    bool validated;
     void PassSearchQuery();
     char name[128] = "";
     char surname[128] = "";
