@@ -1,11 +1,9 @@
 #include "customer_input_window.h"
 
-
 void CustomerInputWindow::Render() {
         ImGui::PushItemWidth(-1);
         decorator.SetTestValue(validated);
         decorator.DecoratedSeparatorText("CUSTOMER:");
-
         ImGui::Text(validate_feedback.c_str());
         CreateInputFields();
         ImGui::Spacing();
@@ -81,28 +79,30 @@ void CustomerInputWindow::CreateInputFields() {
             continue;
         }
         ImGui::InputTextWithHint(input.label, input.hint, input.buffer, input.bufferSize, input.flags);
-    
+
         if (ImGui::IsItemEdited()) {
             InputValidation(input);
             std::cout << input.label << " " << input.is_valid << std::endl;
             ValidationCheck();
         }
-        if (ImGui::IsItemDeactivated())
+        if (ImGui::IsItemDeactivated()) {
             std::cout << "validate error i: " << validate_error << std::endl;
 
             ValidationFeedback();
+        }
     }
 }
 
 void CustomerInputWindow::ValidationCheck() {
     bool allFieldsValid = true;
+    validate_error = -1;
+
     for (size_t i = 0; i < inputFields.size(); i++)
     {
         if (reparo_flags & CustomerInputFlags_NoSurnameField && inputFields[i].label == "##Surname")
             continue;
         if (!inputFields[i].is_valid) {
             allFieldsValid = false;
-            std::cout << "validate ERROR i: " << validate_error << std::endl;
 
             validate_error = i;
             break;
@@ -117,7 +117,6 @@ void CustomerInputWindow::ValidationCheck() {
         }
     }*/
     validated = allFieldsValid;
-    //validate_error = -1;
 }
 
 Customer CustomerInputWindow::FieldsToCustomer() {
@@ -137,11 +136,11 @@ void CustomerInputWindow::Submit() {
 }
 
 void CustomerInputWindow::ValidationFeedback() {
-    if (validate_error == -1)
+    //if (validate_error == -1)
         validate_feedback = "";
-    if (validate_error == 0)
+    if (validate_error == 0 && strlen(inputFields[0].buffer) >0)
         validate_feedback = "Wrong number format";
-    if(validate_error == 1)
+    if(validate_error == 1 && strlen(inputFields[1].buffer) > 0)
         validate_feedback = "Wrong name format";
     if (validate_error == 2)
         validate_feedback = "Wrong surname format";
