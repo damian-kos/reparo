@@ -34,6 +34,9 @@ private:
     CustomerInputWindow customerInput;
     SQLQuery sql;
     Repair device;
+    bool model_validated;
+    std::string device_validate_feedback = "";
+    bool price_validation;
 
 private:
     void CheckDeviceInputs();

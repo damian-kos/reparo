@@ -51,6 +51,7 @@ int SQLQuery::GetIdForValue(std::string query, const char* searchValue) {
     //ex. "SELECT " + std::string(columnName) + "_id FROM " + std::string(tableName) + " WHERE " + std::string(columnName) + " = ? ";
     std::string sql = query;
     sqlite3_stmt* stmt;
+    int id = -1; // Default value if the value is not found
 
     int rc = sqlite3_prepare_v2(partsStock.db, sql.c_str(), -1, &stmt, nullptr);
     if (rc != SQLITE_OK) {
@@ -69,7 +70,6 @@ int SQLQuery::GetIdForValue(std::string query, const char* searchValue) {
         return -1; // Return an error code or handle the error appropriately
     }
 
-    int id = -1; // Default value if the value is not found
 
     // Execute the query
     if (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -199,6 +199,8 @@ void SQLQuery::InsertPart(Part& part) {
     sqlite3_close(partsStock.db);
 }
 
+// This need to be adjusted, no need to use TokenizeAndStore if we are just
+// by a phone number directly.
 int SQLQuery::SearchForCustomerSQL(Customer customer) {
     if (customer.phone_number.empty())
         return -2;

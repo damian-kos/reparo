@@ -154,30 +154,31 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
         std::cout << input.input << std::endl;
     }
     if (input.is_input_text_activated) {
-        
+    
         ImGui::OpenPopup(label);
        
     }
-    
-        ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
-        //ImGui::SetNextWindowSize({ ImGui::GetItemRectSize().x, 0 });
-        if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
-        {
 
-            for (int i = 0; i < attribute.data.size(); i++)
+    
+    ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
+    //ImGui::SetNextWindowSize({ ImGui::GetItemRectSize().x, 0 });
+    if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
+    {
+
+        for (int i = 0; i < attribute.data.size(); i++)
+        {
+/*            if (strstr(autocomplete[i], input.input) == NULL)
+                continue;*/
+            if (ImGui::Selectable(autocomplete[i]))
             {
-    /*            if (strstr(autocomplete[i], input.input) == NULL)
-                    continue;*/
-                if (ImGui::Selectable(autocomplete[i]))
-                {
-                    //ImGui::ClearActiveID();
-                    strcpy(input.input, autocomplete[i]);
-                    attribute.name = attribute.data[i];
-                    attribute.current_id = 1;
-                }
+                //ImGui::ClearActiveID();
+                strcpy(input.input, autocomplete[i]);
+                attribute.name = attribute.data[i];
+                attribute.current_id = 1;
             }
-            if (input.is_input_enter_pressed || (!input.is_input_text_active && !ImGui::IsWindowFocused()))
-                ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
         }
+        if (input.is_input_enter_pressed || (!input.is_input_text_active && !ImGui::IsWindowFocused()))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
     }

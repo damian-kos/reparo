@@ -39,6 +39,7 @@ public:
     Customer customer;
     int submit_customer_result = NotSubmitted;
     ModalController modalController;
+    bool GetValidationState() const;
 
 private:
     SQLQuery sql;

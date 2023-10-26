@@ -1,11 +1,12 @@
 #include "customer_input_window.h"
 
 void CustomerInputWindow::Render() {
-        ImGui::PushItemWidth(-1);
+        //ImGui::PushItemWidth(-1);
         decorator.SetTestValue(validated);
         decorator.DecoratedSeparatorText("CUSTOMER:");
+        CreateInputFields(); 
         ImGui::Text(validate_feedback.c_str());
-        CreateInputFields();
+
         ImGui::Spacing();
         if (reparo_flags & CustomerInputFlags_SubmitButton) {
             SubmitCustomerButton();
@@ -20,7 +21,6 @@ void CustomerInputWindow::Render() {
 void CustomerInputWindow::SubmitCustomerButton() {
     if (!validated) {
         ImGui::BeginDisabled(true);
-
     }
     if (ImGui::Button("Submit Customer Details")) {
         Submit();
@@ -31,10 +31,54 @@ void CustomerInputWindow::SubmitCustomerButton() {
     }
     if (!validated) {
         ImGui::EndDisabled();
-     
-
     }
 }
+
+void CustomerInputWindow::Submit() {
+    Customer curr_customer = FieldsToCustomer();
+    submit_customer_result = sql.SearchForCustomerSQL(curr_customer);
+}
+
+bool CustomerInputWindow::TestSubmitCall(CustomerSubmissionFlags reparo_flags) {
+    if (submit_customer_result == PhoneNumberIsEmpty) {
+        std::cout << "phonenumberisempty" << std::endl;
+        error_message = "Phone number can't be empty. It is used to identify customers.";
+        modalController.RenderErrorModal(error_title.c_str());
+        return false;
+    }
+    if (submit_customer_result == AddNewCustomer) {
+        std::cout << "add new customer" << std::endl;
+        for (InputField& field : inputFields) {
+            memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
+        }
+        return true;
+    }
+    if (submit_customer_result == WrongQuery) {
+        std::cout << "wrong query" << std::endl;
+        modalController.RenderErrorModal(error_title.c_str());
+        error_message = "There is a problem with inputting customers. Please contact support team.";
+        return false;
+    }
+    if (!(reparo_flags) || (reparo_flags & (CustomerSubmissionFlags_None | CustomerSubmissionFlags_SimpleAdd)))
+    {
+        std::cout << "simple add: " << CustomerSubmissionFlags_SimpleAdd << std::endl;
+        modalController.RenderErrorModal(error_title.c_str());
+        error_message = "Customer with this phone number already exists. \nYou can edit his details. Right click on customer in table view and click a button.";
+        return false;
+    }
+    if (reparo_flags & CustomerSubmissionFlags_RepairAdd) {
+        std::cout << "repair add" << std::endl;
+        modalController.RenderErrorModal(error_title.c_str());
+        error_message = "Repair couldn't be added for unknown reasons, try again later.";
+        return true;
+    }
+    else {
+        std::cout << "nothing happened" << std::endl;
+        return false;
+    }
+    return false;
+}
+
 
 void CustomerInputWindow::InputValidation(InputField& input) {
     std::string label = input.buffer;
@@ -108,14 +152,6 @@ void CustomerInputWindow::ValidationCheck() {
             break;
         }
     }
-   /* for (InputField& input : inputFields) {
-        if (reparo_flags & CustomerInputFlags_NoSurnameField && input.label == "##Surname")
-            continue;
-        if (!input.is_valid) {
-            allFieldsValid = false;
-            break;
-        }
-    }*/
     validated = allFieldsValid;
 }
 
@@ -130,13 +166,8 @@ Customer CustomerInputWindow::FieldsToCustomer() {
     return customer;
 }
 
-void CustomerInputWindow::Submit() {
-    Customer curr_customer = FieldsToCustomer();
-    submit_customer_result = sql.SearchForCustomerSQL(curr_customer);
-}
-
 void CustomerInputWindow::ValidationFeedback() {
-    //if (validate_error == -1)
+    if (validate_error == -1)
         validate_feedback = "";
     if (validate_error == 0 && strlen(inputFields[0].buffer) >0)
         validate_feedback = "Wrong number format";
@@ -148,53 +179,18 @@ void CustomerInputWindow::ValidationFeedback() {
         validate_feedback = "Wrong email format";
 }
 
-bool CustomerInputWindow::TestSubmitCall(CustomerSubmissionFlags reparo_flags) {
-    if (submit_customer_result == PhoneNumberIsEmpty) {
-        std::cout << "phonenumberisempty" << std::endl;
-        error_message = "Phone number can't be empty. It is used to identify customers.";
-        modalController.RenderErrorModal(error_title.c_str());
-        return false;
-    }
-    if (submit_customer_result == AddNewCustomer) {
-        std::cout << "add new customer" << std::endl;
-        for (InputField& field : inputFields) {
-            memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
-        }
-        return true;
-    }
-    if (submit_customer_result == WrongQuery) {
-        std::cout << "wrong query" << std::endl;
-        modalController.RenderErrorModal(error_title.c_str());
-        error_message = "There is a problem with inputting customers. Please contact support team.";
-        return false;
-    }
-    if (!(reparo_flags ) || (reparo_flags & (CustomerSubmissionFlags_None | CustomerSubmissionFlags_SimpleAdd)))
-    {
-        std::cout << "simple add: " << CustomerSubmissionFlags_SimpleAdd << std::endl;
-        modalController.RenderErrorModal(error_title.c_str());
-        error_message = "Customer with this phone number already exists. \nYou can edit his details. Right click on customer in table view and click a button.";
-        return false;
-    }
-    if (reparo_flags & CustomerSubmissionFlags_RepairAdd ) {
-        std::cout << "repair add" << std::endl;
-        modalController.RenderErrorModal(error_title.c_str());
-        error_message = "Repair couldn't be added for unknown reasons, try again later.";
-        return true;
-    }
-    else {
-        std::cout << "nothing happened" << std::endl;
-        return false;
-    }
-    return false;
-}
-
 void CustomerInputWindow::PassSearchQuery()
 {
     Search search;
     search.SearchField(inputFields[0].buffer);  
     search.ForAdd(inputFields, 1);
+    if (search.recently_populated) {
+        validate_feedback = "";
+    }
 }
 
-
+bool CustomerInputWindow::GetValidationState() const {
+    return validated;
+}
 
 
