@@ -39,7 +39,7 @@ private:
     bool price_validation;
 
 private:
-    void CheckDeviceInputs();
+    void SubmitRepairButton();
     void SubmitRepair();
     void Models();
     void Categories();

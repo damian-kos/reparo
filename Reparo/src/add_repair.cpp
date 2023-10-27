@@ -21,7 +21,6 @@ void AddRepair::AddRepairWindow() {
             pop_model.input,
             IM_ARRAYSIZE(pop_model.input),
             ImGuiInputTextFlags_EnterReturnsTrue);
-       
         Models();
 
 
@@ -40,6 +39,8 @@ void AddRepair::AddRepairWindow() {
             IM_ARRAYSIZE(pop_color.input),
             ImGuiInputTextFlags_EnterReturnsTrue);
         Colors();
+        device_validate_feedback = (device.model.IDinDB > 0) ? "" : "No such model of device in Database.";
+
         ImGui::Text(device_validate_feedback.c_str());
 
   
@@ -55,24 +56,8 @@ void AddRepair::AddRepairWindow() {
         decorator.DecoratedSeparatorText("Price:");
         ImGui::InputDouble("input float", &device.price, 0.1f, 1.0f, "%.2f");
 
-        if (!customerInput.GetValidationState() || !device_validation || !price_validation)
-            ImGui::BeginDisabled(true);
-        if (ImGui::Button("Add repair")) {
-            SubmitRepair();
-            if (customerInput.TestSubmitCall(CustomerSubmissionFlags_RepairAdd)) {
-                GetIDs();
-                if (customerInput.submit_customer_result == AddNewCustomer) {
-                    int cust_ID = sql.InsertCustomer(device.customer);
-                    sql.AddRepair(device, cust_ID);
-                }
-                else {
-                    sql.AddRepair(device, customerInput.submit_customer_result);
-                }
-            }
-        }
-        if (!customerInput.GetValidationState() || !device_validation || !price_validation)
-            ImGui::EndDisabled();
-
+        ImGui::SeparatorText("SUBMIT:");
+        SubmitRepairButton();
         ImGui::TableNextColumn();
         ImGui::SeparatorText("GENERAL SEARCH:");
         ImGui::InputTextWithHint("##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None);
@@ -80,6 +65,7 @@ void AddRepair::AddRepairWindow() {
         ImGui::SeparatorText("SIMILAR CUSTOMERS:");
         char text[32];
         sprintf_s(text, "%d", device.model.IDinDB);
+
         ImGui::Text(text);
         SearchForByPhone();
         ImGui::EndTable();
@@ -88,6 +74,26 @@ void AddRepair::AddRepairWindow() {
         }
     }
     ImGui::End();
+}
+
+void AddRepair::SubmitRepairButton() {
+    if (!customerInput.GetValidationState() || !device_validation || !price_validation)
+        ImGui::BeginDisabled(true);
+    if (ImGui::Button("Add repair")) {
+        SubmitRepair();
+        if (customerInput.TestSubmitCall(CustomerSubmissionFlags_RepairAdd)) {
+            GetIDs();
+            if (customerInput.submit_customer_result == AddNewCustomer) {
+                int cust_ID = sql.InsertCustomer(device.customer);
+                sql.AddRepair(device, cust_ID);
+            }
+            else {
+                sql.AddRepair(device, customerInput.submit_customer_result);
+            }
+        }
+    }
+    if (!customerInput.GetValidationState() || !device_validation || !price_validation)
+        ImGui::EndDisabled();
 }
 
 void AddRepair::SubmitRepair() {
@@ -106,8 +112,9 @@ void AddRepair::Models() {
         std::string query = "SELECT model_id FROM models WHERE LOWER(model) = LOWER(?)";
         device.model.IDinDB = sql.GetIdForValue(query, pop_model.input);
     }
-    if (ImGui::IsItemDeactivatedAfterEdit()) {
-        device_validate_feedback = (device.model.IDinDB > 0) ? "" : "No such model of device in Database.";
+    if (ImGui::IsItemDeactivatedAfterEdit()){
+        std::cout << "model id: " << device.model.IDinDB << std::endl;
+
     }
 }
 

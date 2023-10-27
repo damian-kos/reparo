@@ -150,9 +150,7 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
     input.is_input_text_active = ImGui::IsItemActive();
     input.is_input_text_activated = ImGui::IsItemActivated();
     const char** autocomplete = vectorToCharArray(attribute.data);
-    if (ImGui::IsItemEdited()) {
-        std::cout << input.input << std::endl;
-    }
+    
     if (input.is_input_text_activated) {
     
         ImGui::OpenPopup(label);
