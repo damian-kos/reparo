@@ -38,7 +38,6 @@ private:
     ImGuiDecorator decorator;
     CustomerInputWindow customerInput;
     SQLQuery sql;
-    bool model_validated;
     bool price_validation;
     std::string device_validate_feedback = "";
     ModalController modalController;
@@ -47,6 +46,7 @@ private:
     void SubmitRepair();
     void SubmissionConfirmed();
     bool CanSubmitRepair();
+    void ResetFields();
     void Models();
     void UpdateDeviceValidationFeedback();
     void Categories();

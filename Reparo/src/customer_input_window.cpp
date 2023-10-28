@@ -68,6 +68,11 @@ bool CustomerInputWindow::TestSubmitCall(CustomerSubmissionFlags reparo_flags) {
     }
     if (reparo_flags & CustomerSubmissionFlags_RepairAdd) {
         std::cout << "repair add" << std::endl;
+        for (InputField& field : inputFields) {
+            memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
+        }
+        InputValidation();
+        ValidationCheck();
         //modalController.RenderErrorModal(error_title.c_str());
         //error_message = "Repair couldn't be added for unknown reasons, try again later.";
         return true;
@@ -77,6 +82,15 @@ bool CustomerInputWindow::TestSubmitCall(CustomerSubmissionFlags reparo_flags) {
         return false;
     }
     return false;
+}
+
+void CustomerInputWindow::ResetFields() {
+    customer = Customer();
+    for (InputField& field : inputFields) {
+        memset(field.buffer, 0, field.bufferSize); // Set all characters to null (clear the buffer)
+    }
+    InputValidation();
+    ValidationCheck();
 }
 
 void CustomerInputWindow::InputValidation(InputField& input) {

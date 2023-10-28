@@ -55,6 +55,10 @@ void AddRepair::AddRepairWindow() {
         modalController.RepairConfirmation("Repair", device, repair_submission);
 
         SubmitRepairButton();
+        if (ImGui::Button("Reset")) {
+            customerInput.ResetFields();
+            ResetFields();
+        }
 
         ImGui::TableNextColumn();
 
@@ -107,7 +111,7 @@ void AddRepair::SubmissionConfirmed() {
                 sql.AddRepair(device, customerInput.submit_customer_result);
             }
         }
-        repair_submission = RepairSubmission_Cancel;
+        ResetFields();
     }
 }
 
@@ -115,6 +119,20 @@ bool AddRepair::CanSubmitRepair() {
     return (!customerInput.GetValidationState() || !device_validation || !price_validation);
 }
 
+
+void AddRepair::ResetFields() {
+    device = Repair();
+ 
+    memset(pop_model.input, 0, IM_ARRAYSIZE(pop_model.input));
+    memset(pop_category.input, 0, IM_ARRAYSIZE(pop_category.input));
+    memset(pop_color.input, 0, IM_ARRAYSIZE(pop_color.input));
+    memset(notes, 0, IM_ARRAYSIZE(notes));
+    memset(notes_hidden, 0, IM_ARRAYSIZE(notes_hidden));
+
+    repair_submission = RepairSubmission_Cancel;
+
+
+}
 void AddRepair::Models() {
     
         static Search search;

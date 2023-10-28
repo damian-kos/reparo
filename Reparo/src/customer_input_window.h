@@ -30,6 +30,7 @@ public:
     void Submit();
     void ValidationFeedback();
     bool TestSubmitCall(CustomerSubmissionFlags reparo_flags = 0);
+    void ResetFields();
     std::vector<InputField> inputFields = {
     {"##PhoneNumber", "Phone Number..", phoneNumber, IM_ARRAYSIZE(phoneNumber), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank},
     {"##Name", "Name..", name, IM_ARRAYSIZE(name), ImGuiInputTextFlags_None},
