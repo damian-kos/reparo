@@ -65,7 +65,10 @@ void Search::ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags 
                     if (reparo_flags & SearchFlags_CopyToFields) {
                         CustomerPopulate populate;
                         populate.PopulteCustomerFields(fields, val);
+
                         recently_populated = true;
+                        std::cout << "from SEARCH : " << recently_populated << std::endl;
+
 
                     }
 
@@ -75,7 +78,6 @@ void Search::ForAdd(std::vector<InputField>& fields, int label_int, SearchFlags 
             if (ImGui::BeginPopupContextItem()) {
                 ImGui::Text(("Customer: \"%s\".", val.name.c_str()));
                 if (reparo_flags & SearchFlags_EditCustomer) {
-                    std::cout << val.name << std::endl;
                     if (ImGui::SmallButton("Edit")) {
                         customerEditWindow.SetCustomerToEdit(&val, key);
                     }

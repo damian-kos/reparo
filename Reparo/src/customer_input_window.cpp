@@ -130,11 +130,10 @@ void CustomerInputWindow::CreateInputFields() {
             ValidationCheck();
         }
         if (ImGui::IsItemDeactivated()) {
-            std::cout << "validate error i: " << validate_error << std::endl;
-
             ValidationFeedback();
         }
     }
+
 }
 
 void CustomerInputWindow::ValidationCheck() {
@@ -147,9 +146,10 @@ void CustomerInputWindow::ValidationCheck() {
             continue;
         if (!inputFields[i].is_valid) {
             allFieldsValid = false;
-
-            validate_error = i;
-            break;
+            if (strlen(inputFields[i].buffer) > 0) {
+                validate_error = i;
+                break;
+            }
         }
     }
     validated = allFieldsValid;
@@ -167,9 +167,11 @@ Customer CustomerInputWindow::FieldsToCustomer() {
 }
 
 void CustomerInputWindow::ValidationFeedback() {
-    if (validate_error == -1)
+  
+
+    //if (validate_error == -1)
         validate_feedback = "";
-    if (validate_error == 0 && strlen(inputFields[0].buffer) >0)
+    if (validate_error == 0 && strlen(inputFields[0].buffer) > 0)
         validate_feedback = "Wrong number format";
     if(validate_error == 1 && strlen(inputFields[1].buffer) > 0)
         validate_feedback = "Wrong name format";

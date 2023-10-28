@@ -45,6 +45,7 @@ private:
     SQLQuery sql;
     ImGuiDecorator decorator;
 
+
 private:
     CustomerInputFlags reparo_flags;
     int validate_error = -1;

@@ -144,6 +144,7 @@ void AddRepair::SearchForByPhone() {
     if (search.recently_populated) {
         customerInput.InputValidation();
         customerInput.ValidationCheck();
+        customerInput.ValidationFeedback();
         search.recently_populated = false;
     }
 }
