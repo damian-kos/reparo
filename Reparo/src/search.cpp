@@ -131,7 +131,6 @@ bool Search::SearchModel(PopupInput& popup, std::vector<std::string>& vector) {
     if (popup.previous_len != strlen(popup.input)) {
         model_retreived = false;
         popup.previous_len = strlen(popup.input);
-        std::cout << "prev len " << popup.previous_len << std::endl;
         return false;
     }
     if (strlen(popup.input) >= 1 && !model_retreived) {
@@ -144,18 +143,14 @@ bool Search::SearchModel(PopupInput& popup, std::vector<std::string>& vector) {
         vector.clear();
         searchResultsBox = false;
         popup.previous_len = strlen(popup.input);
-        std::cout << "curr len " << popup.previous_len << std::endl;
-
         return false;
     }
     return false;
 }
 
 void Search::PopupModels(PopupInput& input, PartData& attribute, const char* label) {
-
     input.is_input_text_active = ImGui::IsItemActive();
     input.is_input_text_activated = ImGui::IsItemActivated();
-
     if (input.is_input_text_activated) {
         ImGui::OpenPopup(label);
 
@@ -166,7 +161,6 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
     if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
     {
         const char** autocomplete = vectorToCharArray(attribute.data);
-
         for (int i = 0; i < attribute.data.size(); i++)
         {
             /*            if (strstr(autocomplete[i], input.input) == NULL)

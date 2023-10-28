@@ -18,7 +18,7 @@ public:
     void AddRepairWindow();
     void SubmitRepairButton();
     std::string error_message;
-    ModalController modalController;
+    //ModalController modalController;
 
 private:
     char searchQuery[128] = "";
@@ -34,15 +34,18 @@ private: //Structs
 private:
     //Search search;
     //PartsStockWindow parts;
+    RepairSubmissionState repair_submission = 0;
     ImGuiDecorator decorator;
     CustomerInputWindow customerInput;
     SQLQuery sql;
     bool model_validated;
     bool price_validation;
     std::string device_validate_feedback = "";
+    ModalController modalController;
 
 private:
     void SubmitRepair();
+    void SubmissionConfirmed();
     bool CanSubmitRepair();
     void Models();
     void UpdateDeviceValidationFeedback();

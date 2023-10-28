@@ -8,6 +8,8 @@ typedef int CustomerInputFlags;
 typedef int SearchFlags;
 typedef int CustomerSubmissionFlags;
 typedef int CustomerSubmissionState;
+typedef int RepairSubmissionState;
+
 
 
 struct InputField {
@@ -76,6 +78,11 @@ enum CustomerSubmissionState_ {
 	PhoneNumberIsEmpty = -2,
 	WrongQuery = -1,
 	AddNewCustomer = 0,
+};
+
+enum RepairSubmissionState_ {
+	RepairSubmission_Cancel,
+	RepairSubmission_Submit,
 };
 
 enum CustomerSubmissionFlags_ {

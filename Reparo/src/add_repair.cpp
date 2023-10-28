@@ -52,6 +52,8 @@ void AddRepair::AddRepairWindow() {
         decorator.SetTestValue(price_validation);
         decorator.DecoratedSeparatorText("Price:");
         ImGui::InputDouble("input float", &device.price, 0.1f, 1.0f, "%.2f");
+        modalController.RepairConfirmation("Repair", device, repair_submission);
+
         SubmitRepairButton();
 
         ImGui::TableNextColumn();
@@ -64,6 +66,8 @@ void AddRepair::AddRepairWindow() {
         SearchForByPhone();
 
         ImGui::EndTable();
+        SubmissionConfirmed();
+
     }
     ImGui::End();
 }
@@ -74,7 +78,26 @@ void AddRepair::SubmitRepairButton() {
     ImGui::Spacing();
     if (ImGui::Button("Add repair")) {
         SubmitRepair();
+       
+          
+        
+    }
+    ImGui::Spacing();
+    if (CanSubmitRepair())
+        ImGui::EndDisabled();
+}
+
+void AddRepair::SubmitRepair() {
+    modalController.RenderErrorModal("Repair");
+    device.customer = customerInput.FieldsToCustomer();
+    customerInput.submit_customer_result = sql.SearchForCustomerSQL(device.customer);
+}
+
+void AddRepair::SubmissionConfirmed() {
+    if (repair_submission == RepairSubmission_Submit) {
+        std::cout << "Submitted" << std::endl;
         if (customerInput.TestSubmitCall(CustomerSubmissionFlags_RepairAdd)) {
+            std::cout << "After submit " << std::endl;
             GetIDs();
             if (customerInput.submit_customer_result == AddNewCustomer) {
                 int cust_ID = sql.InsertCustomer(device.customer);
@@ -84,15 +107,8 @@ void AddRepair::SubmitRepairButton() {
                 sql.AddRepair(device, customerInput.submit_customer_result);
             }
         }
+        repair_submission = RepairSubmission_Cancel;
     }
-    ImGui::Spacing();
-    if (CanSubmitRepair())
-        ImGui::EndDisabled();
-}
-
-void AddRepair::SubmitRepair() {
-    device.customer = customerInput.FieldsToCustomer();
-    customerInput.submit_customer_result = sql.SearchForCustomerSQL(device.customer);
 }
 
 bool AddRepair::CanSubmitRepair() {
@@ -103,7 +119,6 @@ void AddRepair::Models() {
     
         static Search search;
         if (search.SearchModel(pop_model, device.model.data)) {
-            std::cout << "Models" << std::endl;
 
             std::string strSearchQuery(pop_model.input);
             sql.MatchingModels(strSearchQuery, device.model.data, "models");
@@ -141,20 +156,15 @@ void AddRepair::Categories() {
 
 void AddRepair::Colors() {
     static Search search;
-
-    PartsStockWindow parts;
-
-        parts.GetColorsForModel(device.color.data, device.model.data, device.model.name);
-        const char* label = "##color";
-        parts.part.color.retreived = true;
-    
-
+    PartsStockWindow parts; // figure out why it does not work with static
+    parts.GetColorsForModel(device.color.data, device.model.data, device.model.name);
+    const char* label = "##color";
+    parts.part.color.retreived = true;
     search.PopupModels(pop_color, device.color, label);
 }
 
 void AddRepair::SearchForByPhone() {
     static Search search;
-
     search.SearchField(customerInput.inputFields[0].buffer);
     search.ForAdd(customerInput.inputFields, 2, SearchFlags_CopyToFields | SearchFlags_EditCustomer);
     if (search.recently_populated) {
@@ -167,7 +177,6 @@ void AddRepair::SearchForByPhone() {
 
 void AddRepair::SearchForCustomers() {
     static Search search;
-
     search.SearchField(searchQuery);
     search.ForAdd(customerInput.inputFields, 1, SearchFlags_CopyToFields);
 }

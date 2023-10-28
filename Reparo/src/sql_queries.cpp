@@ -350,7 +350,6 @@ void SQLQuery::MatchingCustomers(std::string& partial_phone_number, std::unorder
 
 void SQLQuery::MatchingModels(std::string& model_query, std::vector<std::string>& vector, std::string label) {
     partsStock.OpenPartsStockDb();
-    std::cout << "Models Mathcing" << std::endl;
 
     const char* query = nullptr;  // Declare the query variable
 

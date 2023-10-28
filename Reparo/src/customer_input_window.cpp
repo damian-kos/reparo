@@ -68,8 +68,8 @@ bool CustomerInputWindow::TestSubmitCall(CustomerSubmissionFlags reparo_flags) {
     }
     if (reparo_flags & CustomerSubmissionFlags_RepairAdd) {
         std::cout << "repair add" << std::endl;
-        modalController.RenderErrorModal(error_title.c_str());
-        error_message = "Repair couldn't be added for unknown reasons, try again later.";
+        //modalController.RenderErrorModal(error_title.c_str());
+        //error_message = "Repair couldn't be added for unknown reasons, try again later.";
         return true;
     }
     else {

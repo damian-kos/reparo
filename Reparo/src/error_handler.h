@@ -7,16 +7,9 @@
 
 class ModalController {
 public:
-    bool isModalOpen = false;
-
-    void ShowModal() {
-        isModalOpen = true;
-    }
-
-    void CloseModal() {
-        isModalOpen = false;
-    }
-
-    void RenderErrorModal(const char* errorName);
-    void GetErrorState(const char* errorName, const char* errorMessage, int& state);
+    void RenderErrorModal(const char* error_name);
+    void GetErrorState(const char* error_name, const char* errorMessage, int& state);
+    void RepairConfirmation(const char* error_name, Repair& repair, RepairSubmissionState&);
+    void RepairDetails(Repair& repair);
+    void CustomerDetails(Customer&);
 };
