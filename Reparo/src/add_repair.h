@@ -26,15 +26,17 @@ private:
     char notes_hidden[512] = "";
     bool device_validation;
 
-private:
+private: //Structs
     PopupInput pop_model;
     PopupInput pop_category;
     PopupInput pop_color;
-    Search search;
+    Repair device;
+private:
+    //Search search;
+    //PartsStockWindow parts;
     ImGuiDecorator decorator;
     CustomerInputWindow customerInput;
     SQLQuery sql;
-    Repair device;
     bool model_validated;
     bool price_validation;
     std::string device_validate_feedback = "";

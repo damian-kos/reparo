@@ -37,6 +37,8 @@ void AddRepair::AddRepairWindow() {
             IM_ARRAYSIZE(pop_color.input),
             ImGuiInputTextFlags_EnterReturnsTrue);
         Colors();
+
+        UpdateDeviceValidationFeedback();
         ImGui::Text(device_validate_feedback.c_str());
 
         ImGui::SeparatorText("NOTES:");
@@ -95,17 +97,20 @@ void AddRepair::SubmitRepair() {
 
 bool AddRepair::CanSubmitRepair() {
     return (!customerInput.GetValidationState() || !device_validation || !price_validation);
-
 }
 
 void AddRepair::Models() {
-    if (search.SearchModel(pop_model, device.model.data)) {
-        std::string strSearchQuery(pop_model.input);
-        sql.MatchingModels(strSearchQuery, device.model.data, "models");
-    }    
-    const char* label = "##model";
-    search.PopupModels(pop_model, device.model, label);
-    UpdateDeviceValidationFeedback();
+    
+        static Search search;
+        if (search.SearchModel(pop_model, device.model.data)) {
+            std::cout << "Models" << std::endl;
+
+            std::string strSearchQuery(pop_model.input);
+            sql.MatchingModels(strSearchQuery, device.model.data, "models");
+        }
+        const char* label = "##model";
+        search.PopupModels(pop_model, device.model, label);
+    
 }
 
 void AddRepair::UpdateDeviceValidationFeedback() {
@@ -123,6 +128,9 @@ void AddRepair::UpdateDeviceValidationFeedback() {
 }
 
 void AddRepair::Categories() {
+   
+    static Search search;
+
     if (search.SearchModel(pop_category, device.category.data)) {
         std::string strSearchQuery(pop_category.input);
         sql.MatchingModels(strSearchQuery, device.category.data, "categories");
@@ -132,13 +140,21 @@ void AddRepair::Categories() {
 }
 
 void AddRepair::Colors() {
+    static Search search;
+
     PartsStockWindow parts;
-    parts.GetColorsForModel(device.color.data, device.model.data, device.model.name);
-    const char* label = "##color";
+
+        parts.GetColorsForModel(device.color.data, device.model.data, device.model.name);
+        const char* label = "##color";
+        parts.part.color.retreived = true;
+    
+
     search.PopupModels(pop_color, device.color, label);
 }
 
 void AddRepair::SearchForByPhone() {
+    static Search search;
+
     search.SearchField(customerInput.inputFields[0].buffer);
     search.ForAdd(customerInput.inputFields, 2, SearchFlags_CopyToFields | SearchFlags_EditCustomer);
     if (search.recently_populated) {
@@ -150,6 +166,8 @@ void AddRepair::SearchForByPhone() {
 }
 
 void AddRepair::SearchForCustomers() {
+    static Search search;
+
     search.SearchField(searchQuery);
     search.ForAdd(customerInput.inputFields, 1, SearchFlags_CopyToFields);
 }

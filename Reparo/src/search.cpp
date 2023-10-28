@@ -8,7 +8,6 @@
 size_t previousLen = 0;
 int previousModelLen = 0;
 bool retreived = false;
-bool model_retreived = false;
 int selected_model = -1;
 
 std::unordered_map<int, Customer> customers;
@@ -132,43 +131,46 @@ bool Search::SearchModel(PopupInput& popup, std::vector<std::string>& vector) {
     if (popup.previous_len != strlen(popup.input)) {
         model_retreived = false;
         popup.previous_len = strlen(popup.input);
+        std::cout << "prev len " << popup.previous_len << std::endl;
         return false;
     }
     if (strlen(popup.input) >= 1 && !model_retreived) {
         searchResultsBox = true;
         popup.previous_len = strlen(popup.input);
+        model_retreived = true;
         return true;
     }
-    else if (strlen(popup.input) < 1) {
+    else if (strlen(popup.input) < 0) {
         vector.clear();
         searchResultsBox = false;
         popup.previous_len = strlen(popup.input);
+        std::cout << "curr len " << popup.previous_len << std::endl;
+
         return false;
     }
     return false;
 }
 
 void Search::PopupModels(PopupInput& input, PartData& attribute, const char* label) {
+
     input.is_input_text_active = ImGui::IsItemActive();
     input.is_input_text_activated = ImGui::IsItemActivated();
-    const char** autocomplete = vectorToCharArray(attribute.data);
-    
+
     if (input.is_input_text_activated) {
-    
         ImGui::OpenPopup(label);
-       
+
     }
 
-    
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
     //ImGui::SetNextWindowSize({ ImGui::GetItemRectSize().x, 0 });
     if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
     {
+        const char** autocomplete = vectorToCharArray(attribute.data);
 
         for (int i = 0; i < attribute.data.size(); i++)
         {
-/*            if (strstr(autocomplete[i], input.input) == NULL)
-                continue;*/
+            /*            if (strstr(autocomplete[i], input.input) == NULL)
+                            continue;*/
             if (ImGui::Selectable(autocomplete[i]))
             {
                 //ImGui::ClearActiveID();
@@ -177,14 +179,14 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
                 attribute.current_id = 1;
             }
         }
- 
         if (input.is_input_enter_pressed || (!input.is_input_text_active && !ImGui::IsWindowFocused())) {
             ImGui::CloseCurrentPopup();
             input.check_in_db = true;
-        } 
+        }
         ImGui::EndPopup();
     }
     if (ImGui::IsItemDeactivated()) {
         input.check_in_db = true;
     }
- }
+    
+}

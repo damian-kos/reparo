@@ -25,6 +25,6 @@ public:
 
 	void GetCategories(std::vector<std::string>& data);
 	void GetQualities();
-	void GetColorsForModel(std::vector<std::string>& data, std::vector<std::string>& model_data, std::string selected_model_id);
+	void GetColorsForModel(std::vector<std::string>& data, std::vector<std::string>& model_data, std::string selected_model_name);
 	void GetColorsForModel(std::vector<std::string>& data, std::vector<std::string>& model_data, int selected_model_id);
 };

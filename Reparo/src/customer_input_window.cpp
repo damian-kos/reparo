@@ -79,7 +79,6 @@ bool CustomerInputWindow::TestSubmitCall(CustomerSubmissionFlags reparo_flags) {
     return false;
 }
 
-
 void CustomerInputWindow::InputValidation(InputField& input) {
     std::string label = input.buffer;
     if (input.label == "##PhoneNumber")
@@ -133,7 +132,6 @@ void CustomerInputWindow::CreateInputFields() {
             ValidationFeedback();
         }
     }
-
 }
 
 void CustomerInputWindow::ValidationCheck() {
@@ -167,9 +165,6 @@ Customer CustomerInputWindow::FieldsToCustomer() {
 }
 
 void CustomerInputWindow::ValidationFeedback() {
-  
-
-    //if (validate_error == -1)
         validate_feedback = "";
     if (validate_error == 0 && strlen(inputFields[0].buffer) > 0)
         validate_feedback = "Wrong number format";
@@ -181,12 +176,10 @@ void CustomerInputWindow::ValidationFeedback() {
         validate_feedback = "Wrong email format";
 }
 
-void CustomerInputWindow::PassSearchQuery()
-{
+void CustomerInputWindow::PassSearchQuery() {
     Search search;
     search.SearchField(inputFields[0].buffer);  
     search.ForAdd(inputFields, 1);
-
 }
 
 bool CustomerInputWindow::GetValidationState() const {

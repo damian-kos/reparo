@@ -20,4 +20,7 @@ public:
     bool SearchModel(PopupInput& popup, std::vector<std::string>& vector);
     void PopupModels(PopupInput& input, PartData& attribute, const char* label);
     
+private:
+    bool model_retreived = false;
+
 };

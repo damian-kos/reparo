@@ -124,14 +124,16 @@ void PartsStockWindow::GetStates(PartData& state) {
 }
 
 
-void PartsStockWindow::GetColorsForModel(std::vector<std::string>& data, std::vector<std::string>& model_data, std::string selected_model_id) {
+void PartsStockWindow::GetColorsForModel(std::vector<std::string>& data, std::vector<std::string>& model_data, std::string selected_model_name) {
     if (!part.color.retreived) {
-        const char* currentModel = selected_model_id.c_str();
+        const char* currentModel = selected_model_name.c_str();
         std::string query = "SELECT model_id FROM models WHERE model = ?";
         int model_id = sqlQuery.GetIdForValue(query, currentModel);
         const char* colorsQuery = "SELECT color FROM colors WHERE color_id IN (SELECT color_id FROM model_color WHERE model_id = ?)";
         sqlQuery.OnID(colorsQuery, data, model_id);
         part.color.retreived = true;
+
+
     }
 }
 
