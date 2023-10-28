@@ -16,6 +16,7 @@ public:
     }
    
     void AddRepairWindow();
+    void SubmitRepairButton();
     std::string error_message;
     ModalController modalController;
 
@@ -35,13 +36,14 @@ private:
     SQLQuery sql;
     Repair device;
     bool model_validated;
-    std::string device_validate_feedback = "";
     bool price_validation;
+    std::string device_validate_feedback = "";
 
 private:
-    void SubmitRepairButton();
     void SubmitRepair();
+    bool CanSubmitRepair();
     void Models();
+    void UpdateDeviceValidationFeedback();
     void Categories();
     void Colors();
     void SearchForByPhone();

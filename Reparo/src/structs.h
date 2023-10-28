@@ -23,7 +23,7 @@ struct PartData {
 	int current_id = -1;
 	std::vector<std::string> data;
 	std::string name = "";
-	int IDinDB;
+	int IDinDB = -1;
 	bool retreived = false;
 };
 
@@ -68,6 +68,7 @@ struct PopupInput {
 	size_t previous_len;
 	bool is_input_text_active;
 	bool is_input_text_activated;
+	bool check_in_db;
 };
 
 enum CustomerSubmissionState_ {

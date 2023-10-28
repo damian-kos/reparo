@@ -184,9 +184,7 @@ void CustomerInputWindow::PassSearchQuery()
     Search search;
     search.SearchField(inputFields[0].buffer);  
     search.ForAdd(inputFields, 1);
-    if (search.recently_populated) {
-        validate_feedback = "";
-    }
+
 }
 
 bool CustomerInputWindow::GetValidationState() const {

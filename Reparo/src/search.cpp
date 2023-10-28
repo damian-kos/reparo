@@ -175,8 +175,14 @@ void Search::PopupModels(PopupInput& input, PartData& attribute, const char* lab
                 attribute.current_id = 1;
             }
         }
-        if (input.is_input_enter_pressed || (!input.is_input_text_active && !ImGui::IsWindowFocused()))
+ 
+        if (input.is_input_enter_pressed || (!input.is_input_text_active && !ImGui::IsWindowFocused())) {
             ImGui::CloseCurrentPopup();
+            input.check_in_db = true;
+        } 
         ImGui::EndPopup();
     }
+    if (ImGui::IsItemDeactivated()) {
+        input.check_in_db = true;
     }
+ }

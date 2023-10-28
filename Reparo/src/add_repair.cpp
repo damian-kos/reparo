@@ -10,7 +10,6 @@ void AddRepair::AddRepairWindow() {
         ImGui::PushItemWidth(-1);
 
         customerInput.Render();
-
         device_validation = (device.model.IDinDB > 0);
         decorator.SetTestValue(device_validation);
         decorator.DecoratedSeparatorText("DEVICE:");
@@ -22,7 +21,6 @@ void AddRepair::AddRepairWindow() {
             IM_ARRAYSIZE(pop_model.input),
             ImGuiInputTextFlags_EnterReturnsTrue);
         Models();
-
 
         pop_category.is_input_enter_pressed = ImGui::InputTextWithHint(
             "##Category_search",
@@ -39,11 +37,8 @@ void AddRepair::AddRepairWindow() {
             IM_ARRAYSIZE(pop_color.input),
             ImGuiInputTextFlags_EnterReturnsTrue);
         Colors();
-        device_validate_feedback = (device.model.IDinDB > 0) ? "" : "No such model of device in Database.";
-
         ImGui::Text(device_validate_feedback.c_str());
 
-  
         ImGui::SeparatorText("NOTES:");
         ImGui::InputTextWithHint("##Notes", "Notes visible for customer..", notes, IM_ARRAYSIZE(notes), ImGuiInputTextFlags_None);
         ImGui::InputTextWithHint("##Notes_hidden", "Notes hidden from customer..", notes_hidden, IM_ARRAYSIZE(notes_hidden), ImGuiInputTextFlags_None);
@@ -55,30 +50,26 @@ void AddRepair::AddRepairWindow() {
         decorator.SetTestValue(price_validation);
         decorator.DecoratedSeparatorText("Price:");
         ImGui::InputDouble("input float", &device.price, 0.1f, 1.0f, "%.2f");
-
-        ImGui::SeparatorText("SUBMIT:");
         SubmitRepairButton();
+
         ImGui::TableNextColumn();
+
         ImGui::SeparatorText("GENERAL SEARCH:");
         ImGui::InputTextWithHint("##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None);
         SearchForCustomers();
-        ImGui::SeparatorText("SIMILAR CUSTOMERS:");
-        char text[32];
-        sprintf_s(text, "%d", device.model.IDinDB);
 
-        ImGui::Text(text);
+        ImGui::SeparatorText("SIMILAR CUSTOMERS:");
         SearchForByPhone();
+
         ImGui::EndTable();
-        if (ImGui::Button("Prices")) {
-            sql.Prices();
-        }
     }
     ImGui::End();
 }
 
 void AddRepair::SubmitRepairButton() {
-    if (!customerInput.GetValidationState() || !device_validation || !price_validation)
+    if (CanSubmitRepair())
         ImGui::BeginDisabled(true);
+    ImGui::Spacing();
     if (ImGui::Button("Add repair")) {
         SubmitRepair();
         if (customerInput.TestSubmitCall(CustomerSubmissionFlags_RepairAdd)) {
@@ -92,13 +83,19 @@ void AddRepair::SubmitRepairButton() {
             }
         }
     }
-    if (!customerInput.GetValidationState() || !device_validation || !price_validation)
+    ImGui::Spacing();
+    if (CanSubmitRepair())
         ImGui::EndDisabled();
 }
 
 void AddRepair::SubmitRepair() {
     device.customer = customerInput.FieldsToCustomer();
     customerInput.submit_customer_result = sql.SearchForCustomerSQL(device.customer);
+}
+
+bool AddRepair::CanSubmitRepair() {
+    return (!customerInput.GetValidationState() || !device_validation || !price_validation);
+
 }
 
 void AddRepair::Models() {
@@ -108,13 +105,20 @@ void AddRepair::Models() {
     }    
     const char* label = "##model";
     search.PopupModels(pop_model, device.model, label);
-    if (ImGui::IsItemActivated) {
-        std::string query = "SELECT model_id FROM models WHERE LOWER(model) = LOWER(?)";
-        device.model.IDinDB = sql.GetIdForValue(query, pop_model.input);
-    }
-    if (ImGui::IsItemDeactivatedAfterEdit()){
-        std::cout << "model id: " << device.model.IDinDB << std::endl;
+    UpdateDeviceValidationFeedback();
+}
 
+void AddRepair::UpdateDeviceValidationFeedback() {
+    if (pop_model.check_in_db) {
+        if (strlen(pop_model.input) == 0) {
+            device_validate_feedback = "";
+        }
+        else {
+            std::string query = "SELECT model_id FROM models WHERE LOWER(model) = LOWER(?)";
+            device.model.IDinDB = sql.GetIdForValue(query, pop_model.input);
+            device_validate_feedback = (device.model.IDinDB > 0) ? "" : "No such model of device in Database.";
+        }
+        pop_model.check_in_db = false;
     }
 }
 
