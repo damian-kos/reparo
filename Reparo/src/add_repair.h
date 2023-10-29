@@ -17,12 +17,16 @@ public:
     void SubmitRepairButton();
     std::string error_message;
 
+    void RepairSetter(Repair& repair);
+      
+    
 
 private:
     char searchQuery[128] = "";
     char notes[512] = "";
     char notes_hidden[512] = "";
     bool device_validation;
+   
 
 private: //Structs
     PopupInput pop_model;

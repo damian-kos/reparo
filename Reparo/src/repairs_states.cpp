@@ -1,53 +1,44 @@
 #include "repairs_states.h"
+#include "sql_queries.h"
 
-void Repairs::RetreiveToDoRepairs() {
-    if (!to_do.repairs_of_state_retreived) {
-        to_do.repair_of_state = sql.GetRetreiveToDoRepairs(1);
-        to_do.repairs_of_state_retreived = true;
+template <RepairState state>
+std::vector<Repair>& Repairs::GetRepairs() {
+    static std::vector<Repair> repairs;
+    
+    if (!repairs.empty()) {
+        return curr_repairs;
     }
+    if (current_selection == previous_selection) {
+        return curr_repairs;
+    }
+    SQLQuery sql; // Assuming SQLQuery is a class for database access
+    curr_repairs = sql.GetRetreiveToDoRepairs(state);
+    return repairs;
 }
 
-void Repairs::RetreiveProcessingRepairs() {
-    if (!processing.repairs_of_state_retreived) {
-        processing.repair_of_state = sql.GetRetreiveToDoRepairs(2);
-        processing.repairs_of_state_retreived = true;
-    }
+void Repairs::RepairsSelector(int selection, bool& update_repair) {
+    current_selection = selection;
+
+        switch (selection) {
+            case 0:
+                helper.RepairStatesTable(GetRepairs<RepairState_::RepairState_ToDo>(), sel, update_repair);
+                break;
+            case 1:
+                helper.RepairStatesTable(GetRepairs<RepairState_::RepairState_Processing>(), sel, update_repair);
+                break;
+            case 2:
+                helper.RepairStatesTable(GetRepairs<RepairState_::RepairState_Warranty>(), sel, update_repair);
+                break;
+            case 3:
+                helper.RepairStatesTable(GetRepairs<RepairState_::RepairState_AwaitingParts>(), sel, update_repair);
+                break;
+            default:
+                std::cout << "error" << std::endl;
+                break;
+        }
+        if (sel > 0)
+            device = curr_repairs[sel];
+        
+    previous_selection = current_selection;
 }
 
-void Repairs::RetreiveWarrantyRepairs() {
-    if (!warranty.repairs_of_state_retreived) {
-        warranty.repair_of_state = sql.GetRetreiveToDoRepairs(3);
-        warranty.repairs_of_state_retreived = true;
-    }
-}
-
-void Repairs::RetreiveAwaitingRepairs() {
-    if (!awaiting.repairs_of_state_retreived) {
-        awaiting.repair_of_state = sql.GetRetreiveToDoRepairs(4);
-        awaiting.repairs_of_state_retreived = true;
-    }
-}
-
-void Repairs::RepairsSelector(int selection) {
-    switch (selection) {
-        case 0:
-            RetreiveToDoRepairs();
-            helper.RepairStatesTable(to_do.repair_of_state, to_do.selected);
-            break;
-        case 1:
-            RetreiveProcessingRepairs();
-            helper.RepairStatesTable(processing.repair_of_state, processing.selected); 
-            break;
-        case 2:
-            RetreiveWarrantyRepairs();
-            helper.RepairStatesTable(warranty.repair_of_state, warranty.selected);
-            break;
-        case 3:
-            RetreiveAwaitingRepairs();
-            helper.RepairStatesTable(awaiting.repair_of_state, awaiting.selected);
-            break;
-        default:
-            std::cout << "error" << std::endl;
-            break;
-    }
-}

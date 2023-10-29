@@ -14,7 +14,7 @@ public:
     bool TableBegin(const char* label, int columns, std::vector<std::string> columns_name, int i, ImGuiTableFlags flags);
     void TablesColumnsText(int column, std::string text);
     void ComboForDevice(const char* label, PartData& device);
-    void RepairStatesTable(std::vector<Repair>& repairs, int& selected);
+    void RepairStatesTable(std::vector<Repair>& repairs, int& selected, bool& update_repair);
 
 };
 
@@ -29,7 +29,6 @@ public:
         else {
             ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
         }
-
         ImGui::SeparatorText(text);
 
         ImGui::PopStyleColor(1);

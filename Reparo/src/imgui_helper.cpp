@@ -115,9 +115,11 @@ void ImGuiHelper::ComboForDevice(const char* label, PartData& attribute) {
         ImGui::EndCombo();
     }
 }
-int poop = -1;
 
-void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected) {
+
+#include "repairs_states.h"
+void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected, bool& update_repair) {
+
     //const bool item_is_selected = repairs.
 
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
@@ -133,8 +135,6 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
         ImGui::TableSetupColumn("Cust. Name", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("State", ImGuiTableColumnFlags_WidthStretch);
 
-
-
         ImGui::TableHeadersRow();
         for (int row = 0; row < repairs.size(); row++)
         {
@@ -149,7 +149,13 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
             if (ImGui::Selectable(label, is_selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {                
                     selected = row;
             }
-   
+            if (ImGui::BeginPopupContextItem()) {
+                if (ImGui::Button("Update repair")) {
+                    update_repair = true;
+                }
+                ImGui::EndPopup();
+            }
+            
             ImGui::TableNextColumn();
             ImGui::Text(repairs[row].model.name.c_str());
             ImGui::TableNextColumn();
@@ -168,9 +174,6 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
             ImGui::Text(repairs[row].customer.name.c_str());
             ImGui::TableNextColumn();
             ImGui::Text(repairs[row].state.name.c_str());
-
-
-
 
 
             ImGui::PopID();

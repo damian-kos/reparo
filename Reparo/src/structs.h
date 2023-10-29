@@ -9,8 +9,7 @@ typedef int SearchFlags;
 typedef int CustomerSubmissionFlags;
 typedef int CustomerSubmissionState;
 typedef int RepairSubmissionState;
-
-
+typedef int RepairState;
 
 struct InputField {
     const char* label;
@@ -77,6 +76,13 @@ struct RepairsVector {
 	std::vector<Repair> repair_of_state;
 	bool repairs_of_state_retreived;
 	int selected = -1;
+};
+
+enum RepairState_ {
+	RepairState_ToDo = 1,
+	RepairState_Processing,
+	RepairState_Warranty,
+	RepairState_AwaitingParts,
 };
 
 enum CustomerSubmissionState_ {

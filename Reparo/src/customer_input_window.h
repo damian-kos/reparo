@@ -41,6 +41,7 @@ public:
     int submit_customer_result = NotSubmitted;
     ModalController modalController;
     bool GetValidationState() const;
+    CustomerInputFlags reparo_flags;
 
 private:
     SQLQuery sql;
@@ -48,7 +49,6 @@ private:
 
 
 private:
-    CustomerInputFlags reparo_flags;
     int validate_error = -1;
     std::string validate_feedback = "";
     bool validated;

@@ -1,10 +1,8 @@
 #include "add_repair.h"
 #include <iostream> // delete later
 
-void AddRepair::AddRepairWindow() {
-
-    ImGui::Begin("Add Repair");
-    if (ImGui::BeginTable("Add repair table", 2, ImGuiTableFlags_Borders | ImGuiTableColumnFlags_IsHovered)) {
+void AddRepair::AddRepairWindow() {  
+    if (ImGui::BeginTable("Add repair table", 2, ImGuiTableFlags_None)) {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::PushItemWidth(-1);
@@ -54,6 +52,8 @@ void AddRepair::AddRepairWindow() {
         ImGui::InputDouble("input float", &device.price, 0.1f, 1.0f, "%.2f");
         modalController.RepairConfirmation("Repair", device, repair_submission);
 
+
+        // ON  OFF
         SubmitRepairButton();
         if (ImGui::Button("Reset")) {
             customerInput.ResetFields();
@@ -62,18 +62,21 @@ void AddRepair::AddRepairWindow() {
 
         ImGui::TableNextColumn();
 
+        // ON  OFF
         ImGui::SeparatorText("GENERAL SEARCH:");
         ImGui::InputTextWithHint("##Search", "Search for customer...", searchQuery, IM_ARRAYSIZE(searchQuery), ImGuiInputTextFlags_None);
         SearchForCustomers();
-
+        
+        // ON OFF
         ImGui::SeparatorText("SIMILAR CUSTOMERS:");
         SearchForByPhone();
 
         ImGui::EndTable();
         SubmissionConfirmed();
-
+        if (ImGui::Button("Flags")) {
+            std::cout << customerInput.reparo_flags << std::endl;
+        }
     }
-    ImGui::End();
 }
 
 void AddRepair::SubmitRepairButton() {
@@ -82,9 +85,6 @@ void AddRepair::SubmitRepairButton() {
     ImGui::Spacing();
     if (ImGui::Button("Add repair")) {
         SubmitRepair();
-       
-          
-        
     }
     ImGui::Spacing();
     if (CanSubmitRepair())
@@ -118,7 +118,6 @@ void AddRepair::SubmissionConfirmed() {
 bool AddRepair::CanSubmitRepair() {
     return (!customerInput.GetValidationState() || !device_validation || !price_validation);
 }
-
 
 void AddRepair::ResetFields() {
     device = Repair();
@@ -216,4 +215,24 @@ void AddRepair::GetIDs() {
     device.color.IDinDB = sql.GetIdForValue(query, device.color.name.c_str());
     query = "SELECT repair_state_id FROM repair_states WHERE repair_state = ? ";
     device.state.IDinDB = sql.GetIdForValue(query, device.state.name.c_str());
+}
+
+void AddRepair::RepairSetter(Repair& repair_to_update) {
+    device = repair_to_update;
+    strncpy_s(customerInput.inputFields[0].buffer, customerInput.inputFields[0].bufferSize, device.customer.phone_number.c_str(), _TRUNCATE);
+    strncpy_s(customerInput.inputFields[1].buffer, customerInput.inputFields[1].bufferSize, device.customer.name.c_str(), _TRUNCATE);
+    strncpy_s(customerInput.inputFields[3].buffer, customerInput.inputFields[3].bufferSize, device.customer.email.c_str(), _TRUNCATE);
+    strncpy_s(pop_model.input, 128, device.model.name.c_str(), _TRUNCATE);
+    strncpy_s(pop_category.input, 128, device.category.name.c_str(), _TRUNCATE);
+    strncpy_s(pop_color.input, 128, device.color.name.c_str(), _TRUNCATE);
+    strncpy_s(notes, 128, device.note.c_str(), _TRUNCATE);
+    strncpy_s(notes_hidden, 128, device.note_hidden.c_str(), _TRUNCATE);
+    //strncpy_s(device_price, 128, device.model.name.c_str(), _TRUNCATE);
+    customerInput.InputValidation();
+    customerInput.ValidationCheck();
+    customerInput.ValidationFeedback();
+
+
+    
+
 }

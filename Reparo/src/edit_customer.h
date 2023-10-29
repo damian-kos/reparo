@@ -9,7 +9,7 @@
 class CustomerEditWindow {
 
 public:
-    ModalController modalController;
+  
 
     void SetCustomerToEdit(Customer* customerData, int id);
     void Render();
