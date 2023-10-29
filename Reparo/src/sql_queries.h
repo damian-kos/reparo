@@ -25,6 +25,6 @@ public:
     void MatchingCustomers(std::string& partial_phone_number, std::unordered_map<int, Customer>& customers); // Search for customers according to name/email/phone/surname
     void MatchingModels(std::string& model, std::vector<std::string>& vector, std::string label);  
     void AddRepair(Repair& repair, int customerID);
-    std::vector<Repair> GetAllToDoRepairs();
+    std::vector<Repair> GetRetreiveToDoRepairs(int state_id);
     void Prices();
 };

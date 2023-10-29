@@ -73,6 +73,12 @@ struct PopupInput {
 	bool check_in_db;
 };
 
+struct RepairsVector {
+	std::vector<Repair> repair_of_state;
+	bool repairs_of_state_retreived;
+	int selected = -1;
+};
+
 enum CustomerSubmissionState_ {
 	NotSubmitted = -3,
 	PhoneNumberIsEmpty = -2,

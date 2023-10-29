@@ -55,7 +55,6 @@ void PartsStockWindow::Render() {
     ImGui::End();
 }
 
-
 void PartsStockWindow::AddPart()
 {
     if (part.brand.current_id == -1 || part.model.current_id == -1 || part.category.current_id == -1) { return; }

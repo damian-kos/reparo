@@ -117,11 +117,11 @@ int main(int, char**)
     // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
     // - Read 'docs/FONTS.md' for more instructions and details.
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    // io.Fonts->AddFontDefault();
-    // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+     //io.Fonts->AddFontDefault();
+     //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     // IM_ASSERT(font != nullptr);
 
@@ -231,22 +231,15 @@ int main(int, char**)
             show_add_repair_window = !show_add_repair_window;
         ImGui::SameLine(); HelpMarker("Adding new repair \nAdd new or chose existing customer details \n");
 
-        if (ImGui::Button("Repairs TO DO"))
+        if (ImGui::Button("Repairs"))
             show_repair_states_window = !show_repair_states_window;
-        ImGui::SameLine(); HelpMarker("Repairs to do \nCurrent tickets which are not progressing yet \n");
+        ImGui::SameLine(); HelpMarker("Repairs \nHistory and current tickets \n");
 
         if (ImGui::Button("Create database")) {
             //partsStock.OpenPartsStockDb();
             //partsStock.CreateTable();
         }
-        ImGui::InputText("Print data", test, IM_ARRAYSIZE(test));
-        
-        if (ImGui::IsItemActivated()) {
-            ImGui::Text("Button Clicked!");
-        }
-        if (ImGui::Button("Click Me")) {
 
-        }
    
         ImGui::End();
 

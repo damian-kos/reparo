@@ -17,7 +17,7 @@ public:
     void RepairStatesTable(std::vector<Repair>& repairs, int& selected);
 
 };
-// imgui_helper.h
+
 class ImGuiDecorator {
 public:
     ImGuiDecorator(bool initialTestValue) : test_(initialTestValue) { }

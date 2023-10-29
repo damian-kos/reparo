@@ -4,11 +4,21 @@
 #include "imgui_helper.h"
 #include "sql_queries.h"
 
+
 class Repairs {
 public:
-    void AllToDoRepairs();
-    std::vector<Repair> to_do_repairs;
-    bool to_do_retreived;
+    void RetreiveToDoRepairs();
+    void RetreiveProcessingRepairs();
+    void RetreiveWarrantyRepairs();
+    void RetreiveAwaitingRepairs();
+    void RepairsSelector(int selection);
+    RepairsVector to_do;
+    RepairsVector processing;
+    RepairsVector warranty;
+    RepairsVector awaiting;
+    ImGuiHelper helper;
+
+
 private:
 
     SQLQuery sql;
@@ -20,5 +30,4 @@ public:
     Repairs repairs;
 
 private:
-    ImGuiHelper helper;
 };

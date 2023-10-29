@@ -8,8 +8,6 @@
 #include "sql_queries.h"
 #include "customer_input_window.h"
 
-
-
 class AddRepair {
 public:
     AddRepair() : customerInput("some text", CustomerInputFlags_NoSurnameField), decorator(false) {
@@ -18,7 +16,7 @@ public:
     void AddRepairWindow();
     void SubmitRepairButton();
     std::string error_message;
-    //ModalController modalController;
+
 
 private:
     char searchQuery[128] = "";
@@ -32,8 +30,6 @@ private: //Structs
     PopupInput pop_color;
     Repair device;
 private:
-    //Search search;
-    //PartsStockWindow parts;
     RepairSubmissionState repair_submission = 0;
     ImGuiDecorator decorator;
     CustomerInputWindow customerInput;

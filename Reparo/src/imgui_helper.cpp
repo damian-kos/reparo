@@ -121,13 +121,20 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
     //const bool item_is_selected = repairs.
 
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit| ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-    if (ImGui::BeginTable("##states", 6, flags)) {
+    if (ImGui::BeginTable("##states", 10, flags)) {
         ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Model", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Color", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Price", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Note", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Note Hidden", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Cust. Phone number", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Cust. Name", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("State", ImGuiTableColumnFlags_WidthStretch);
+
+
+
         ImGui::TableHeadersRow();
         for (int row = 0; row < repairs.size(); row++)
         {
@@ -153,6 +160,16 @@ void ImGuiHelper::RepairStatesTable(std::vector<Repair>& repairs, int& selected)
             ImGui::Text("%.2f", repairs[row].price);
             ImGui::TableNextColumn();
             ImGui::Text(repairs[row].note.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text(repairs[row].note_hidden.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text(repairs[row].customer.phone_number.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text(repairs[row].customer.name.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text(repairs[row].state.name.c_str());
+
+
 
 
 

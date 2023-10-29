@@ -122,19 +122,14 @@ bool AddRepair::CanSubmitRepair() {
 
 void AddRepair::ResetFields() {
     device = Repair();
- 
     memset(pop_model.input, 0, IM_ARRAYSIZE(pop_model.input));
     memset(pop_category.input, 0, IM_ARRAYSIZE(pop_category.input));
     memset(pop_color.input, 0, IM_ARRAYSIZE(pop_color.input));
     memset(notes, 0, IM_ARRAYSIZE(notes));
     memset(notes_hidden, 0, IM_ARRAYSIZE(notes_hidden));
-
     repair_submission = RepairSubmission_Cancel;
-
-
 }
 void AddRepair::Models() {
-    
         static Search search;
         if (search.SearchModel(pop_model, device.model.data)) {
 
@@ -143,7 +138,6 @@ void AddRepair::Models() {
         }
         const char* label = "##model";
         search.PopupModels(pop_model, device.model, label);
-    
 }
 
 void AddRepair::UpdateDeviceValidationFeedback() {
@@ -161,9 +155,7 @@ void AddRepair::UpdateDeviceValidationFeedback() {
 }
 
 void AddRepair::Categories() {
-   
     static Search search;
-
     if (search.SearchModel(pop_category, device.category.data)) {
         std::string strSearchQuery(pop_category.input);
         sql.MatchingModels(strSearchQuery, device.category.data, "categories");

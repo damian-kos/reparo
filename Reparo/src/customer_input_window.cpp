@@ -193,7 +193,7 @@ void CustomerInputWindow::ValidationFeedback() {
 void CustomerInputWindow::PassSearchQuery() {
     Search search;
     search.SearchField(inputFields[0].buffer);  
-    search.ForAdd(inputFields, 1);
+    search.ForAdd(inputFields, 1, SearchFlags_EditCustomer);
 }
 
 bool CustomerInputWindow::GetValidationState() const {
