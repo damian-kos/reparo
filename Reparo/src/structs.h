@@ -1,119 +1,19 @@
 #pragma once
-
-#include "imgui.h"
-#include <vector>
 #include <string>
 
-typedef int CustomerInputFlags;
-typedef int SearchFlags;
-typedef int CustomerSubmissionFlags;
-typedef int CustomerSubmissionState;
-typedef int RepairSubmissionState;
-typedef int RepairState;
-
-struct InputField {
-    const char* label;
-    const char* hint;
-    char* buffer;
-    int bufferSize;
-    ImGuiInputTextFlags flags;
-	bool is_valid;
-};
-
-struct PartData {
-	int current_id = -1;
-	std::vector<std::string> data;
-	std::string name = "";
-	int IDinDB = -1;
-	bool retreived = false;
-};
-
-struct PartQualityData {
-	bool selections[20] = {};
-	std::vector<std::string> data;
-	std::vector<int> order;
-	std::string desc = "";
-	bool retreived = false;
-};
-
-struct Part {
-	PartData brand;
-	PartData model;
-	PartData category;
-	PartData color;
-	PartQualityData quality;
-};
-
 struct Customer {
-	std::string name;
-	std::string surname;
-	std::string email;
-	std::string phone_number;
-};
+public:
+    Customer()
+        : phone(""), name(""), surname(""), email("") {}
 
-struct Repair {
-	int id;
-	PartData model;
-	PartData category;
-	PartData color;
-	PartData state;
-	std::string note = "";
-	std::string note_hidden = "";
-	double price;
-	Customer customer;
-};
+    Customer(const std::string& phone, const std::string& name,
+        const std::string& surname, const std::string& email)
+        : phone(phone), name(name), surname(surname), email(email) {}
 
-struct PopupInput {
-	char input[128] = { "" };
-	bool is_input_enter_pressed;
-	size_t previous_len;
-	bool is_input_text_active;
-	bool is_input_text_activated;
-	bool check_in_db;
-};
+    ~Customer() {}
 
-struct RepairsVector {
-	std::vector<Repair> repair_of_state;
-	bool repairs_of_state_retreived;
-	int selected = -1;
-};
-
-enum RepairState_ {
-	RepairState_ToDo = 1,
-	RepairState_Processing,
-	RepairState_Warranty,
-	RepairState_AwaitingParts,
-};
-
-enum CustomerSubmissionState_ {
-	NotSubmitted = -3,
-	PhoneNumberIsEmpty = -2,
-	WrongQuery = -1,
-	AddNewCustomer = 0,
-};
-
-enum RepairSubmissionState_ {
-	RepairSubmission_Cancel,
-	RepairSubmission_Submit,
-};
-
-enum CustomerSubmissionFlags_ {
-	CustomerSubmissionFlags_None = 0,
-	CustomerSubmissionFlags_SimpleAdd = 1 << 0,
-	CustomerSubmissionFlags_RepairAdd = 1 << 1,
-};
-
-enum SearchFlags_ {
-	SearchFlags_None = 0,
-	SearchFlags_EditCustomer = 1 << 1,
-	SearchFlags_CopyToFields = 1 << 2,
-};
-
-enum CustomerInputFlags_ {
-	CustomerInputFlags_None = 0,
-	CustomerInputFlags_SubmitButton = 1 << 0,
-	CustomerInputFlags_NoNameField = 1 << 1,
-	CustomerInputFlags_NoSurnameField = 1 << 2,
-	CustomerInputFlags_NoEmailField = 1 << 3,
-	CustomerInputFlags_SearchResultsOnPhoneNo = 1 << 4,
+    std::string phone;
+    std::string name;
+    std::string surname;
+    std::string email;
 };

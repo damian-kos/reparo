@@ -3,22 +3,15 @@
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 #include "imgui.h"
-#include "customer_input_window.h"
-#include "edit_customer.h"
 #include "helpmarker.h"
-#include "parts_stock_window.h"
-#include "add_repair.h"
-#include "repairs_states.h"
-
+#include "insert_customer.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <tchar.h>
-
 #include <iostream>
 #include <string>
 
-#include "parts_stock.h"
 
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
@@ -46,13 +39,9 @@ int main(int, char**)
 //    LPSTR lpCmdLine,
 //    int nShowCmd)
 {
-    CustomerInputWindow addCustomerWin("Poop", CustomerInputFlags_SubmitButton | CustomerInputFlags_SearchResultsOnPhoneNo);
-    CustomerEditWindow customerEditWin;
-    ModalController modalController;
-    PartsStockWindow partsStockWindow;
-    PartsStock partsStock;
-    AddRepair repair;
-    RepairMenu repair_menu;
+    InsertCustomer insert_customer;
+
+
     // Create application window
     // ImGui_ImplWin32_EnableDpiAwareness();
     WNDCLASSEXW wc = {sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr};
@@ -239,40 +228,15 @@ int main(int, char**)
             //partsStock.OpenPartsStockDb();
             //partsStock.CreateTable();
         }
-
    
         ImGui::End();
 
         if (show_add_customer_window) {
             ImGui::Begin("Add customer", &show_add_customer_window);
-            addCustomerWin.Render();
+            insert_customer.Render();
             ImGui::End();
         }
 
-        
-        if (show_add_part_to_stock_window) {
-            partsStockWindow.GetBrands();
-            partsStockWindow.Render();
-        }
-      
-        if (repair_menu.repair_update_window_on)
-            repair_menu.UpdateRepairWin();
-        
-        if (customerEditWin.GetShouldRender()) {
-            customerEditWin.Render();
-        }
-
-        if (show_add_repair_window) {
-            ImGui::Begin("Add repair", &show_add_repair_window);
-            repair.AddRepairWindow();
-            ImGui::End();
-        }
-
-        if (show_repair_states_window) {
-            ImGui::Begin("Repairs", &show_repair_states_window);
-            repair_menu.RepairMainWin();
-            ImGui::End();
-        }
 
 
         // Rendering
