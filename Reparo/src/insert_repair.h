@@ -4,6 +4,7 @@
 class InsertRepair : public InsertCustomer {
 public:
     void Render() override;
+    void NotesSection();
     void DeviceSection();
     void SubmitButton() override;
     void CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function);
@@ -13,6 +14,7 @@ public:
     void PopupFields(const char* label, HintInputFieldsW_Popup& field, HintInputFieldsW_Popup& rel_field);
     bool BufferQueryOnDatabase(const char* label, const char* buffer);
 private:
+    double price;
     bool device_validated;
     HintInputFieldsW_Popup model;
     HintInputFieldsW_Popup category;

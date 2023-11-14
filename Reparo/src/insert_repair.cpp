@@ -3,13 +3,10 @@
 void InsertRepair::Render() {
     InsertCustomer::Render();
     DeviceSection();
-
-    imgui_decorator.SetTestValue(true);
-    imgui_decorator.DecorateSeparatorText("DEVICE: ");
-    CreateInputField("##VisibleNote", "Note for customer...", visible_note);
-    CreateInputField("##VisibleNote", "Note for shop...", hidden_note);
-
-
+    NotesSection();
+    imgui_decorator.SetTestValue((price > 0) ? true : false);
+    imgui_decorator.DecorateSeparatorText("PRICE: ");
+    ImGui::InputDouble("input float", &price, 0.1f, 1.0f, "%.2f");
 }
 
 void InsertRepair::DeviceSection() {
@@ -30,6 +27,14 @@ void InsertRepair::DeviceSection() {
     ImGui::SameLine(); ImGui::Text(category.input.validated ? "true" : "false");
     ImGui::SameLine(); ImGui::Text(color.input.validated ? "true" : "false");
     //
+}
+
+void InsertRepair::NotesSection()
+{
+    imgui_decorator.SetTestValue(true);
+    imgui_decorator.DecorateSeparatorText("DEVICE: ");
+    CreateInputField("##VisibleNote", "Note for customer...", visible_note);
+    CreateInputField("##VisibleNote", "Note for shop...", hidden_note);
 }
 
 void InsertRepair::CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function) {
