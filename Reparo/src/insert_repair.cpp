@@ -4,9 +4,7 @@ void InsertRepair::Render() {
     InsertCustomer::Render();
     DeviceSection();
     NotesSection();
-    imgui_decorator.SetTestValue((price > 0) ? true : false);
-    imgui_decorator.DecorateSeparatorText("PRICE: ");
-    ImGui::InputDouble("input float", &price, 0.1f, 1.0f, "%.2f");
+    PriceSection();
 }
 
 void InsertRepair::DeviceSection() {
@@ -37,6 +35,13 @@ void InsertRepair::NotesSection()
     CreateInputField("##VisibleNote", "Note for shop...", hidden_note);
 }
 
+void InsertRepair::PriceSection()
+{
+    imgui_decorator.SetTestValue((price > 0) ? true : false);
+    imgui_decorator.DecorateSeparatorText("PRICE: ");
+    ImGui::InputDouble("input float", &price, 0.1f, 1.0f, "%.2f");
+}
+
 void InsertRepair::CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function) {
     if (field.input.is_on) {
         ImGui::InputTextWithHint(label, hint, field.input.buffer, 128, field.input.imgui_flags);
@@ -52,10 +57,6 @@ void InsertRepair::CreateInputField(const char* label, const char* hint, HintInp
 void InsertRepair::CreateInputField(const char* label, const char* hint, HintInputField& field) {
     if (field.is_on) 
         ImGui::InputTextWithHint(label, hint, field.buffer, 128, field.imgui_flags);
-}
-
-void InsertRepair::SubmitButton() {
-
 }
 
 bool InsertRepair::DeviceFieldsValidated() {
@@ -77,4 +78,8 @@ void InsertRepair::PopupFields(const char* label, HintInputFieldsW_Popup& field,
 
 bool InsertRepair::BufferQueryOnDatabase(const char* label, const char* buffer) {
     return db.GetBoolForValue(label, buffer);
+}
+
+void InsertRepair::SubmitButton() {
+    If
 }

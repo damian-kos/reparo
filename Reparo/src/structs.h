@@ -45,3 +45,28 @@ struct HintInputFieldsW_Popup  {
     Attribute attribute;
 };
 
+struct Device {
+    Device()
+        : name(""), color("") {
+        std::cout << "Device created empty" << std::endl;
+    }
+    Device(const char* name, const char* color)
+        : name(name), color(color) {
+        std::cout << "Device created with values " << std::endl;
+    }
+    ~Device() { std::cout << "Device destroyed " << std::endl; }
+    const char* name;
+    const char* color;
+};
+
+struct Repair {
+    Repair()
+        : customer(), device(), category("") {}
+
+    Repair(const Customer& cust, const Device& dev, const char* cat)
+        : customer(cust), device(dev), category(cat) {}
+
+    Customer customer;
+    Device device;
+    const char* category;
+};

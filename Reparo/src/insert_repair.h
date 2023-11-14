@@ -4,6 +4,7 @@
 class InsertRepair : public InsertCustomer {
 public:
     void Render() override;
+    void PriceSection();
     void NotesSection();
     void DeviceSection();
     void SubmitButton() override;
