@@ -2,17 +2,17 @@
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
-#include "imgui.h"
-#include "helpmarker.h"
-#include "insert_customer.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <tchar.h>
 #include <iostream>
 #include <string>
 
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
 
+#include "helpmarker.h"
+#include "insert_repair.h"
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
 static ID3D11DeviceContext *g_pd3dDeviceContext = nullptr;
@@ -40,6 +40,7 @@ int main(int, char**)
 //    int nShowCmd)
 {
     InsertCustomer insert_customer;
+    InsertRepair insert_repair;
 
 
     // Create application window
@@ -117,9 +118,9 @@ int main(int, char**)
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
-    bool show_add_customer_window = false;
+    bool show_insert_customer_win = false;
     bool show_add_part_to_stock_window = false;
-    bool show_add_repair_window = false;
+    bool show_insert_repair = false;
     bool show_repair_states_window = false;
 
     char test[128] = "";
@@ -210,30 +211,37 @@ int main(int, char**)
         ImGui::Begin("Main Menu");
         // Window for Adding Customers
         if (ImGui::Button("Add customer"))
-            show_add_customer_window = !show_add_customer_window;
+            show_insert_customer_win = !show_insert_customer_win;
         ImGui::SameLine(); HelpMarker("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer");
         if (ImGui::Button("Add part to stock"))
             show_add_part_to_stock_window = !show_add_part_to_stock_window;
         ImGui::SameLine(); HelpMarker("Adding new part \nSearching for parts to update \nEditing existings ones");
 
         if (ImGui::Button("Add repair"))
-            show_add_repair_window = !show_add_repair_window;
+            show_insert_repair = !show_insert_repair;
         ImGui::SameLine(); HelpMarker("Adding new repair \nAdd new or chose existing customer details \n");
 
         if (ImGui::Button("Repairs"))
             show_repair_states_window = !show_repair_states_window;
         ImGui::SameLine(); HelpMarker("Repairs \nHistory and current tickets \n");
 
-        if (ImGui::Button("Create database")) {
-            //partsStock.OpenPartsStockDb();
-            //partsStock.CreateTable();
+        if (ImGui::Button("Test popup")) {
+            bool is_open = ImGui::IsPopupOpen("##Model");
+            std::cout << "Popup is: " << is_open << std::endl;
         }
    
         ImGui::End();
 
-        if (show_add_customer_window) {
-            ImGui::Begin("Add customer", &show_add_customer_window);
+        if (show_insert_customer_win) {
+            ImGui::Begin("Add customer", &show_insert_customer_win);
             insert_customer.Render();
+            ImGui::End();
+        }
+
+        if (show_insert_repair) {
+            ImGui::Begin("Insert Repair", &show_insert_repair);
+            insert_repair.Render();
+            
             ImGui::End();
         }
 

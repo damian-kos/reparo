@@ -133,8 +133,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\database.h" />
+    <ClInclude Include="src\enums.h" />
+    <ClInclude Include="src\imgui_decorator.h" />
     <ClInclude Include="src\insert_customer.h" />
     <ClInclude Include="src\helpmarker.h" />
+    <ClInclude Include="src\insert_repair.h" />
+    <ClInclude Include="src\modals.h" />
     <ClInclude Include="src\structs.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
@@ -149,9 +154,13 @@
     <ClInclude Include="vendor\sqlite3\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\database.cpp" />
+    <ClCompile Include="src\imgui_decorator.cpp" />
     <ClCompile Include="src\insert_customer.cpp" />
     <ClCompile Include="src\helpmarker.cpp" />
+    <ClCompile Include="src\insert_repair.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\modals.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
