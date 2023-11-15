@@ -55,6 +55,7 @@ void Database::InsertCustomer(Customer& customer) {
     sqlite3_close(db);
 }
 
+
 void Database::ManageSearchState(const char* label, Attribute& attribute, const char* buffer) {
     OpenDB();
 
@@ -168,3 +169,4 @@ bool Database::GetBoolForValue(const char* label, const char* buffer) {
 
     return is_found;
 }
+

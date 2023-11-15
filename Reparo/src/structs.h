@@ -61,13 +61,15 @@ struct Device {
 
 struct Repair {
     Repair()
-        : customer(), device(), category("") {}
+        : customer(), device(), category(""), price(0), visible_note(""), hidden_note("") {}
 
-    Repair(const Customer& cust, const Device& dev, const char* cat, double price)
-        : customer(cust), device(dev), category(cat), price(price) {}
+    Repair(const Customer& cust, const Device& dev, const char* cat, double price, const char* visible_note, const char* hidden_note)
+        : customer(cust), device(dev), category(cat), price(price), visible_note(visible_note), hidden_note(hidden_note) {}
 
     Customer customer;
     Device device;
     const char* category;
     double price;
+    const char* visible_note;
+    const char* hidden_note;
 };

@@ -32,7 +32,7 @@ void InsertRepair::NotesSection() {
     imgui_decorator.SetTestValue(true);
     imgui_decorator.DecorateSeparatorText("NOTES: ");
     CreateInputField("##VisibleNote", "Note for customer...", visible_note);
-    CreateInputField("##VisibleNote", "Note for shop...", hidden_note);
+    CreateInputField("##HiddenNote", "Note for shop...", hidden_note);
 }
 
 void InsertRepair::PriceSection() {
@@ -91,7 +91,7 @@ void InsertRepair::AddRepairButton() {
 
 Repair InsertRepair::InitRepair() {
     Device device(model.input.buffer, color.input.buffer);
-    Repair init_repair(InitCustomer(), device, category.input.buffer, price);
+    Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer);
     return init_repair;
 }
 
@@ -107,7 +107,7 @@ void InsertRepair::RunModal(Repair& repair) {
 
        int customerID = db.QueryCustomerByPhone(repair.customer.phone);
        if (customerID == 0) {
-            //db.InsertCustomer(repair.customer);
+            //db.InsertCustomer(repair.customer); // Insert Customer if doesnt exist
             ResetFields();
        }
     }

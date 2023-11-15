@@ -16,6 +16,7 @@ public:
 
     void InsertCustomer(Customer& customer);
 
+
     void ManageSearchState(const char* label, Attribute& attribute, const char* buffer);
 
     void ManageSearchState(const char* label, Attribute& attribute, const char* buffer, int rel_id);
