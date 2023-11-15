@@ -103,7 +103,7 @@ void InsertCustomer::RunModal(Customer& customer) {
        int customerID = db.QueryCustomerByPhone(phone.buffer);
        if (customerID == 0) {
            db.InsertCustomer(customer);
-           result = ConfirmResult::ConfirmCancel;
+           result = ConfirmResult::ConfirmIdle;
            ResetFields();
        }
     }

@@ -27,8 +27,8 @@ private:
 
 private:
     std::string validation_feedback = "";
-    ConfirmResult result = ConfirmResult::ConfirmIdle;
 protected:
+    ConfirmResult result = ConfirmResult::ConfirmIdle;
     Database db;
     ImGuiDecorator imgui_decorator;
     ModalController modals;
@@ -41,10 +41,10 @@ protected:
     int SetValidaitonErr();
     void SetValidationMsg();
     Customer InitCustomer();
-    void InitModal();
+    virtual void InitModal();
     void RunModal(Customer& customer);
 
-    void ResetFields();
+    virtual void ResetFields();
 
 
 };
