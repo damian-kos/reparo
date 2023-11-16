@@ -16,10 +16,10 @@ void ModalController::SubmitConfirm(const char* modal_title, Customer& customer,
         ImGui::Text("Do you want to insert customer with this details?");
         ImGui::Separator();
         ImGui::Text("Phone: "); ImGui::SameLine(); ImGui::Text(customer.phone.c_str());
-        if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::ConfirmSubmit; }
+        if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
-        if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); result  = ConfirmResult::ConfirmCancel; }
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); result  = ConfirmResult::CONFIRM_CANCEL; }
         ImGui::EndPopup();
     }
 }
@@ -33,10 +33,10 @@ void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, Con
         ImGui::Text("Phone: "); ImGui::SameLine(); ImGui::Text(repair.customer.phone.c_str());
         ImGui::Text("Model: "); ImGui::SameLine(); ImGui::Text(repair.device.name);
 
-        if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::ConfirmSubmit; }
+        if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
-        if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); result = ConfirmResult::ConfirmCancel; }
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); result = ConfirmResult::CONFIRM_CANCEL; }
         ImGui::EndPopup();
     }
 }

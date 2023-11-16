@@ -6,6 +6,7 @@
 #include <map>
 
 #include "structs.h"
+#include "enums.h"
 
 class Database {
 public:
@@ -14,7 +15,8 @@ public:
 public:
     int QueryCustomerByPhone(std::string phone);
 
-    void InsertCustomer(Customer& customer);
+    void InsertCustomer(Customer& customer, int* last_row_id);
+
 
 
     void ManageSearchState(const char* label, Attribute& attribute, const char* buffer);
@@ -24,6 +26,7 @@ public:
     int GetIDForValue(const char* label, const char* value);
 
     bool GetBoolForValue(const char* label, const char* buffer);
+    void InsertRepair(Repair repair);
 
 private:
     sqlite3* db = nullptr;

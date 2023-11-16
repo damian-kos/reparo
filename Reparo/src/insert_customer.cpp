@@ -7,14 +7,20 @@ InsertCustomer::~InsertCustomer() {
 }
 
 void InsertCustomer::Render() {
+    FieldsSection();
+    ImGui::Text(validation_feedback.c_str());
+    SubmitButton();
+}
+
+void InsertCustomer::FieldsSection() {
     imgui_decorator.SetTestValue(FieldsValidated());
     imgui_decorator.DecorateSeparatorText("CUSTOMER: ");
-    CreateInputField("##Phone", "Phone number...", phone, [&]() { return SimpleValidation(phone.buffer, 8); });
+    CreateInputField("##Phone", "Phone number...", phone, [&]() { return SimpleValidation(phone.input.buffer, 8); });
+    PopupFields("##Phone", phone);
+    modals.PopupOnInputField(phone, "phone");
     CreateInputField("##Name", "Name...", name, [&]() { return SimpleValidation(name.buffer, 3); });
     CreateInputField("##Surname", "Surname...", surname, [&]() { return SimpleValidation(surname.buffer, 3); });
     CreateInputField("##Email", "Email...", email, [&]() {return IsEmailValid(email.buffer); });
-    ImGui::Text(validation_feedback.c_str());
-    SubmitButton();
 }
 
 void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function) {
@@ -26,6 +32,24 @@ void InsertCustomer::CreateInputField(const char* label, const char* hint, HintI
         if (ImGui::IsItemDeactivated()) {
             SetValidationMsg();
         }
+    }
+}
+
+void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function) {
+    if (field.input.is_on) {
+        ImGui::InputTextWithHint(label, hint, field.input.buffer, 128, field.input.imgui_flags);
+        if (ImGui::IsItemEdited()) {
+            field.input.validated = validation_function();
+        }
+        if (ImGui::IsItemDeactivated()) {
+
+        }
+    }
+}
+
+void InsertCustomer::PopupFields(const char* label, HintInputFieldsW_Popup& field) {
+    if (ImGui::IsItemEdited() || ImGui::IsItemActivated()) {
+        db.ManageSearchState(label, field.attribute, field.input.buffer);
     }
 }
 
@@ -55,11 +79,11 @@ bool InsertCustomer::SimpleValidation(const char* buffer, int length) {
 }
 
 bool InsertCustomer::FieldsValidated() {
-    return (phone.validated && name.validated && surname.validated && email.validated);
+    return (phone.input.validated && name.validated && surname.validated && email.validated);
 }
 
 int InsertCustomer::SetValidaitonErr() {
-    std::vector<HintInputField> validations = { phone, name, surname, email };
+    std::vector<HintInputField> validations = { phone.input, name, surname, email };
     if (FieldsValidated())
         return -1;
     for (int i = 0; i < validations.size();  i++) {
@@ -88,7 +112,7 @@ void InsertCustomer::SetValidationMsg() {
 }
 
 Customer InsertCustomer::InitCustomer() {
-    Customer customer(phone.buffer, name.buffer, surname.buffer, email.buffer);
+    Customer customer(phone.input.buffer, name.buffer, surname.buffer, email.buffer);
     std::cout << customer.phone << std::endl;
     return customer;
 }
@@ -99,18 +123,18 @@ void InsertCustomer::InitModal() {
 
 void InsertCustomer::RunModal(Customer& customer) {
    modals.SubmitConfirm("Confirm Customer Details", customer, result);
-   if (result == ConfirmResult::ConfirmSubmit) {
-       int customerID = db.QueryCustomerByPhone(phone.buffer);
+   if (result == ConfirmResult::CONIFRM_SUBMIT) {
+       int customerID = db.QueryCustomerByPhone(phone.input.buffer);
        if (customerID == 0) {
-           db.InsertCustomer(customer);
-           result = ConfirmResult::ConfirmIdle;
+           db.InsertCustomer(customer, nullptr);
+           result = ConfirmResult::CONIFRM_IDLE;
            ResetFields();
        }
     }
 }
 
 void InsertCustomer::ResetFields() {
-    phone = HintInputField({ ImGuiInputTextFlags_CharsDecimal });
+    phone.input = HintInputField({ ImGuiInputTextFlags_CharsDecimal });
     name = HintInputField();
     surname = HintInputField();
     email = HintInputField();

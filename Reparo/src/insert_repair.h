@@ -7,11 +7,12 @@ public:
     void DeviceSection();
     void PriceSection();
     void NotesSection();
-    void AddRepairButton();
-    void CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function);
+    void InsertRepairButton();
+    //void CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function);
     void CreateInputField(const char* label, const char* hint, HintInputField& field);
     bool DeviceFieldsValidated();
-    void PopupFields(const char* label, HintInputFieldsW_Popup& field);
+    bool RepairValidated();
+    
     void PopupFields(const char* label, HintInputFieldsW_Popup& field, HintInputFieldsW_Popup& rel_field);
     bool BufferQueryOnDatabase(const char* label, const char* buffer);
     Repair InitRepair();

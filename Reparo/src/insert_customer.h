@@ -19,8 +19,9 @@ public:
 public:
     virtual void Render();
 
+
 private:
-    HintInputField phone{ ImGuiInputTextFlags_CharsDecimal };
+    HintInputFieldsW_Popup phone{ ImGuiInputTextFlags_CharsDecimal };
     HintInputField name;
     HintInputField surname;
     HintInputField email;
@@ -28,12 +29,15 @@ private:
 private:
     std::string validation_feedback = "";
 protected:
-    ConfirmResult result = ConfirmResult::ConfirmIdle;
+    ConfirmResult result = ConfirmResult::CONIFRM_IDLE;
     Database db;
     ImGuiDecorator imgui_decorator;
     ModalController modals;
 protected:
     void CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function);
+    void CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function);
+    virtual void PopupFields(const char* label, HintInputFieldsW_Popup& field);
+    void FieldsSection();
     virtual void SubmitButton();
     bool IsEmailValid(std::string email);
     bool SimpleValidation(const char* buffer, int length);
