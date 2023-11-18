@@ -31,7 +31,7 @@ void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, Con
         ImGui::Text("Do you want to insert repair with this details?");
         ImGui::Separator();
         ImGui::Text("Phone: "); ImGui::SameLine(); ImGui::Text(repair.customer.phone.c_str());
-        ImGui::Text("Model: "); ImGui::SameLine(); ImGui::Text(repair.device.name);
+        ImGui::Text("Model: "); ImGui::SameLine(); ImGui::Text(repair.device.name.c_str());
 
         if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
         ImGui::SetItemDefaultFocus();
@@ -49,6 +49,16 @@ const char** vectorToCharArray(const std::vector<std::string>& strings) {
         charArray[i] = strings[i].c_str();
     }
     return charArray;
+}
+
+#include <sstream>
+
+std::string SeperateData(const char* data) {
+    std::string data_string(data);
+    std::istringstream iss(data_string);
+    std::string changed_data;
+    iss >> changed_data;
+    return changed_data;
 }
 
 void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const char* label) {
@@ -72,7 +82,7 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
             if (ImGui::Selectable(autocomplete[i]))
             {
                 //ImGui::ClearActiveID();
-                strcpy(field.input.buffer, autocomplete[i]);
+                strcpy(field.input.buffer, SeperateData(autocomplete[i]).c_str());
                 field.input.validated = true;
                 field.attribute.name = field.attribute.data[i];
                 //field.attribute.current_id = 1;
@@ -92,3 +102,4 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
     //}
 
 }
+

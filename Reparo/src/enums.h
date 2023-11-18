@@ -7,7 +7,8 @@ enum class ConfirmResult {
     CONIFRM_SUBMIT,
 };
 
-enum class RepairState{
+enum class RepairState {
+    EMPTY = 0,
     TO_DO = 1,
     PROCESSING = 2,
     WARRANTY = 3,

@@ -13,6 +13,7 @@
 
 #include "helpmarker.h"
 #include "insert_repair.h"
+#include "repairs.h"
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
 static ID3D11DeviceContext *g_pd3dDeviceContext = nullptr;
@@ -41,6 +42,7 @@ int main(int, char**)
 {
     InsertCustomer insert_customer;
     InsertRepair insert_repair;
+    RepairsView repairs_view;
 
 
     // Create application window
@@ -229,6 +231,7 @@ int main(int, char**)
             bool is_open = ImGui::IsPopupOpen("##Model");
             std::cout << "Popup is: " << is_open << std::endl;
         }
+
    
         ImGui::End();
 
@@ -241,7 +244,12 @@ int main(int, char**)
         if (show_insert_repair) {
             ImGui::Begin("Insert Repair", &show_insert_repair);
             insert_repair.Render();
-            
+            ImGui::End();
+        }
+
+        if (show_repair_states_window) {
+            ImGui::Begin("Repairs", &show_repair_states_window);
+            repairs_view.Render();
             ImGui::End();
         }
 

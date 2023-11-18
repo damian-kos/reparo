@@ -4,6 +4,8 @@
 #include <iostream>
 #include "imgui.h"
 
+#include "enums.h"
+
 struct Customer {
 public:
     Customer()
@@ -50,26 +52,29 @@ struct Device {
         : name(""), color("") {
         std::cout << "Device created empty" << std::endl;
     }
-    Device(const char* name, const char* color)
+    Device(std::string name, std::string color)
         : name(name), color(color) {
         std::cout << "Device created with values " << std::endl;
     }
     ~Device() { std::cout << "Device destroyed " << std::endl; }
-    const char* name;
-    const char* color;
+    std::string name;
+    std::string color;
 };
 
 struct Repair {
     Repair()
-        : customer(), device(), category(""), price(0), visible_note(""), hidden_note("") {}
+        : customer(), device(), category(""), price(0), visible_note(""), hidden_note(""), state("") {}
 
-    Repair(const Customer& cust, const Device& dev, const char* cat, double price, const char* visible_note, const char* hidden_note)
-        : customer(cust), device(dev), category(cat), price(price), visible_note(visible_note), hidden_note(hidden_note) {}
+    Repair(const Customer& cust, const Device& dev, std::string cat, double price, std::string visible_note, std::string hidden_note)
+        : customer(cust), device(dev), category(cat), price(price), visible_note(visible_note), hidden_note(hidden_note){}
 
+    Repair(const Customer& cust, const Device& dev, std::string cat, double price, std::string visible_note, std::string hidden_note, std::string state)
+        : customer(cust), device(dev), category(cat), price(price), visible_note(visible_note), hidden_note(hidden_note), state(state) {}
     Customer customer;
     Device device;
-    const char* category;
+    std::string category;
     double price;
-    const char* visible_note;
-    const char* hidden_note;
+    std::string visible_note;
+    std::string hidden_note;
+    std::string state;
 };

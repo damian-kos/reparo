@@ -28,6 +28,8 @@ public:
     bool GetBoolForValue(const char* label, const char* buffer);
     void InsertRepair(Repair repair);
 
+    std::map<int, Repair> RetreiveRepairsOfState(int state);
+
 private:
     sqlite3* db = nullptr;
 
