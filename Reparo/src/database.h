@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_map>
 
 #include "structs.h"
 #include "enums.h"
@@ -29,6 +30,14 @@ public:
     void InsertRepair(Repair repair);
 
     std::map<int, Repair> RetreiveRepairsOfState(int state);
+
+    std::map<int, std::string> GetRepairStates();
+
+    void UpdateCustomer(Customer& customer, int id);
+
+    int GetIDForID(int id, std::string table);
+
+
 
 private:
     sqlite3* db = nullptr;

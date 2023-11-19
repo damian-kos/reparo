@@ -1,6 +1,19 @@
 #include "insert_customer.h"
 
-InsertCustomer::InsertCustomer() : imgui_decorator() { }
+InsertCustomer::InsertCustomer() : imgui_decorator() { std::cout << "InsertCustomer Created" << std::endl; }
+InsertCustomer::InsertCustomer(Customer& cust) : imgui_decorator(), customer(cust){ 
+    CopyToBuffer(phone.input.buffer, 
+        customer.phone.c_str(), 
+        phone.input.validated, 
+        [&]() { return SimpleValidation(phone.input.buffer, 8); });
+    CopyToBuffer(name.buffer, 
+        customer.name.c_str(), 
+        name.validated, [&]() { return SimpleValidation(name.buffer, 3); });
+    CopyToBuffer(surname.buffer, 
+        customer.surname.c_str(), 
+        surname.validated, [&]() { return SimpleValidation(surname.buffer, 3); });
+    CopyToBuffer(email.buffer, customer.email.c_str(), email.validated, [&]() { return IsEmailValid(email.buffer); });
+}
 
 InsertCustomer::~InsertCustomer() {
     std::cout << "Insert Customer destroyed" << std::endl;
@@ -41,6 +54,7 @@ void InsertCustomer::CreateInputField(const char* label, const char* hint, HintI
         if (ImGui::IsItemEdited()) {
             field.input.validated = validation_function();
         }
+        
         if (ImGui::IsItemDeactivated()) {
 
         }
@@ -54,7 +68,7 @@ void InsertCustomer::PopupFields(const char* label, HintInputFieldsW_Popup& fiel
 }
 
 void InsertCustomer::SubmitButton() {
-    static Customer customer;
+    //static Customer customer;
     if (!FieldsValidated()) {
         ImGui::BeginDisabled(true);
     }
@@ -138,4 +152,10 @@ void InsertCustomer::ResetFields() {
     name = HintInputField();
     surname = HintInputField();
     email = HintInputField();
+}
+
+void InsertCustomer::CopyToBuffer(char* buffer, std::string source, bool& field_validation, std::function<bool()> validation_function) {
+    std::cout << "Source: "  << source << std::endl;
+    strcpy(buffer, source.c_str());
+    field_validation = validation_function();
 }

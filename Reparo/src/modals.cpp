@@ -53,12 +53,17 @@ const char** vectorToCharArray(const std::vector<std::string>& strings) {
 
 #include <sstream>
 
-std::string SeperateData(const char* data) {
+std::string SeperateData(const char* data, const char* label) {
     std::string data_string(data);
-    std::istringstream iss(data_string);
-    std::string changed_data;
-    iss >> changed_data;
-    return changed_data;
+    if (label == "phone") {
+        std::istringstream iss(data_string);
+        std::string changed_data;
+        iss >> changed_data;
+        return changed_data;
+    }
+    else {
+        return data_string;
+    }
 }
 
 void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const char* label) {
@@ -68,11 +73,13 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
 
     if (field.is_input_activated) {
         ImGui::OpenPopup(label);
+        std::cout << &field << label << std::endl;
     }
 
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
     if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
     {
+
         const char** autocomplete = vectorToCharArray(field.attribute.data);
         for (int i = 0; i < field.attribute.data.size(); i++)
         {
@@ -82,24 +89,25 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
             if (ImGui::Selectable(autocomplete[i]))
             {
                 //ImGui::ClearActiveID();
-                strcpy(field.input.buffer, SeperateData(autocomplete[i]).c_str());
+                strcpy(field.input.buffer, SeperateData(autocomplete[i], label).c_str());
                 field.input.validated = true;
                 field.attribute.name = field.attribute.data[i];
                 //field.attribute.current_id = 1;
             }
         }
-        if (field.is_input_enter_pressed || (!field.is_input_active && !ImGui::IsWindowFocused())) {
-            ImGui::CloseCurrentPopup();
-            //field.input.check_in_db = true;
-        }
-        
-        ImGui::EndPopup();
-        
+        //if(field.is_input_enter_pressed)
+        //    std::cout << "Enter Pressed " << std::endl;
 
+        //if (ImGui::IsWindowFocused())
+        //    std::cout << "Window is focused " << std::endl;
+
+        if ( /*field.is_input_enter_pressed ||*/ (!field.is_input_active && !ImGui::IsWindowFocused())) {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
     }
     //if (ImGui::IsItemDeactivated()) {
     //    input.check_in_db = true;
     //}
-
 }
 

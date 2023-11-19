@@ -4,14 +4,15 @@
 class InsertRepair : public InsertCustomer {
 public:
     InsertRepair();
-    InsertRepair(Repair& repair);
+    InsertRepair(Repair& repair_);
 public:
     void Render() override;
     void DeviceSection();
     void NotesSection();
     void PriceSection();
     virtual void StateSection();
-    void InsertRepairButton();
+    void InsertRepairButtonEnabler();
+    virtual void InsertRepairButton();
     //void CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function);
     void CreateInputField(const char* label, const char* hint, HintInputField& field);
     bool DeviceFieldsValidated();
@@ -20,13 +21,14 @@ public:
     void PopupFields(const char* label, HintInputFieldsW_Popup& field, HintInputFieldsW_Popup& rel_field);
     bool BufferQueryOnDatabase(const char* label, const char* buffer);
     Repair InitRepair();
-    void InitModal() override;
-    void RunModal(Repair& customer);
+    virtual void InitModal() override;
+    virtual void RunModal(Repair& repair);
     void SubmitButton() override;
     void ResetFields() override;
-    void TestButton();
+    virtual void TestButton();
     Repair repair;
-private:
+protected:
+    const char* modal_message;
     double price = 0;
     bool device_validated = false;
     HintInputFieldsW_Popup model;
@@ -34,5 +36,4 @@ private:
     HintInputFieldsW_Popup color;
     HintInputField visible_note;
     HintInputField hidden_note;
-
 };

@@ -44,6 +44,7 @@ struct HintInputFieldsW_Popup  {
     bool is_input_enter_pressed;
     bool is_input_active;
     bool is_input_activated;
+    bool is_widnow_active;
     Attribute attribute;
 };
 

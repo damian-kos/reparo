@@ -1,23 +1,14 @@
 #include "insert_repair.h"
 
-InsertRepair::InsertRepair() { std::cout << "InsertRepair created " << std::endl; }
-InsertRepair::InsertRepair(Repair& repair) : repair(repair) {
-    
-    strcpy(InsertCustomer::phone.input.buffer, repair.customer.phone.c_str());
-    strcpy(InsertCustomer::name.buffer, repair.customer.name.c_str());
-    strcpy(InsertCustomer::surname.buffer, repair.customer.surname.c_str());
-    strcpy(InsertCustomer::email.buffer, repair.customer.email.c_str());
-
-    strcpy(model.input.buffer, repair.device.name.c_str());
-    strcpy(category.input.buffer, repair.category.c_str());
-    strcpy(color.input.buffer, repair.device.color.c_str());
-
-    strcpy(visible_note.buffer, repair.visible_note.c_str());
-    strcpy(hidden_note.buffer, repair.hidden_note.c_str());
-    price = repair.price;
-    //strcpy(pr, repair.device.name.c_str());
+InsertRepair::InsertRepair() : InsertCustomer() { modal_message = "Confirm Repair Details"; std::cout << "InsertRepair created " << std::endl; }
+InsertRepair::InsertRepair(Repair& repair_) : InsertCustomer(repair_.customer), repair(repair_) {
+    InsertCustomer::CopyToBuffer(model.input.buffer, repair_.device.name.c_str(), model.input.validated, [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); });
+    InsertCustomer::CopyToBuffer(category.input.buffer, repair_.category.c_str(), category.input.validated, [&]() { return BufferQueryOnDatabase("##Category", category.input.buffer); });
+    InsertCustomer::CopyToBuffer(color.input.buffer, repair_.device.color.c_str(), color.input.validated, [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); });
+    strcpy(visible_note.buffer, repair_.visible_note.c_str());
+    strcpy(hidden_note.buffer, repair_.hidden_note.c_str());
+    price = repair_.price;
 }
-
 
 void InsertRepair::Render() {
     InsertCustomer::Render();
@@ -25,7 +16,7 @@ void InsertRepair::Render() {
     NotesSection();
     PriceSection();
     StateSection();
-    InsertRepairButton();
+    InsertRepairButtonEnabler();
     TestButton();
 }
 
@@ -95,20 +86,25 @@ bool InsertRepair::BufferQueryOnDatabase(const char* label, const char* buffer) 
     return db.GetBoolForValue(label, buffer);
 }
 
-void InsertRepair::InsertRepairButton() {
+void InsertRepair::InsertRepairButtonEnabler() {
     imgui_decorator.SetTestValue(true);
     imgui_decorator.DecorateSeparatorText("SUBMIT: ");
     if (!RepairValidated()) {
         ImGui::BeginDisabled(true);
     }
-    if (ImGui::Button("Add repair")) {
-        repair = InitRepair();
-        InitModal();
-    }
+    InsertRepairButton();
     if (!RepairValidated()) {
         ImGui::EndDisabled();
     }
     RunModal(repair);
+}
+
+void InsertRepair::InsertRepairButton()
+{
+    if (ImGui::Button("Insert Repair")) {
+        repair = InitRepair();
+        InitModal();
+    }
 }
 
 Repair InsertRepair::InitRepair() {
@@ -118,14 +114,13 @@ Repair InsertRepair::InitRepair() {
 }
 
 void InsertRepair::InitModal() {
-    modals.RenderModal("Confirm Repair Details");
+    modals.RenderModal(modal_message);
 }
 
 void InsertRepair::RunModal(Repair& repair) {
    
-    modals.SubmitConfirm("Confirm Repair Details", repair, result);
+    modals.SubmitConfirm(modal_message, repair, result);
     if (result == ConfirmResult::CONIFRM_SUBMIT) {
-       std::cout << "Customer insertion would be confirmed " << std::endl;
        int customerID = db.QueryCustomerByPhone(repair.customer.phone);
        if (customerID == 0) {
             db.InsertCustomer(repair.customer, nullptr); // Insert Customer if doesnt exist

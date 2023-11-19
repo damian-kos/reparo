@@ -15,6 +15,9 @@
 class InsertCustomer {
 public:
     InsertCustomer();
+    InsertCustomer(Customer& cust);
+
+
     ~InsertCustomer();
 public:
     virtual void Render();
@@ -25,6 +28,7 @@ protected:
     HintInputField name;
     HintInputField surname;
     HintInputField email;
+    Customer customer;
 
 private:
     std::string validation_feedback = "";
@@ -49,6 +53,8 @@ protected:
     void RunModal(Customer& customer);
 
     virtual void ResetFields();
+
+    void CopyToBuffer(char* buffer, std::string, bool& field_validation, std::function<bool()> validation_function);
 
 
 };

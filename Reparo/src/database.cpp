@@ -88,13 +88,21 @@ void Database::ManageSearchState(const char* label, Attribute& attribute, const 
                 break;
             }
             std::ostringstream concatenatedValue;
+
             for (int i = 0; i < column_count; ++i) {
                 const char* column_value = reinterpret_cast<const char*>(sqlite3_column_text(stmt, i));
 
                 // Append the value to the concatenated string
                 concatenatedValue << column_value << ' ';
             }
-            attribute.data.emplace_back(concatenatedValue.str());
+
+            // Get the concatenated string without the trailing space
+            std::string value = concatenatedValue.str();
+            if (!value.empty()) {
+                value.pop_back();
+            }
+
+            attribute.data.emplace_back(value);
 
             record_count++;
         }
@@ -285,4 +293,74 @@ std::map<int, Repair> Database::RetreiveRepairsOfState(int state) {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
     return repairs;
+}
+
+std::map<int, std::string> Database::GetRepairStates() {
+    std::cout << "GetRepairsStates is running " << std::endl;
+    OpenDB();
+    static std::map<int, std::string> states;
+    sqlite3_stmt* stmt;
+    const char* query = "SELECT * FROM repair_states";
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            int state_id = sqlite3_column_int(stmt, 0);
+            std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            states.insert(std::make_pair(state_id, state));
+        }
+    }
+    else {
+        std::cout << "States couldn't be retreived " << std::endl;
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return states;
+}
+
+void Database::UpdateCustomer(Customer& customer, int id) {
+    std::cout << "UpdateCustomer is running" << std::endl;
+    OpenDB();
+    sqlite3_stmt* stmt;
+    const char* query = "UPDATE customers SET name = ?, surname = ?, email = ?, phone = ? WHERE customer_id = ?";
+    if(sqlite3_prepare_v2(db, query, -1, &stmt, NULL) == SQLITE_OK) {
+        std::cout << "uPDAE WILL HAPPEN" << std::endl;
+        sqlite3_bind_text(stmt, 1, customer.name.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, customer.surname.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 3, customer.email.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 4, customer.phone.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 5, id);
+    }
+    else {
+        std::cout << "Customer couldn't be updated " << std::endl;
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+
+int Database::GetIDForID(int id, std::string table) {
+    int found_id = -1;
+    std::cout << "GetIDForValue is running " << std::endl;
+    static std::unordered_map<std::string, const char*> queries = {
+    {"repairs", "SELECT customer_id FROM repairs WHERE repair_id = ?"},
+    };
+    OpenDB();
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, queries[table], -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_int(stmt, 1, id);
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            found_id = sqlite3_column_int(stmt, 0);
+        }
+        else {
+            std::cerr << "GetIDForID: No rows returned." << std::endl;
+        }
+    }
+    else {
+        std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db) << std::endl;
+        found_id = -1; // error
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return found_id;
 }

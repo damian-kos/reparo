@@ -69,7 +69,8 @@ void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs)
                 if (ImGui::Button("Update repair")) {
                     *EditRepair::show_repair = true;
                     repair_to_init = pair.second;
-                    edit_repair = std::make_shared<EditRepair>(repair_to_init);
+                    
+                    edit_repair = std::make_shared<EditRepair>(repair_to_init, pair.first);
 
                 }
                 ImGui::EndPopup();
