@@ -134,6 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\database.h" />
+    <ClInclude Include="src\edit_repair.h" />
     <ClInclude Include="src\enums.h" />
     <ClInclude Include="src\imgui_decorator.h" />
     <ClInclude Include="src\insert_customer.h" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\database.cpp" />
+    <ClCompile Include="src\edit_repair.cpp" />
     <ClCompile Include="src\imgui_decorator.cpp" />
     <ClCompile Include="src\insert_customer.cpp" />
     <ClCompile Include="src\helpmarker.cpp" />

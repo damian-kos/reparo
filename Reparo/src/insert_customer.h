@@ -20,7 +20,7 @@ public:
     virtual void Render();
 
 
-private:
+protected:
     HintInputFieldsW_Popup phone{ ImGuiInputTextFlags_CharsDecimal };
     HintInputField name;
     HintInputField surname;

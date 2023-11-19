@@ -15,7 +15,7 @@ public:
         const std::string& surname, const std::string& email)
         : phone(phone), name(name), surname(surname), email(email) {}
 
-    ~Customer() { std::cout << "Customer destroyed" << std::endl; }
+    ~Customer() { /*std::cout << "Customer destroyed" << std::endl;*/ }
 
     std::string phone;
     std::string name;
@@ -50,13 +50,13 @@ struct HintInputFieldsW_Popup  {
 struct Device {
     Device()
         : name(""), color("") {
-        std::cout << "Device created empty" << std::endl;
+       /* std::cout << "Device created empty" << std::endl;*/
     }
     Device(std::string name, std::string color)
         : name(name), color(color) {
-        std::cout << "Device created with values " << std::endl;
+        /*std::cout << "Device created with values " << std::endl;*/
     }
-    ~Device() { std::cout << "Device destroyed " << std::endl; }
+    ~Device() { /*std::cout << "Device destroyed " << std::endl;*/ }
     std::string name;
     std::string color;
 };

@@ -75,6 +75,9 @@
     <ClInclude Include="src\repairs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\edit_repair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vendor\imgui\imgui.cpp">
@@ -123,6 +126,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\repairs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\edit_repair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,11 +1,32 @@
 #include "insert_repair.h"
 
+InsertRepair::InsertRepair() { std::cout << "InsertRepair created " << std::endl; }
+InsertRepair::InsertRepair(Repair& repair) : repair(repair) {
+    
+    strcpy(InsertCustomer::phone.input.buffer, repair.customer.phone.c_str());
+    strcpy(InsertCustomer::name.buffer, repair.customer.name.c_str());
+    strcpy(InsertCustomer::surname.buffer, repair.customer.surname.c_str());
+    strcpy(InsertCustomer::email.buffer, repair.customer.email.c_str());
+
+    strcpy(model.input.buffer, repair.device.name.c_str());
+    strcpy(category.input.buffer, repair.category.c_str());
+    strcpy(color.input.buffer, repair.device.color.c_str());
+
+    strcpy(visible_note.buffer, repair.visible_note.c_str());
+    strcpy(hidden_note.buffer, repair.hidden_note.c_str());
+    price = repair.price;
+    //strcpy(pr, repair.device.name.c_str());
+}
+
+
 void InsertRepair::Render() {
     InsertCustomer::Render();
     DeviceSection();
     NotesSection();
     PriceSection();
+    StateSection();
     InsertRepairButton();
+    TestButton();
 }
 
 void InsertRepair::DeviceSection() {
@@ -39,6 +60,10 @@ void InsertRepair::PriceSection() {
     imgui_decorator.SetTestValue((price > 0) ? true : false);
     imgui_decorator.DecorateSeparatorText("PRICE: ");
     ImGui::InputDouble("##input float", &price, 0.1f, 1.0f, "%.2f");
+}
+
+void InsertRepair::StateSection() {
+
 }
 
 void InsertRepair::CreateInputField(const char* label, const char* hint, HintInputField& field) {
@@ -124,4 +149,10 @@ void InsertRepair::ResetFields() {
     visible_note = HintInputField();
     hidden_note = HintInputField();
     price = 0;
+}
+
+void InsertRepair::TestButton() {
+    if (ImGui::Button("Test button")) {
+        std::cout << repair.customer.phone << std::endl;
+    }
 }

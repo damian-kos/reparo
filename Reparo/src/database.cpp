@@ -271,7 +271,7 @@ std::map<int, Repair> Database::RetreiveRepairsOfState(int state) {
             Customer customer(customer_phone, customer_name, customer_surname, customer_email);
 
             Repair repair(customer, device, category, price, visible_note, hidden_note, state);
-            std::cout << "Inserted to repairs " << repair_id << " " << repair.customer.phone << std::endl;
+         
             repairs.insert(std::make_pair(repair_id, repair));;
         }
     }

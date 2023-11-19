@@ -1,9 +1,11 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
 #include "imgui.h"
 #include "database.h"
+#include "edit_repair.h"
 
 class RepairsView {
 public:
@@ -13,9 +15,12 @@ public:
 
     void Render();
     void RepairsToTable(const std::map<int, Repair>& repairs);
+    std::shared_ptr<EditRepair> GetEditRepair();
 private:
     Database db;
-     std::map<int, Repair> repairs;
-     int prev_chosen_tab;
-     int curr_chosen_tab;
+    std::map<int, Repair> repairs;
+    int prev_chosen_tab;
+    int curr_chosen_tab;
+    Repair repair_to_init;
+    std::shared_ptr<EditRepair> edit_repair;
 };

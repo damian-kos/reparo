@@ -65,6 +65,15 @@ void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs)
             if (ImGui::Selectable(label, is_selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
                 selected = pair.first;
             }
+            if (ImGui::BeginPopupContextItem()) {
+                if (ImGui::Button("Update repair")) {
+                    *EditRepair::show_repair = true;
+                    repair_to_init = pair.second;
+                    edit_repair = std::make_shared<EditRepair>(repair_to_init);
+
+                }
+                ImGui::EndPopup();
+            }
             ImGui::TableNextColumn();
             ImGui::Text(pair.second.device.name.c_str());
             ImGui::TableNextColumn();
@@ -83,10 +92,12 @@ void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs)
             ImGui::Text(pair.second.customer.name.c_str());
             ImGui::TableNextColumn();
             ImGui::Text(pair.second.state.c_str());
-
-        }
-
+            }
         }
         ImGui::EndTable();
 
+}
+
+std::shared_ptr<EditRepair> RepairsView::GetEditRepair() {
+    return edit_repair;
 }

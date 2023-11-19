@@ -14,6 +14,7 @@
 #include "helpmarker.h"
 #include "insert_repair.h"
 #include "repairs.h"
+#include "edit_repair.h"
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
 static ID3D11DeviceContext *g_pd3dDeviceContext = nullptr;
@@ -43,6 +44,8 @@ int main(int, char**)
     InsertCustomer insert_customer;
     InsertRepair insert_repair;
     RepairsView repairs_view;
+ /*   EditRepair edit_repair;*/
+    
 
 
     // Create application window
@@ -121,9 +124,11 @@ int main(int, char**)
     bool show_demo_window = true;
     bool show_another_window = false;
     bool show_insert_customer_win = false;
-    bool show_add_part_to_stock_window = false;
     bool show_insert_repair = false;
     bool show_repair_states_window = false;
+    
+
+    bool show_add_part_to_stock_window = false;
 
     char test[128] = "";
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -244,6 +249,18 @@ int main(int, char**)
         if (show_insert_repair) {
             ImGui::Begin("Insert Repair", &show_insert_repair);
             insert_repair.Render();
+            ImGui::End();
+        }
+
+        if (*EditRepair::show_repair) {
+            ImGui::Begin("Edit Repair", EditRepair::show_repair);
+
+            std::shared_ptr<EditRepair> e_r = repairs_view.GetEditRepair();
+
+            if (e_r) {
+                e_r->Render();
+            }
+
             ImGui::End();
         }
 
