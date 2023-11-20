@@ -17,19 +17,19 @@ void Database::OpenDB() {
 
 int Database::QueryCustomerByPhone(std::string phone) {
     std::cout << "QueryCustomerByPhone is running  " << std::endl;
-    static int result;
+    int result = -1;
     OpenDB();
     if (phone.empty()) { result = -2; }
     const char* query = "SELECT customer_id FROM customers WHERE phone = ?";
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db, query, -1, &stmt, NULL) == SQLITE_OK) {
         sqlite3_bind_text(stmt, 1, phone.c_str(), phone.size(), NULL);
-        int customerID;
+        int customerID = 0;
+        
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             customerID = sqlite3_column_int(stmt, 0);
-            result =  customerID; // ID of existing customer
         }
-        result =  0; // For new customer
+        result = (customerID !=0) ? customerID : 0; // For new customer
     }
     else {
         result =  -1; // Error querying db
@@ -147,6 +147,7 @@ int Database::GetIDForValue(const char* label, const char* value) {
     {"##Category", "SELECT category_id FROM categories WHERE LOWER(category) = LOWER(?)"},
     {"##Color", "SELECT model_id FROM models WHERE LOWER(model) = LOWER(?)"},
     {"##Color2", "SELECT color_id FROM colors WHERE LOWER(color) = LOWER(?)"},
+    {"##State", "SELECT repair_state_id FROM repair_states WHERE LOWER(repair_state) = LOWER(?)"},
     };
     int id = -1;
     sqlite3_stmt* stmt;
@@ -271,7 +272,8 @@ std::map<int, Repair> Database::RetreiveRepairsOfState(int state) {
             std::string category = (repair_category_id > 0) ?
                 reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9)) : "N/A";
             std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12));
-
+          
+            
             std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 14));
             std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 15));
             std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
@@ -321,17 +323,56 @@ void Database::UpdateCustomer(Customer& customer, int id) {
     OpenDB();
     sqlite3_stmt* stmt;
     const char* query = "UPDATE customers SET name = ?, surname = ?, email = ?, phone = ? WHERE customer_id = ?";
-    if(sqlite3_prepare_v2(db, query, -1, &stmt, NULL) == SQLITE_OK) {
-        std::cout << "uPDAE WILL HAPPEN" << std::endl;
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, NULL) == SQLITE_OK) {
+        std::cout << "Update will happen" << std::endl;
+        std::cout << id << " / " << customer.name.c_str() << " / " << customer.surname.c_str() << " /  " << customer.email.c_str() << " / " << customer.phone.c_str() << std::endl;
         sqlite3_bind_text(stmt, 1, customer.name.c_str(), -1, SQLITE_STATIC);
         sqlite3_bind_text(stmt, 2, customer.surname.c_str(), -1, SQLITE_STATIC);
         sqlite3_bind_text(stmt, 3, customer.email.c_str(), -1, SQLITE_STATIC);
         sqlite3_bind_text(stmt, 4, customer.phone.c_str(), -1, SQLITE_STATIC);
         sqlite3_bind_int(stmt, 5, id);
+
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            std::cerr << "Error updating customer: " << sqlite3_errmsg(db) << std::endl;
+        }
     }
     else {
-        std::cout << "Customer couldn't be updated " << std::endl;
+        std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db) << std::endl;
     }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+
+void Database::UpdateRepair(Repair& repair, int id) {
+    std::cout << "UpdateRepair is running" << std::endl;
+    static int model_id = GetIDForValue("##Model", repair.device.name.c_str());
+    static int category_id = GetIDForValue("##Category", repair.category.c_str());
+    static int color_id = GetIDForValue("##Color2", repair.device.color.c_str());
+    OpenDB();
+    sqlite3_stmt* stmt;
+    const char* query = "UPDATE repairs SET model_id = ?, category_id = ?, color_id = ?, repair_desc = ?, repair_desc_hidden = ?, price = ?, repair_state_id = ? WHERE repair_id = ?";
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, NULL) == SQLITE_OK) {
+        std::cout << "Update Repairwill happen" << std::endl;
+        //std::cout << id << " / " << customer.name.c_str() << " / " << customer.surname.c_str() << " /  " << customer.email.c_str() << " / " << customer.phone.c_str() << std::endl;
+        sqlite3_bind_int(stmt, 1, model_id);
+        sqlite3_bind_int(stmt, 2, category_id);
+        sqlite3_bind_int(stmt, 3, color_id);
+        sqlite3_bind_text(stmt, 4, repair.visible_note.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 5, repair.hidden_note.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_double(stmt, 6, repair.price);
+        std::cout << "Repair State: |" << repair.state << "|" << std::endl;
+        int state_id = GetIDForValue("##State", repair.state.c_str());
+        sqlite3_bind_int(stmt, 7, state_id);
+        sqlite3_bind_int(stmt, 8, id);
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            std::cerr << "Error updating repair: " << sqlite3_errmsg(db) << std::endl;
+        }
+    }
+    else {
+        std::cerr << "Error preparing UpdateRepair statement: " << sqlite3_errmsg(db) << std::endl;
+    }
+
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 }

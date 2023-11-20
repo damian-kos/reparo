@@ -35,6 +35,8 @@ public:
 
     void UpdateCustomer(Customer& customer, int id);
 
+    void UpdateRepair(Repair& repair, int id);
+
     int GetIDForID(int id, std::string table);
 
 

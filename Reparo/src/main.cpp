@@ -55,7 +55,7 @@ int main(int, char**)
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 200, 300, screenWidth-600, screenHeight-500, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 400, 200, screenWidth-600, screenHeight-300, nullptr, nullptr, wc.hInstance, nullptr);
 
 
 

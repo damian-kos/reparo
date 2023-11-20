@@ -20,7 +20,7 @@ public:
     
     void PopupFields(const char* label, HintInputFieldsW_Popup& field, HintInputFieldsW_Popup& rel_field);
     bool BufferQueryOnDatabase(const char* label, const char* buffer);
-    Repair InitRepair();
+    virtual Repair InitRepair();
     virtual void InitModal() override;
     virtual void RunModal(Repair& repair);
     void SubmitButton() override;
