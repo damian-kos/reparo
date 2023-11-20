@@ -79,35 +79,53 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
     if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
     {
-
         const char** autocomplete = vectorToCharArray(field.attribute.data);
         for (int i = 0; i < field.attribute.data.size(); i++)
         {
-
-            /*            if (strstr(autocomplete[i], input.input) == NULL)
-                            continue;*/
             if (ImGui::Selectable(autocomplete[i]))
             {
-                //ImGui::ClearActiveID();
                 strcpy(field.input.buffer, SeperateData(autocomplete[i], label).c_str());
                 field.input.validated = true;
                 field.attribute.name = field.attribute.data[i];
-                //field.attribute.current_id = 1;
             }
         }
-        //if(field.is_input_enter_pressed)
-        //    std::cout << "Enter Pressed " << std::endl;
+        if ( /*field.is_input_enter_pressed ||*/ (!field.is_input_active && !ImGui::IsWindowFocused())) {
+            ImGui::CloseCurrentPopup();
+            std::cout << "CloseCurrentPopup" << std::endl;
 
-        //if (ImGui::IsWindowFocused())
-        //    std::cout << "Window is focused " << std::endl;
+        }
+        ImGui::EndPopup();
+        std::cout << "EndPopup" << std::endl;
+    }
+}
 
+void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const char* label, bool& selected) {
+
+    field.is_input_active = ImGui::IsItemActive();
+    field.is_input_activated = ImGui::IsItemActivated();
+
+    if (field.is_input_activated) {
+        ImGui::OpenPopup(label);
+        std::cout << &field << label << std::endl;
+    }
+
+    ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
+    if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
+    {
+        const char** autocomplete = vectorToCharArray(field.attribute.data);
+        for (int i = 0; i < field.attribute.data.size(); i++)
+        {
+            if (ImGui::Selectable(autocomplete[i]))
+            {
+                strcpy(field.input.buffer, SeperateData(autocomplete[i], label).c_str());
+                field.input.validated = true;
+                field.attribute.name = field.attribute.data[i];
+                selected = true;
+            }
+        }
         if ( /*field.is_input_enter_pressed ||*/ (!field.is_input_active && !ImGui::IsWindowFocused())) {
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
     }
-    //if (ImGui::IsItemDeactivated()) {
-    //    input.check_in_db = true;
-    //}
 }
-

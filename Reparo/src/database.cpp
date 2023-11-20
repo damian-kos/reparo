@@ -15,8 +15,8 @@ void Database::OpenDB() {
     std::cout << "DB IS OPEN" << std::endl;
 }
 
-int Database::QueryCustomerByPhone(std::string phone) {
-    std::cout << "QueryCustomerByPhone is running  " << std::endl;
+int Database::QueryCustomerIDByPhone(std::string phone) {
+    std::cout << "QueryCustomerIDByPhone is running  " << std::endl;
     int result = -1;
     OpenDB();
     if (phone.empty()) { result = -2; }
@@ -37,6 +37,33 @@ int Database::QueryCustomerByPhone(std::string phone) {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
     return result;
+}
+
+Customer Database::QueryCustomerByPhone(std::string phone) {
+    Customer customer;
+    std::string name;
+    std::string surname;
+    std::string email;
+    std::cout << "QueryCustomerByPhone is running  " << std::endl;
+    OpenDB();
+    const char* query = "SELECT * FROM customers WHERE phone = ?";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, query, -1, &stmt, NULL) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, phone.c_str(), phone.size(), NULL);
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+            surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+            email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        }
+        customer = Customer(phone, name, surname, email);
+    }
+    else {
+        std::cerr << "Error preparing SQL statement QueryCustomerByPhone: " << sqlite3_errmsg(db) << std::endl;
+        return customer; // Error querying db
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return customer;
 }
 
 void Database::InsertCustomer(Customer& customer, int* lastRowId) {

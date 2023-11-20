@@ -1,10 +1,20 @@
 #include "insert_repair.h"
 
 InsertRepair::InsertRepair() : InsertCustomer() { modal_message = "Confirm Repair Details"; std::cout << "InsertRepair created " << std::endl; }
+
 InsertRepair::InsertRepair(Repair& repair_) : InsertCustomer(repair_.customer), repair(repair_) {
-    InsertCustomer::CopyToBuffer(model.input.buffer, repair_.device.name.c_str(), model.input.validated, [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); });
-    InsertCustomer::CopyToBuffer(category.input.buffer, repair_.category.c_str(), category.input.validated, [&]() { return BufferQueryOnDatabase("##Category", category.input.buffer); });
-    InsertCustomer::CopyToBuffer(color.input.buffer, repair_.device.color.c_str(), color.input.validated, [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); });
+    InsertCustomer::CopyToBuffer(model.input.buffer,
+        repair_.device.name.c_str(),
+        model.input.validated,
+        [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); });
+    InsertCustomer::CopyToBuffer(category.input.buffer,
+        repair_.category.c_str(),
+        category.input.validated,
+        [&]() { return BufferQueryOnDatabase("##Category", category.input.buffer); });
+    InsertCustomer::CopyToBuffer(color.input.buffer,
+        repair_.device.color.c_str(),
+        color.input.validated,
+        [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); });
     strcpy(visible_note.buffer, repair_.visible_note.c_str());
     strcpy(hidden_note.buffer, repair_.hidden_note.c_str());
     price = repair_.price;
@@ -23,13 +33,25 @@ void InsertRepair::Render() {
 void InsertRepair::DeviceSection() {
     imgui_decorator.SetTestValue(DeviceFieldsValidated());
     imgui_decorator.DecorateSeparatorText("DEVICE: ");
-    InsertCustomer::CreateInputField("##Model", "Model of device...", model, [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); });
+
+    InsertCustomer::CreateInputField("##Model",
+        "Model of device...",
+        model,
+        [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); });
     InsertCustomer::PopupFields("##Model", model);
     modals.PopupOnInputField(model, "model");
-    InsertCustomer::CreateInputField("##Category", "Category...", category, [&]() { return BufferQueryOnDatabase("##Category", category.input.buffer); });
+
+    InsertCustomer::CreateInputField("##Category",
+        "Category...",
+        category,
+        [&]() { return BufferQueryOnDatabase("##Category", category.input.buffer); });
     InsertCustomer::PopupFields("##Category", category);
     modals.PopupOnInputField(category, "category");
-    InsertCustomer::CreateInputField("##Color", "Color...", color, [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); });
+
+    InsertCustomer::CreateInputField("##Color",
+        "Color...",
+        color,
+        [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); });
     PopupFields("##Color", color, model);
     modals.PopupOnInputField(color, "color");
     
@@ -70,7 +92,6 @@ bool InsertRepair::RepairValidated() {
     return (DeviceFieldsValidated() && FieldsValidated() && price > 0);
 }
 
-
 void InsertRepair::PopupFields(const char* label, HintInputFieldsW_Popup& field, HintInputFieldsW_Popup& rel_field) {
     if (rel_field.input.validated && !field.attribute.retreived) {
         int id = db.GetIDForValue(label, rel_field.input.buffer);
@@ -99,8 +120,7 @@ void InsertRepair::InsertRepairButtonEnabler() {
     RunModal(repair);
 }
 
-void InsertRepair::InsertRepairButton()
-{
+void InsertRepair::InsertRepairButton() {
     if (ImGui::Button("Insert Repair")) {
         repair = InitRepair();
         InitModal();
@@ -121,7 +141,7 @@ void InsertRepair::RunModal(Repair& repair) {
    
     modals.SubmitConfirm(modal_message, repair, result);
     if (result == ConfirmResult::CONIFRM_SUBMIT) {
-       int customerID = db.QueryCustomerByPhone(repair.customer.phone);
+       int customerID = db.QueryCustomerIDByPhone(repair.customer.phone);
        if (customerID == 0) {
             db.InsertCustomer(repair.customer, nullptr); // Insert Customer if doesnt exist
        }

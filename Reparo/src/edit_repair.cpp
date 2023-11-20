@@ -4,7 +4,6 @@
 int EditRepair::instance_count = 0;
 bool* EditRepair::show_repair = new bool(false);
 
-//EditRepair::EditRepair() { instance_count++;  std::cout << "EditRepair created " << instance_count << std::endl; }
 EditRepair::EditRepair(Repair& repair, int passed_repair_id) : InsertRepair(repair), repair_id(passed_repair_id) {
     instance_count++;
     modal_message = "Confirm Update Repair";
@@ -40,9 +39,7 @@ void EditRepair::StateSection() {
        
         ImGui::EndCombo();
     }
-
 }
-
 
 void EditRepair::InsertRepairButton() {
     // Debugging
@@ -55,13 +52,12 @@ void EditRepair::InsertRepairButton() {
     }
 }
 
-
 void EditRepair::RunModal(Repair& repair){
     modals.SubmitConfirm(modal_message, repair, result);
     if (result == ConfirmResult::CONIFRM_SUBMIT) {
         if (CustomerModified()) {
             Customer temp_customer = InsertCustomer::InitCustomer();
-            int customerID = db.QueryCustomerByPhone(temp_customer.phone);
+            int customerID = db.QueryCustomerIDByPhone(temp_customer.phone);
             if (customerID > 0) {
                 db.UpdateCustomer(temp_customer, customerID); 
                 }
@@ -76,10 +72,8 @@ void EditRepair::RunModal(Repair& repair){
             Repair temp_repair = InitRepair();
             db.UpdateRepair(temp_repair, repair_id);
         }
-        //db.InsertRepair(repair);
         //ResetFields();
         result = ConfirmResult::CONIFRM_IDLE;
-
     }
 }
 
@@ -90,23 +84,14 @@ Repair EditRepair::InitRepair() {
 }
 
 void EditRepair::TestButton() {
-    if (ImGui::Button("Test button")) {
-        std::string modified = RepairModified() ? "true" : "false";
-        std::string modified_c = CustomerModified() ? "Cust true" : "Cust false";
+    std::string modified = RepairModified() ? "true" : "false";
+    std::string modified_c = CustomerModified() ? "true" : "Cust false";
 
-        
-        std::cout << modified << std::endl;
-        std::cout << modified_c << std::endl;
-
-    }
+    ImGui::Text("Repair modified: %s", modified.c_str());
+    ImGui::Text("Customer modified: %s", modified_c.c_str());
 }
 
 bool EditRepair::CustomerModified() {
-    std::cout << "Phone " << (repair.customer.phone == std::string(phone.input.buffer)) << std::endl;
-    std::cout << "Name " << (repair.customer.name == std::string(name.buffer)) << std::endl;
-    std::cout << "Surname " << (repair.customer.surname == std::string(surname.buffer)) << std::endl;
-    std::cout << "Email " << (repair.customer.email == std::string(email.buffer)) << std::endl;
-
     return !(repair.customer.phone == std::string(phone.input.buffer) &&
         repair.customer.name == std::string(name.buffer) &&
         repair.customer.surname == std::string(surname.buffer) &&
@@ -114,7 +99,6 @@ bool EditRepair::CustomerModified() {
 }
 
 bool EditRepair::RepairModified() {
-
     double tolerance = 1e-3;
     return !(
         repair.device.name == std::string(model.input.buffer) &&

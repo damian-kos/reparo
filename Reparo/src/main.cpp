@@ -44,9 +44,6 @@ int main(int, char**)
     InsertCustomer insert_customer;
     InsertRepair insert_repair;
     RepairsView repairs_view;
- /*   EditRepair edit_repair;*/
-    
-
 
     // Create application window
     // ImGui_ImplWin32_EnableDpiAwareness();

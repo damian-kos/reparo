@@ -10,18 +10,15 @@
 #include "database.h"
 #include "modals.h"
 
-
-
 class InsertCustomer {
 public:
     InsertCustomer();
     InsertCustomer(Customer& cust);
 
-
     ~InsertCustomer();
+
 public:
     virtual void Render();
-
 
 protected:
     HintInputFieldsW_Popup phone{ ImGuiInputTextFlags_CharsDecimal };
@@ -29,16 +26,18 @@ protected:
     HintInputField surname;
     HintInputField email;
     Customer customer;
-
-private:
-    std::string validation_feedback = "";
-protected:
     ConfirmResult result = ConfirmResult::CONIFRM_IDLE;
     Database db;
     ImGuiDecorator imgui_decorator;
     ModalController modals;
+
+private:
+    std::string validation_feedback = "";
+    bool selected;
+
 protected:
     void CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function);
+    void CustomerSelectedOnPopup();
     void CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function);
     virtual void PopupFields(const char* label, HintInputFieldsW_Popup& field);
     void FieldsSection();
@@ -47,14 +46,10 @@ protected:
     bool SimpleValidation(const char* buffer, int length);
     bool FieldsValidated();
     int SetValidaitonErr();
-    void SetValidationMsg();
+    void UpdateValidationMsg();
     Customer InitCustomer();
     virtual void InitModal();
     void RunModal(Customer& customer);
-
     virtual void ResetFields();
-
     void CopyToBuffer(char* buffer, std::string, bool& field_validation, std::function<bool()> validation_function);
-
-
 };
