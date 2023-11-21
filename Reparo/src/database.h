@@ -15,7 +15,7 @@ public:
     ~Database();
 public:
     int QueryCustomerIDByPhone(std::string phone);
-    Customer QueryCustomerByPhone(std::string phone);
+    Customer* QueryCustomerByPhone(std::string phone);
     void InsertCustomer(Customer& customer, int* last_row_id);
     void ManageSearchState(const char* label, Attribute& attribute, const char* buffer);
     void ManageSearchState(const char* label, Attribute& attribute, const char* buffer, int rel_id);

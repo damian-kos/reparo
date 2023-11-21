@@ -37,6 +37,7 @@ private:
 
 protected:
     void CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function);
+    void CustomerAlreadyExists();
     void CustomerSelectedOnPopup();
     void CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function);
     virtual void PopupFields(const char* label, HintInputFieldsW_Popup& field);

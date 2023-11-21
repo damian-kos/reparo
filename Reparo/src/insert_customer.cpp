@@ -33,13 +33,22 @@ void InsertCustomer::Render() {
 void InsertCustomer::FieldsSection() {
     imgui_decorator.SetTestValue(FieldsValidated());
     imgui_decorator.DecorateSeparatorText("CUSTOMER: ");
+    CustomerSelectedOnPopup();
     CreateInputField("##Phone", "Phone number...", phone, [&]() { return SimpleValidation(phone.input.buffer, 8); });
-   /* PopupFields("##Phone", phone);
+    if (phone.input.validated) {
+    PopupFields("##Phone", phone);
+    }
     modals.PopupOnInputField(phone, "phone", selected);
-    CustomerSelectedOnPopup();*/
     CreateInputField("##Name", "Name...", name, [&]() { return SimpleValidation(name.buffer, 3); });
     CreateInputField("##Surname", "Surname...", surname, [&]() { return SimpleValidation(surname.buffer, 3); });
     CreateInputField("##Email", "Email...", email, [&]() {return IsEmailValid(email.buffer); });
+
+    //Debugging
+    ImGui::Text(phone.input.validated ? "true" : "false");
+    ImGui::SameLine(); ImGui::Text(name.validated ? "true" : "false");
+    ImGui::SameLine(); ImGui::Text(surname.validated ? "true" : "false");
+    ImGui::SameLine(); ImGui::Text(email.validated ? "true" : "false");
+    //
 }
 
 void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function) {
@@ -54,14 +63,23 @@ void InsertCustomer::CreateInputField(const char* label, const char* hint, HintI
     }
 }
 
+void InsertCustomer::CustomerAlreadyExists() {
+    if (phone.input.validated)
+        ImGui::Text("Customer already exists");
+}
+
 void InsertCustomer::CustomerSelectedOnPopup() {
-    if (selected) {
-        Customer temp_customer = db.QueryCustomerByPhone(phone.input.buffer);
-        std::cout << temp_customer.name << std::endl;
-        strcpy(name.buffer, temp_customer.name.c_str());
-        strcpy(surname.buffer, temp_customer.surname.c_str());
-        strcpy(email.buffer, temp_customer.email.c_str());
-        selected = false;
+    if (phone.input.validated) {
+        Customer* temp_customer = nullptr;
+        if (selected) {
+            temp_customer = db.QueryCustomerByPhone(phone.input.buffer);
+            strcpy(name.buffer, temp_customer->name.c_str());
+            strcpy(surname.buffer, temp_customer->surname.c_str());
+            strcpy(email.buffer, temp_customer->email.c_str());
+            selected = false;
+        }
+        if(!phone.attribute.data.empty())
+            ImGui::Text("Customer already exists");
     }
 }
 

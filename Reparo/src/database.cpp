@@ -39,7 +39,7 @@ int Database::QueryCustomerIDByPhone(std::string phone) {
     return result;
 }
 
-Customer Database::QueryCustomerByPhone(std::string phone) {
+Customer* Database::QueryCustomerByPhone(std::string phone) {
     Customer customer;
     std::string name;
     std::string surname;
@@ -59,11 +59,11 @@ Customer Database::QueryCustomerByPhone(std::string phone) {
     }
     else {
         std::cerr << "Error preparing SQL statement QueryCustomerByPhone: " << sqlite3_errmsg(db) << std::endl;
-        return customer; // Error querying db
+        return nullptr; // Error querying db
     }
     sqlite3_finalize(stmt);
     sqlite3_close(db);
-    return customer;
+    return &customer;
 }
 
 void Database::InsertCustomer(Customer& customer, int* lastRowId) {
@@ -93,18 +93,18 @@ void Database::InsertCustomer(Customer& customer, int* lastRowId) {
 }
 
 void Database::ManageSearchState(const char* label, Attribute& attribute, const char* buffer) {
-    std::cout << "ManageSearchState is running  " << std::endl;
-
+    std::cout << "ManageSearchState is running  w/ buffer: " << buffer << std::endl;
+    
     OpenDB();
     static std::map<const char*, const char*> queries = {
     {"##Model", "SELECT model FROM models WHERE model LIKE ?"},
     {"##Category", "SELECT category FROM categories WHERE category LIKE ?"},
-    {"##Phone", "SELECT phone, name, surname FROM customers WHERE phone LIKE ?"},
+    {"##Phone", "SELECT phone, name, surname FROM customers WHERE phone = ?"},
     };
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db, queries[label], -1, &stmt, NULL) == SQLITE_OK) {
         std::string buffer_str = buffer;
-        std::string like_query = "%" + buffer_str + "%";
+        std::string like_query = (label != "##Phone") ? "%" + buffer_str + "%" : buffer_str;
         sqlite3_bind_text(stmt, 1, like_query.c_str(), -1, SQLITE_STATIC);
         int column_count = sqlite3_column_count(stmt);
         
@@ -125,6 +125,7 @@ void Database::ManageSearchState(const char* label, Attribute& attribute, const 
 
             // Get the concatenated string without the trailing space
             std::string value = concatenatedValue.str();
+            std::cout << "concatenatedValue: " << value << std::endl;
             if (!value.empty()) {
                 value.pop_back();
             }
