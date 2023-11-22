@@ -40,7 +40,7 @@ int Database::QueryCustomerIDByPhone(std::string phone) {
 }
 
 Customer* Database::QueryCustomerByPhone(std::string phone) {
-    Customer customer;
+    Customer* customer;
     std::string name;
     std::string surname;
     std::string email;
@@ -51,11 +51,17 @@ Customer* Database::QueryCustomerByPhone(std::string phone) {
     if (sqlite3_prepare_v2(db, query, -1, &stmt, NULL) == SQLITE_OK) {
         sqlite3_bind_text(stmt, 1, phone.c_str(), phone.size(), NULL);
         while (sqlite3_step(stmt) == SQLITE_ROW) {
+            std::cout << "Statement step " << std::endl;
             name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
             surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
             email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+            customer = new Customer(phone, name, surname, email);
+            return customer;
         }
-        customer = Customer(phone, name, surname, email);
+        //customer = customer->name.empty() ? nullptr : customer;
+        //customer = Customer(phone, name, surname, email);
+        //std::cout << customer.name << std::endl;
+        return nullptr;
     }
     else {
         std::cerr << "Error preparing SQL statement QueryCustomerByPhone: " << sqlite3_errmsg(db) << std::endl;
@@ -63,7 +69,7 @@ Customer* Database::QueryCustomerByPhone(std::string phone) {
     }
     sqlite3_finalize(stmt);
     sqlite3_close(db);
-    return &customer;
+    return customer;
 }
 
 void Database::InsertCustomer(Customer& customer, int* lastRowId) {

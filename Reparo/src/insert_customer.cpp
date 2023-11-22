@@ -35,9 +35,7 @@ void InsertCustomer::FieldsSection() {
     imgui_decorator.DecorateSeparatorText("CUSTOMER: ");
     CustomerSelectedOnPopup();
     CreateInputField("##Phone", "Phone number...", phone, [&]() { return SimpleValidation(phone.input.buffer, 8); });
-    if (phone.input.validated) {
     PopupFields("##Phone", phone);
-    }
     modals.PopupOnInputField(phone, "phone", selected);
     CreateInputField("##Name", "Name...", name, [&]() { return SimpleValidation(name.buffer, 3); });
     CreateInputField("##Surname", "Surname...", surname, [&]() { return SimpleValidation(surname.buffer, 3); });
@@ -70,22 +68,21 @@ void InsertCustomer::CustomerAlreadyExists() {
 
 void InsertCustomer::CustomerSelectedOnPopup() {
     if (phone.input.validated) {
-        Customer* temp_customer = nullptr;
+        temp_customer = db.QueryCustomerByPhone(phone.input.buffer);
         if (selected) {
-            temp_customer = db.QueryCustomerByPhone(phone.input.buffer);
-            strcpy(name.buffer, temp_customer->name.c_str());
-            strcpy(surname.buffer, temp_customer->surname.c_str());
-            strcpy(email.buffer, temp_customer->email.c_str());
+            CopyToBuffer(name.buffer, temp_customer->name.c_str(), name.validated, [&]() { return SimpleValidation(name.buffer, 3); });
+            CopyToBuffer(surname.buffer, temp_customer->surname.c_str(), surname.validated, [&]() { return SimpleValidation(surname.buffer, 3); });
+            CopyToBuffer(email.buffer, temp_customer->email.c_str(), email.validated, [&]() { return IsEmailValid(email.buffer); });
             selected = false;
         }
-        if(!phone.attribute.data.empty())
-            ImGui::Text("Customer already exists");
     }
+        ImGui::Text((temp_customer != nullptr) ? "Customer already exists" : " ");
 }
 
 void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function) {
     if (field.input.is_on) {
         ImGui::InputTextWithHint(label, hint, field.input.buffer, 128, field.input.imgui_flags);
+        field.is_input_activated = ImGui::IsItemActivated();
         if (ImGui::IsItemEdited()) {
             field.input.validated = validation_function();
         }

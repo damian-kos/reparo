@@ -33,6 +33,8 @@ protected:
 
 private:
     std::string validation_feedback = "";
+    Customer* temp_customer = nullptr;
+
     bool selected;
 
 protected:
