@@ -30,20 +30,19 @@ protected:
     Database db;
     ImGuiDecorator imgui_decorator;
     ModalController modals;
+    bool selected = false;
+    Customer* temp_customer = nullptr;
 
 private:
     std::string validation_feedback = "";
-    Customer* temp_customer = nullptr;
-
-    bool selected;
 
 protected:
     void CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function);
-    void CustomerAlreadyExists();
     void CustomerSelectedOnPopup();
     void CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function);
     virtual void PopupFields(const char* label, HintInputFieldsW_Popup& field);
     void FieldsSection();
+    virtual void PhoneFieldSection();
     virtual void SubmitButton();
     bool IsEmailValid(std::string email);
     bool SimpleValidation(const char* buffer, int length);

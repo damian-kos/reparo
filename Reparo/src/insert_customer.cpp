@@ -33,10 +33,7 @@ void InsertCustomer::Render() {
 void InsertCustomer::FieldsSection() {
     imgui_decorator.SetTestValue(FieldsValidated());
     imgui_decorator.DecorateSeparatorText("CUSTOMER: ");
-    CustomerSelectedOnPopup();
-    CreateInputField("##Phone", "Phone number...", phone, [&]() { return SimpleValidation(phone.input.buffer, 8); });
-    PopupFields("##Phone", phone);
-    modals.PopupOnInputField(phone, "phone", selected);
+    PhoneFieldSection();
     CreateInputField("##Name", "Name...", name, [&]() { return SimpleValidation(name.buffer, 3); });
     CreateInputField("##Surname", "Surname...", surname, [&]() { return SimpleValidation(surname.buffer, 3); });
     CreateInputField("##Email", "Email...", email, [&]() {return IsEmailValid(email.buffer); });
@@ -47,6 +44,12 @@ void InsertCustomer::FieldsSection() {
     ImGui::SameLine(); ImGui::Text(surname.validated ? "true" : "false");
     ImGui::SameLine(); ImGui::Text(email.validated ? "true" : "false");
     //
+}
+void InsertCustomer::PhoneFieldSection() {
+    CustomerSelectedOnPopup();
+    CreateInputField("##Phone", "Phone number...", phone, [&]() { return SimpleValidation(phone.input.buffer, 8); });
+    PopupFields("##Phone", phone);
+    modals.PopupOnInputField(phone, "##Phone", selected);
 }
 
 void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function) {
@@ -61,22 +64,19 @@ void InsertCustomer::CreateInputField(const char* label, const char* hint, HintI
     }
 }
 
-void InsertCustomer::CustomerAlreadyExists() {
-    if (phone.input.validated)
-        ImGui::Text("Customer already exists");
-}
-
 void InsertCustomer::CustomerSelectedOnPopup() {
     if (phone.input.validated) {
-        temp_customer = db.QueryCustomerByPhone(phone.input.buffer);
         if (selected) {
-            CopyToBuffer(name.buffer, temp_customer->name.c_str(), name.validated, [&]() { return SimpleValidation(name.buffer, 3); });
-            CopyToBuffer(surname.buffer, temp_customer->surname.c_str(), surname.validated, [&]() { return SimpleValidation(surname.buffer, 3); });
-            CopyToBuffer(email.buffer, temp_customer->email.c_str(), email.validated, [&]() { return IsEmailValid(email.buffer); });
+            temp_customer = db.QueryCustomerByPhone(phone.input.buffer);
+            if (temp_customer != nullptr) {
+                CopyToBuffer(name.buffer, temp_customer->name.c_str(), name.validated, [&]() { return SimpleValidation(name.buffer, 3); });
+                CopyToBuffer(surname.buffer, temp_customer->surname.c_str(), surname.validated, [&]() { return SimpleValidation(surname.buffer, 3); });
+                CopyToBuffer(email.buffer, temp_customer->email.c_str(), email.validated, [&]() { return IsEmailValid(email.buffer); });
+            }
             selected = false;
+
         }
     }
-        ImGui::Text((temp_customer != nullptr) ? "Customer already exists" : " ");
 }
 
 void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function) {

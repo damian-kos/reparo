@@ -6,6 +6,7 @@
 #include <tchar.h>
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
@@ -239,6 +240,7 @@ int main(int, char**)
 
         if (show_insert_customer_win) {
             ImGui::Begin("Add customer", &show_insert_customer_win);
+
             insert_customer.Render();
             ImGui::End();
         }
@@ -249,23 +251,22 @@ int main(int, char**)
             ImGui::End();
         }
 
+        if (show_repair_states_window) {
+            ImGui::Begin("Repairs", &show_repair_states_window);
+            repairs_view.Render();
+            ImGui::End(); 
+        }
+
         if (*EditRepair::show_repair) {
             ImGui::Begin("Edit Repair", EditRepair::show_repair);
-
-            std::shared_ptr<EditRepair> e_r = repairs_view.GetEditRepair();
-
-            if (e_r) {
-                e_r->Render();
+            std::shared_ptr<EditRepair> edit_repair = repairs_view.GetEditRepair();
+            if (edit_repair) {
+                edit_repair->Render();
             }
 
             ImGui::End();
         }
 
-        if (show_repair_states_window) {
-            ImGui::Begin("Repairs", &show_repair_states_window);
-            repairs_view.Render();
-            ImGui::End();
-        }
 
 
 

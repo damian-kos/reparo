@@ -44,7 +44,7 @@ Customer* Database::QueryCustomerByPhone(std::string phone) {
     std::string name;
     std::string surname;
     std::string email;
-    std::cout << "QueryCustomerByPhone is running  " << std::endl;
+    std::cout << "QueryCustomerByPhone is running  w/ PHONE:" << phone << std::endl;
     OpenDB();
     const char* query = "SELECT * FROM customers WHERE phone = ?";
     sqlite3_stmt* stmt;
@@ -56,11 +56,12 @@ Customer* Database::QueryCustomerByPhone(std::string phone) {
             surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
             email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
             customer = new Customer(phone, name, surname, email);
+            std::cout << customer->name << std::endl;
+
             return customer;
         }
         //customer = customer->name.empty() ? nullptr : customer;
         //customer = Customer(phone, name, surname, email);
-        //std::cout << customer.name << std::endl;
         return nullptr;
     }
     else {
@@ -106,6 +107,8 @@ void Database::ManageSearchState(const char* label, Attribute& attribute, const 
     {"##Model", "SELECT model FROM models WHERE model LIKE ?"},
     {"##Category", "SELECT category FROM categories WHERE category LIKE ?"},
     {"##Phone", "SELECT phone, name, surname FROM customers WHERE phone = ?"},
+    {"##PartialPhone", "SELECT phone, name, surname FROM customers WHERE phone LIKE ?"},
+
     };
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db, queries[label], -1, &stmt, NULL) == SQLITE_OK) {

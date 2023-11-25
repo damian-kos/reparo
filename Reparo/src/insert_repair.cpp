@@ -21,7 +21,7 @@ InsertRepair::InsertRepair(Repair& repair_) : InsertCustomer(repair_.customer), 
 }
 
 void InsertRepair::Render() {
-    InsertCustomer::Render();
+    CustomerSection();
     DeviceSection();
     NotesSection();
     PriceSection();
@@ -30,6 +30,17 @@ void InsertRepair::Render() {
     TestButton();
 }
 
+void InsertRepair::CustomerSection() {
+    InsertCustomer::Render();
+}
+
+void InsertRepair::PhoneFieldSection() {
+    CustomerSelectedOnPopup();
+    InsertCustomer::CreateInputField("##PartialPhone", "Phone number...", phone, [&]() { return SimpleValidation(phone.input.buffer, 8); });
+    InsertCustomer::PopupFields("##PartialPhone", phone);
+    modals.PopupOnInputField(phone, "##PartialPhone", selected);
+    
+}
 void InsertRepair::DeviceSection() {
     imgui_decorator.SetTestValue(DeviceFieldsValidated());
     imgui_decorator.DecorateSeparatorText("DEVICE: ");

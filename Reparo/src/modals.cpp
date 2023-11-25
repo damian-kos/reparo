@@ -55,7 +55,7 @@ const char** vectorToCharArray(const std::vector<std::string>& strings) {
 
 std::string SeperateData(const char* data, const char* label) {
     std::string data_string(data);
-    if (label == "phone") {
+    if (label == "##Phone" || label=="##PartialPhone") {
         std::istringstream iss(data_string);
         std::string changed_data;
         iss >> changed_data;
@@ -79,12 +79,12 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
     if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
     {
-        const char** autocomplete = vectorToCharArray(field.attribute.data);
+        //const char** autocomplete = vectorToCharArray(field.attribute.data);
         for (int i = 0; i < field.attribute.data.size(); i++)
         {
-            if (ImGui::Selectable(autocomplete[i]))
+            if (ImGui::Selectable(field.attribute.data[i].c_str()))
             {
-                strcpy(field.input.buffer, SeperateData(autocomplete[i], label).c_str());
+                strcpy(field.input.buffer, SeperateData(field.attribute.data[i].c_str(), label).c_str());
                 field.input.validated = true;
                 field.attribute.name = field.attribute.data[i];
             }
@@ -100,7 +100,11 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
 }
 
 void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const char* label, bool& selected) {
+    std::unordered_map<const char*, bool> prefix_text_on_popup = {
+    {"##Phone", true},
+    {"##PartialPhone", false},
 
+    };
     field.is_input_active = ImGui::IsItemActive();
     field.is_input_activated = ImGui::IsItemActivated();
 
@@ -112,6 +116,8 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
     if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
     {
+        if(!field.attribute.data.empty() && prefix_text_on_popup[label])
+            ImGui::Text("Customer already exists");
         const char** autocomplete = vectorToCharArray(field.attribute.data);
         for (int i = 0; i < field.attribute.data.size(); i++)
         {

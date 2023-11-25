@@ -21,6 +21,8 @@ protected:
     HintInputField hidden_note;
 
 protected:
+    void CustomerSection();
+    void PhoneFieldSection() override;
     void DeviceSection();
     void NotesSection();
     void PriceSection();
