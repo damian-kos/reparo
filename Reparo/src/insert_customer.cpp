@@ -52,6 +52,7 @@ void InsertCustomer::PhoneFieldSection() {
     modals.PopupOnInputField(phone, "##Phone", selected);
 }
 
+
 void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function) {
     if (field.is_on) {
         ImGui::InputTextWithHint(label, hint, field.buffer, 128, field.imgui_flags);

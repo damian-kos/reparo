@@ -2,7 +2,6 @@
 
 RepairsView::RepairsView() { 
     std::cout << "RepairsView Created empty" << std::endl;
-    std::cout << "RepairsView Created " << curr_chosen_tab << std::endl;
 
     repairs = db.RetreiveRepairsOfState(curr_chosen_tab+1);
 }
@@ -43,7 +42,7 @@ void RepairsView::Render() {
 void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs) {
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
     static int selected = -1;
-    if (ImGui::BeginTable("##states", 10, flags)) {
+    if (ImGui::BeginTable("##states", 11, flags)) {
         ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Model", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed);
@@ -54,6 +53,8 @@ void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs)
         ImGui::TableSetupColumn("Cust. Phone number", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Cust. Name", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("State", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Date", ImGuiTableColumnFlags_WidthStretch);
+
 
         ImGui::TableHeadersRow();
         for (auto& pair : retreived_repairs) {
@@ -93,6 +94,8 @@ void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs)
             ImGui::Text(pair.second.customer.name.c_str());
             ImGui::TableNextColumn();
             ImGui::Text(pair.second.state.c_str());
+            ImGui::TableNextColumn();
+            ImGui::Text(pair.second.date.c_str());
             }
         }
         ImGui::EndTable();

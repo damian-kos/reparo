@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <time.h>
 
 #include "structs.h"
 #include "enums.h"
@@ -30,6 +31,7 @@ public:
 
 private:
     sqlite3* db = nullptr;
+    tm date = {};
 
 private:
     void OpenDB();

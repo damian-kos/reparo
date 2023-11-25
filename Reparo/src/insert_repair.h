@@ -1,5 +1,10 @@
 #pragma once
+
+#include <time.h>
+
 #include "insert_customer.h"
+#include "imguidatechooser.h"
+
 
 class InsertRepair : public InsertCustomer {
 public:
@@ -19,6 +24,8 @@ protected:
     HintInputFieldsW_Popup color;
     HintInputField visible_note;
     HintInputField hidden_note;
+    tm date = {};
+    std::string str_date = "";
 
 protected:
     void CustomerSection();

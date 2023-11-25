@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 
+
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -16,6 +17,7 @@
 #include "insert_repair.h"
 #include "repairs.h"
 #include "edit_repair.h"
+
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
 static ID3D11DeviceContext *g_pd3dDeviceContext = nullptr;
@@ -214,6 +216,7 @@ int main(int, char**)
 
 
         ImGui::Begin("Main Menu");
+     
         // Window for Adding Customers
         if (ImGui::Button("Add customer"))
             show_insert_customer_win = !show_insert_customer_win;
@@ -240,7 +243,6 @@ int main(int, char**)
 
         if (show_insert_customer_win) {
             ImGui::Begin("Add customer", &show_insert_customer_win);
-
             insert_customer.Render();
             ImGui::End();
         }

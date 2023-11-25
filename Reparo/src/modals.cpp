@@ -15,7 +15,7 @@ void ModalController::SubmitConfirm(const char* modal_title, Customer& customer,
     {
         ImGui::Text("Do you want to insert customer with this details?");
         ImGui::Separator();
-        ImGui::Text("Phone: "); ImGui::SameLine(); ImGui::Text(customer.phone.c_str());
+        ImGui::ViewCustomer(customer);
         if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
@@ -30,8 +30,11 @@ void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, Con
     {
         ImGui::Text("Do you want to insert repair with this details?");
         ImGui::Separator();
-        ImGui::Text("Phone: "); ImGui::SameLine(); ImGui::Text(repair.customer.phone.c_str());
-        ImGui::Text("Model: "); ImGui::SameLine(); ImGui::Text(repair.device.name.c_str());
+        ImGui::ViewCustomer(repair.customer);
+        ImGui::Text("Model:    "); ImGui::SameLine(); ImGui::Text(repair.device.name.c_str());
+        ImGui::Text("Category: "); ImGui::SameLine(); ImGui::Text(repair.category.c_str());
+        ImGui::Text("Color:    "); ImGui::SameLine(); ImGui::Text(repair.device.color.c_str());
+        ImGui::Text("Price:    "); ImGui::SameLine(); ImGui::Text("%.2f", repair.price);
 
         if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
         ImGui::SetItemDefaultFocus();
@@ -118,12 +121,12 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
     {
         if(!field.attribute.data.empty() && prefix_text_on_popup[label])
             ImGui::Text("Customer already exists");
-        const char** autocomplete = vectorToCharArray(field.attribute.data);
+        /*const char** autocomplete = vectorToCharArray(field.attribute.data);*/
         for (int i = 0; i < field.attribute.data.size(); i++)
         {
-            if (ImGui::Selectable(autocomplete[i]))
+            if (ImGui::Selectable(field.attribute.data[i].c_str()))
             {
-                strcpy(field.input.buffer, SeperateData(autocomplete[i], label).c_str());
+                strcpy(field.input.buffer, SeperateData(field.attribute.data[i].c_str(), label).c_str());
                 field.input.validated = true;
                 field.attribute.name = field.attribute.data[i];
                 selected = true;

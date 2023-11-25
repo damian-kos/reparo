@@ -21,6 +21,14 @@ InsertRepair::InsertRepair(Repair& repair_) : InsertCustomer(repair_.customer), 
 }
 
 void InsertRepair::Render() {
+    if (ImGui::DateChooser("Date Chooser##MyDateChooser", date, "%d/%m/%Y")) {
+         //A new date has been chosen
+        fprintf(stderr,"A new date has been chosen exacty now: \"%.2d-%.2d-%.4d\"\n",date.tm_mday,date.tm_mon+1,date.tm_year+1900);
+    }
+    ImGui::Text("Chosen date: \"%.2d-%.2d-%.4d\"", date.tm_mday, date.tm_mon + 1, date.tm_year + 1900);
+
+    ////ImGui::DateChooser("##Date", date);
+    //ImGui::Text("Chosen date: \"%.4d-%.2d-%.2d %.2d:%.2d:%.2d\"", date.tm_year + 1900, date.tm_mon + 1, date.tm_mday, date.tm_hour, date.tm_min, date.tm_sec);
     CustomerSection();
     DeviceSection();
     NotesSection();
@@ -44,7 +52,7 @@ void InsertRepair::PhoneFieldSection() {
 void InsertRepair::DeviceSection() {
     imgui_decorator.SetTestValue(DeviceFieldsValidated());
     imgui_decorator.DecorateSeparatorText("DEVICE: ");
-
+  
     InsertCustomer::CreateInputField("##Model",
         "Model of device...",
         model,
@@ -128,7 +136,7 @@ void InsertRepair::InsertRepairButtonEnabler() {
     if (!RepairValidated()) {
         ImGui::EndDisabled();
     }
-    RunModal(repair);
+    RunModal(repair); // This is where insertion of Repair to db is called
 }
 
 void InsertRepair::InsertRepairButton() {
@@ -140,7 +148,7 @@ void InsertRepair::InsertRepairButton() {
 
 Repair InsertRepair::InitRepair() {
     Device device(model.input.buffer, color.input.buffer);
-    Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer);
+    Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer, str_date);
     return init_repair;
 }
 
@@ -179,6 +187,13 @@ void InsertRepair::ResetFields() {
 
 void InsertRepair::TestButton() {
     if (ImGui::Button("Test button")) {
-        std::cout << repair.customer.phone << std::endl;
+        ImGui::SetDateToday(&date);
+        char time[64];
+        sprintf(time, "%.4d-%.2d-%.2d %.2d:%.2d:%.2d",
+            date.tm_year + 1900, date.tm_mon + 1, date.tm_mday,
+            date.tm_hour, date.tm_min, date.tm_sec);
+
+        std::string str_date(time);
+        std::cout << str_date << std::endl;
     }
 }

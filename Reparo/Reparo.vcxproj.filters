@@ -78,6 +78,12 @@
     <ClInclude Include="src\edit_repair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\imguidatechooser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui_viewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vendor\imgui\imgui.cpp">
@@ -129,6 +135,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\edit_repair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imguidatechooser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui_viewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

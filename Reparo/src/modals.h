@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include "imgui.h"
 #include "structs.h"
+#include "imgui_viewer.h"
 #include "enums.h"
 class ModalController {
 public:

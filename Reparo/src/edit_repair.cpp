@@ -79,7 +79,7 @@ void EditRepair::RunModal(Repair& repair){
 
 Repair EditRepair::InitRepair() {
     Device device(model.input.buffer, color.input.buffer);
-    Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer, selected_state);
+    Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer, selected_state, str_date);
     return init_repair;
 }
 
