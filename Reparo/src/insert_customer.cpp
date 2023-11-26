@@ -1,174 +1,177 @@
 #include "insert_customer.h"
 
-InsertCustomer::InsertCustomer()  { 
-    std::cout << "InsertCustomer Created" << std::endl;
-    }
+InsertCustomer::InsertCustomer() { 
+  std::cout << "InsertCustomer Created" << std::endl;
+}
 
 InsertCustomer::InsertCustomer(Customer& cust) :  customer(cust){ 
-    CopyToBuffer(phone.input.buffer, 
-        customer.phone.c_str(), 
-        phone.input.validated, 
-        [&]() { return LenValidation(phone.input.buffer, 8); });
-    CopyToBuffer(name.buffer, 
-        customer.name.c_str(), 
-        name.validated, [&]() { return LenValidation(name.buffer, 3); });
-    CopyToBuffer(surname.buffer, 
-        customer.surname.c_str(), 
-        surname.validated, [&]() { return LenValidation(surname.buffer, 3); });
-    CopyToBuffer(email.buffer,
-        customer.email.c_str(),
-        email.validated, [&]() { return IsEmailValid(email.buffer); });
+  CopyToBuffer(phone.input.buffer, 
+                customer.phone.c_str(), 
+                phone.input.validated, 
+                [&]() { return LenValidation(phone.input.buffer, 8); });
+  CopyToBuffer(name.buffer, 
+               customer.name.c_str(), 
+               name.validated, [&]() { return LenValidation(name.buffer, 3); });
+  CopyToBuffer(surname.buffer, 
+               customer.surname.c_str(), 
+               surname.validated, [&]() { return LenValidation(surname.buffer, 3); });
+  CopyToBuffer(email.buffer,
+               customer.email.c_str(),
+               email.validated, [&]() { return IsEmailValid(email.buffer); });
 }
 
 InsertCustomer::~InsertCustomer() {
-    std::cout << "Insert Customer destroyed" << std::endl;
+  std::cout << "Insert Customer destroyed" << std::endl;
 }
 
 void InsertCustomer::Render() {
-    FieldsSection();
-    ImGui::Text(validation_feedback.c_str());
-    UpdateValidationMsg();
-    SubmitButton();
+  FieldsSection();
+  ImGui::Text(validation_feedback.c_str());
+  UpdateValidationMsg();
+  SubmitButton();
 }
 
 void InsertCustomer::FieldsSection() {
-    ImGui::SeparatorDecorator("CUSTOMER: ", FieldsValidated());
-    PhoneFieldSection();
-    ImGui::InputTextWithHintExt("##Name", "Name...", name, 
-                                [&]() { return LenValidation(name.buffer, 3); },
-                                &feedback); 
-    ImGui::InputTextWithHintExt("##Surname", "Surname...", surname, 
-                                [&]() { return LenValidation(surname.buffer, 3); },
-                                &feedback);
-    ImGui::InputTextWithHintExt("##Email", "Email...", email, 
-                                [&]() {return IsEmailValid(email.buffer); }, 
-                                &feedback);
+  ImGui::SeparatorDecorator("CUSTOMER: ", FieldsValidated());
+  PhoneFieldSection();
+  ImGui::InputTextWithHintExt("##Name", "Name...", name, 
+                              [&]() { return LenValidation(name.buffer, 3); },
+                              &feedback); 
+  ImGui::InputTextWithHintExt("##Surname", "Surname...", surname, 
+                              [&]() { return LenValidation(surname.buffer, 3); },
+                              &feedback);
+  ImGui::InputTextWithHintExt("##Email", "Email...", email, 
+                              [&]() {return IsEmailValid(email.buffer); }, 
+                              &feedback);
 
-    //Debugging
-    ImGui::Text(phone.input.validated ? "true" : "false");
-    ImGui::SameLine(); ImGui::Text(name.validated ? "true" : "false");
-    ImGui::SameLine(); ImGui::Text(surname.validated ? "true" : "false");
-    ImGui::SameLine(); ImGui::Text(email.validated ? "true" : "false");
-    //
+  //Debugging
+  ImGui::Text(phone.input.validated ? "true" : "false");
+  ImGui::SameLine(); ImGui::Text(name.validated ? "true" : "false");
+  ImGui::SameLine(); ImGui::Text(surname.validated ? "true" : "false");
+  ImGui::SameLine(); ImGui::Text(email.validated ? "true" : "false");
+  //
 }
 void InsertCustomer::PhoneFieldSection() {
-    CustomerSelectedOnPopup();
-    ImGui::InputTextWithPopup("##Phone", "Phone number...", phone,
-                              [&]() { return LenValidation(phone.input.buffer, 8); },
-                              &selected, nullptr, &feedback);
+  CustomerSelectedOnPopup();
+  ImGui::InputTextWithPopup("##Phone", "Phone number...", phone,
+                            [&]() { return LenValidation(phone.input.buffer, 8); },
+                            &selected, nullptr, &feedback);
 }
 void InsertCustomer::CustomerSelectedOnPopup() {
-    if (phone.input.validated) {
-        if (selected) {
-            temp_customer = db.QueryCustomerByPhone(phone.input.buffer);
-            if (temp_customer != nullptr) {
-                CopyToBuffer(name.buffer, temp_customer->name.c_str(), 
-                             name.validated, 
-                             [&]() { return LenValidation(name.buffer, 3); });
-                CopyToBuffer(surname.buffer, 
-                             temp_customer->surname.c_str(), surname.validated, 
-                             [&]() { return LenValidation(surname.buffer, 3); });
-                CopyToBuffer(email.buffer, temp_customer->email.c_str(), 
-                             email.validated, 
-                             [&]() { return IsEmailValid(email.buffer); });
-            }
-            selected = false;
-        }
+  if (phone.input.validated) {
+    if (selected) {
+      temp_customer = Database::QueryCustomerByPhone(phone.input.buffer);
+      if (temp_customer != nullptr) {
+        CopyToBuffer(name.buffer, temp_customer->name.c_str(), 
+                      name.validated, 
+                      [&]() { return LenValidation(name.buffer, 3); });
+        CopyToBuffer(surname.buffer, 
+                      temp_customer->surname.c_str(), surname.validated, 
+                      [&]() { return LenValidation(surname.buffer, 3); });
+        CopyToBuffer(email.buffer, temp_customer->email.c_str(), 
+                      email.validated, 
+                      [&]() { return IsEmailValid(email.buffer); });
+      }
+      selected = false;
     }
+  }
 }
 
 void InsertCustomer::SubmitButton() {
-    //static Customer customer;
-    if (!FieldsValidated()) {
-        ImGui::BeginDisabled(true);
-    }
-    if (ImGui::Button("Submit Customer Details")) {
-        customer = InitCustomer();
-        InitModal();        
-    }
-    if (!FieldsValidated()) {
-        ImGui::EndDisabled();
-    }
-    RunModal(customer);
+  //static Customer customer;
+  if (!FieldsValidated()) {
+      ImGui::BeginDisabled(true);
+  }
+  if (ImGui::Button("Submit Customer Details")) {
+      customer = InitCustomer();
+      InitModal();        
+  }
+  if (!FieldsValidated()) {
+      ImGui::EndDisabled();
+  }
+  RunModal(customer);
 }
 
 bool InsertCustomer::IsEmailValid(std::string buffer) {
-    size_t atPos = buffer.find('@');
-    size_t dotPos = buffer.find('.', atPos + 1);
-    return (atPos != std::string::npos && dotPos != std::string::npos);
+  size_t atPos = buffer.find('@');
+  size_t dotPos = buffer.find('.', atPos + 1);
+  return (atPos != std::string::npos && dotPos != std::string::npos);
 }
 
 bool InsertCustomer::LenValidation(const char* buffer, int length) {
-    return (strlen(buffer) >= length);
+   return (strlen(buffer) >= length);
 }
 
 bool InsertCustomer::FieldsValidated() {
-    return (phone.input.validated && name.validated && surname.validated && email.validated);
+  return (phone.input.validated && name.validated && surname.validated 
+          && email.validated);
 }
 
 int InsertCustomer::SetValidaitonErr() {
-    std::vector<HintInputField> validations = { phone.input, name, surname, email };
-    if (FieldsValidated())
-        return -1;
-    for (int i = 0; i < validations.size();  i++) {
-        if (strlen(validations[i].buffer) > 0 && !validations[i].validated)
-        {
-            return i;
-        }
+  std::vector<HintInputField> validations = { phone.input, name, surname, email };
+  if (FieldsValidated())
+     return -1;
+  for (int i = 0; i < validations.size();  i++) {
+    if (strlen(validations[i].buffer) > 0 && !validations[i].validated)
+    {
+        return i;
     }
-    return -1;
+  }
+  return -1;
 }
 
 void InsertCustomer::UpdateValidationMsg() {
-    static std::map<int, std::string> validation_error_messages = {
-    {0, "Wrong phone!"},
-    {1, "Wrong name!"},
-    {2, "Wrong surname!"},
-    {3, "Wrong email!"},
-    };
-    if (feedback) {
-        int error_code = SetValidaitonErr();
-        if (error_code != -1) {
-            validation_feedback = validation_error_messages[error_code];
-        }
-        else {
-            validation_feedback = "";
-        }
-        feedback = false;
+  static std::map<int, std::string> validation_error_messages = {
+  {0, "Wrong phone!"},
+  {1, "Wrong name!"},
+  {2, "Wrong surname!"},
+  {3, "Wrong email!"},
+  };
+  if (feedback) {
+    int error_code = SetValidaitonErr();
+    if (error_code != -1) {
+        validation_feedback = validation_error_messages[error_code];
     }
+    else {
+        validation_feedback = "";
+    }
+    feedback = false;
+  }
 }
 
 Customer InsertCustomer::InitCustomer() {
-    Customer customer(phone.input.buffer, name.buffer, surname.buffer, email.buffer);
-    std::cout << customer.phone << std::endl;
-    return customer;
+  Customer customer(phone.input.buffer, name.buffer, surname.buffer, 
+                    email.buffer);
+  return customer;
 }
 
 void InsertCustomer::InitModal() {
-    modals.RenderModal("Confirm Customer Details");
+  ModalController::RenderModal("Confirm Customer Details");
 }
 
 void InsertCustomer::RunModal(Customer& customer) {
-   modals.SubmitConfirm("Confirm Customer Details", customer, result);
-   if (result == ConfirmResult::CONIFRM_SUBMIT) {
-       int customerID = db.QueryCustomerIDByPhone(phone.input.buffer);
-       if (customerID == 0) {
-           db.InsertCustomer(customer, nullptr);
-           result = ConfirmResult::CONIFRM_IDLE;
-           ResetFields();
-       }
+  ModalController::SubmitConfirm("Confirm Customer Details", customer, result);
+  if (result == ConfirmResult::CONIFRM_SUBMIT) {
+    int customerID = Database::QueryCustomerIDByPhone(phone.input.buffer);
+    if (customerID == 0) {
+      Database::InsertCustomer(customer, nullptr);
+      result = ConfirmResult::CONIFRM_IDLE;
+      ResetFields();
     }
+  }
 }
 
 void InsertCustomer::ResetFields() {
-    phone.input = HintInputField({ ImGuiInputTextFlags_CharsDecimal });
-    name = HintInputField();
-    surname = HintInputField();
-    email = HintInputField();
+  phone.input = HintInputField({ ImGuiInputTextFlags_CharsDecimal });
+  name = HintInputField();
+  surname = HintInputField();
+  email = HintInputField();
 }
 
-void InsertCustomer::CopyToBuffer(char* buffer, std::string source, bool& field_validation, std::function<bool()> validation_function) {
-    std::cout << "Source: "  << source << std::endl;
-    strcpy(buffer, source.c_str());
-    field_validation = validation_function();
+void InsertCustomer::CopyToBuffer(char* buffer, std::string source, 
+                                  bool& field_validation, 
+                                  std::function<bool()> validation_function) {
+  std::cout << "Source: "  << source << std::endl;
+  strcpy(buffer, source.c_str());
+  field_validation = validation_function();
 }

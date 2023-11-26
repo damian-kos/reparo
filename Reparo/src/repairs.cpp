@@ -3,43 +3,38 @@
 RepairsView::RepairsView() { 
     std::cout << "RepairsView Created empty" << std::endl;
 
-    repairs = db.RetreiveRepairsOfState(curr_chosen_tab+1);
+    repairs = Database::RetreiveRepairsOfState(curr_chosen_tab+1);
 }
-
-
 
 RepairsView::~RepairsView() { std::cout << "RepairsView dESTROYED " << std::endl; }
 
 void RepairsView::Render() {
-
-    static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs;
-    const char* names[4] = { "To do", "Processing", "Warranty", "Awaiting Parts" };
-    static bool opened[4] = { true, true, true, true };
+  static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs;
+  const char* names[4] = { "To do", "Processing", "Warranty", "Awaiting Parts" };
+  static bool opened[4] = { true, true, true, true };
     
-    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
-    {
-        for (int n = 0; n < IM_ARRAYSIZE(opened); n++) {
-            if (opened[n] && ImGui::BeginTabItem(names[n], &opened[n], ImGuiTabItemFlags_None))
-            {
-                curr_chosen_tab = n;
-                if (curr_chosen_tab != prev_chosen_tab) {
-                    std::cout << "Reload repairs for this tab: " << n+1 << std::endl;
-                    repairs = db.RetreiveRepairsOfState(n + 1);
-                    prev_chosen_tab = curr_chosen_tab;
-                }
-
-                ImGui::EndTabItem();
-            }
-          
-
+  if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+  {
+    for (int n = 0; n < IM_ARRAYSIZE(opened); n++) {
+      if (opened[n] && ImGui::BeginTabItem(names[n], &opened[n], ImGuiTabItemFlags_None))
+      {
+        curr_chosen_tab = n;
+        if (curr_chosen_tab != prev_chosen_tab) {
+          std::cout << "Reload repairs for this tab: " << n+1 << std::endl;
+          repairs = Database::RetreiveRepairsOfState(n + 1);
+          prev_chosen_tab = curr_chosen_tab;
         }
-        RepairsToTable(repairs);
-        ImGui::EndTabBar();
+
+        ImGui::EndTabItem();
+      }
     }
+    RepairsToTable(repairs);
+    ImGui::EndTabBar();
+  }
 
 }
 
-void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs) {
+void RepairsView::RepairsToTable(const std::unordered_map<int, Repair>& retreived_repairs) {
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
     static int selected = -1;
     if (ImGui::BeginTable("##states", 11, flags)) {
@@ -70,9 +65,7 @@ void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs)
                 if (ImGui::Button("Update repair")) {
                     *EditRepair::show_repair = true;
                     repair_to_init = pair.second;
-                    
                     edit_repair = std::make_shared<EditRepair>(repair_to_init, pair.first);
-
                 }
                 ImGui::EndPopup();
             }

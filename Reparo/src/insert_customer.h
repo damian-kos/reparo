@@ -26,8 +26,6 @@ protected:
     HintInputField email;
     Customer customer;
     ConfirmResult result = ConfirmResult::CONIFRM_IDLE;
-    Database db;
-    ModalController modals;
     bool selected = false;
     bool feedback = false;
 

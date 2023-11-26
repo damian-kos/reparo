@@ -15,26 +15,23 @@ public:
     Database();
     ~Database();
 public:
-    int QueryCustomerIDByPhone(std::string phone);
-    Customer* QueryCustomerByPhone(std::string phone);
-    void InsertCustomer(Customer& customer, int* last_row_id);
-    
+    static int QueryCustomerIDByPhone(std::string phone);
+    static Customer* QueryCustomerByPhone(std::string phone);
+    static void InsertCustomer(Customer& customer, int* last_row_id);
     static void ManageSearchState(const char* label, Attribute& attribute, const char* buffer);
     static void ManageSearchState(const char* label, Attribute& attribute, int rel_id, const char* buffer);
     static int GetIDForValueS(const char* value, const char* label);
-
-    bool GetBoolForValue(const char* label, const char* buffer);
-    void InsertRepair(Repair repair);
-    std::map<int, Repair> RetreiveRepairsOfState(int state);
-    std::map<int, std::string> GetRepairStates();
-    void UpdateCustomer(Customer& customer, int id);
-    void UpdateRepair(Repair& repair, int id);
-    int GetIDForID(int id, std::string table);
+    static bool GetBoolForValue(const char* label, const char* buffer);
+    static void InsertRepair(Repair repair);
+    static std::unordered_map<int, Repair> RetreiveRepairsOfState(int state);
+    static std::unordered_map<int, std::string> GetRepairStates();
+    static void UpdateCustomer(Customer& customer, int id);
+    static void UpdateRepair(Repair& repair, int id);
+    static int GetIDForID(int id, std::string table);
     static sqlite3* PtrDB();
 
 private:
     sqlite3* db = nullptr;
-    tm date = {};
 
 private:
     void OpenDB();

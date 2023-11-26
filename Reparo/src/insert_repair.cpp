@@ -84,7 +84,7 @@ bool InsertRepair::RepairValidated() {
 }
 
 bool InsertRepair::BufferQueryOnDatabase(const char* label, const char* buffer) {
-    return db.GetBoolForValue(label, buffer);
+    return Database::GetBoolForValue(label, buffer);
 }
 
 void InsertRepair::InsertRepairButtonEnabler() {
@@ -114,18 +114,17 @@ Repair InsertRepair::InitRepair() {
 }
 
 void InsertRepair::InitModal() {
-    modals.RenderModal(modal_message);
+    ModalController::RenderModal(modal_message);
 }
 
 void InsertRepair::RunModal(Repair& repair) {
-   
-    modals.SubmitConfirm(modal_message, repair, result);
+    ModalController::SubmitConfirm(modal_message, repair, result);
     if (result == ConfirmResult::CONIFRM_SUBMIT) {
-       int customerID = db.QueryCustomerIDByPhone(repair.customer.phone);
+       int customerID = Database::QueryCustomerIDByPhone(repair.customer.phone);
        if (customerID == 0) {
-            db.InsertCustomer(repair.customer, nullptr); // Insert Customer if doesnt exist
+            Database::InsertCustomer(repair.customer, nullptr); // Insert Customer if doesnt exist
        }
-       db.InsertRepair(repair);
+       Database::InsertRepair(repair);
        //ResetFields();
        result = ConfirmResult::CONIFRM_IDLE;
 

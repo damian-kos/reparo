@@ -15,30 +15,28 @@ EditRepair::~EditRepair() { instance_count--;  std::cout << "EditRepair destroye
 
 void EditRepair::StateSection() {
   static int selected = 1;
-    static bool retreived = false;
-    static std::map<int, std::string> states;
+  static bool retreived = false;
+  static std::unordered_map<int, std::string> states;
 
-    ImGui::SeparatorDecorator("STATE: ", true);
-    if (!retreived) {
-        states = db.GetRepairStates();
-        retreived = !states.empty();
+  ImGui::SeparatorDecorator("STATE: ", true);
+  if (!retreived) {
+    states = Database::GetRepairStates();
+    retreived = !states.empty();
+  }
+
+  if (ImGui::BeginCombo("##States", states[selected].c_str()))
+  {
+    for (auto& pair : states) {
+      const bool is_selected = (selected == pair.first);
+      if (ImGui::Selectable(states[pair.first].c_str(), is_selected)) {
+        selected = pair.first;
+        selected_state = pair.second;
+      }
+      if (is_selected)
+        ImGui::SetItemDefaultFocus();
     }
-
-    if (ImGui::BeginCombo("##States", states[selected].c_str()))
-    {
-        for (auto& pair : states) {
-            const bool is_selected = (selected == pair.first);
-            if (ImGui::Selectable(states[pair.first].c_str(), is_selected)) {
-                selected = pair.first;
-                selected_state = pair.second;
-
-            }
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();
-        }
-       
-        ImGui::EndCombo();
-    }
+    ImGui::EndCombo();
+  }
 }
 
 void EditRepair::InsertRepairButton() {
@@ -53,34 +51,34 @@ void EditRepair::InsertRepairButton() {
 }
 
 void EditRepair::RunModal(Repair& repair){
-    modals.SubmitConfirm(modal_message, repair, result);
-    if (result == ConfirmResult::CONIFRM_SUBMIT) {
-        if (CustomerModified()) {
-            Customer temp_customer = InsertCustomer::InitCustomer();
-            int customerID = db.QueryCustomerIDByPhone(temp_customer.phone);
-            if (customerID > 0) {
-                db.UpdateCustomer(temp_customer, customerID); 
-                }
-            if (customerID == 0) {
-                db.UpdateCustomer(temp_customer, db.GetIDForID(repair_id, "repairs"));
-            }
-            if (customerID != db.GetIDForID(repair_id, "repairs") && customerID >0) {
-                // Change ID of customer_id in repairs table to ID of other existing customer in database
-            }
-        }
-        if (RepairModified()) {
-            Repair temp_repair = InitRepair();
-            db.UpdateRepair(temp_repair, repair_id);
-        }
-        //ResetFields();
-        result = ConfirmResult::CONIFRM_IDLE;
+  ModalController::SubmitConfirm(modal_message, repair, result);
+  if (result == ConfirmResult::CONIFRM_SUBMIT) {
+    if (CustomerModified()) {
+      Customer temp_customer = InsertCustomer::InitCustomer();
+      int customerID = Database::QueryCustomerIDByPhone(temp_customer.phone);
+      if (customerID > 0) {
+          Database::UpdateCustomer(temp_customer, customerID); 
+          }
+      if (customerID == 0) {
+          Database::UpdateCustomer(temp_customer, Database::GetIDForID(repair_id, "repairs"));
+      }
+      if (customerID != Database::GetIDForID(repair_id, "repairs") && customerID >0) {
+          // Change ID of customer_id in repairs table to ID of other existing customer in database
+      }
     }
+    if (RepairModified()) {
+      Repair temp_repair = InitRepair();
+      Database::UpdateRepair(temp_repair, repair_id);
+    }
+    //ResetFields();
+    result = ConfirmResult::CONIFRM_IDLE;
+  }
 }
 
 Repair EditRepair::InitRepair() {
-    Device device(model.input.buffer, color.input.buffer);
-    Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer, selected_state, str_date);
-    return init_repair;
+  Device device(model.input.buffer, color.input.buffer);
+  Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer, selected_state, str_date);
+  return init_repair;
 }
 
 void EditRepair::TestButton() {

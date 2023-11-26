@@ -1,4 +1,13 @@
+#include <sstream>
 #include "modals.h"
+
+ModalController::ModalController() {
+  std::cout << "ModalControler created" << std::endl;
+}
+
+ModalController::~ModalController() {
+  std::cout << "ModalController destroyed" << std::endl;
+}
 
 void ModalController::RenderModal(const char* modal_title) {
     ImGui::OpenPopup(modal_title);
@@ -10,51 +19,38 @@ void ModalController::CenterAlign() {
 }
 
 void ModalController::SubmitConfirm(const char* modal_title, Customer& customer, ConfirmResult& result) {
-    CenterAlign();
-    if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::Text("Do you want to insert customer with this details?");
-        ImGui::Separator();
-        ImGui::ViewCustomer(customer);
-        if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
-        ImGui::SetItemDefaultFocus();
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); result  = ConfirmResult::CONFIRM_CANCEL; }
-        ImGui::EndPopup();
-    }
+  CenterAlign();
+  if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Text("Do you want to insert customer with this details?");
+    ImGui::Separator();
+    ImGui::ViewCustomer(customer);
+    if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
+    ImGui::SetItemDefaultFocus();
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); result  = ConfirmResult::CONFIRM_CANCEL; }
+    ImGui::EndPopup();
+  }
 }
 
 void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, ConfirmResult& result) {
-    CenterAlign();
-    if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::Text("Do you want to insert repair with this details?");
-        ImGui::Separator();
-        ImGui::ViewCustomer(repair.customer);
-        ImGui::Text("Model:    "); ImGui::SameLine(); ImGui::Text(repair.device.name.c_str());
-        ImGui::Text("Category: "); ImGui::SameLine(); ImGui::Text(repair.category.c_str());
-        ImGui::Text("Color:    "); ImGui::SameLine(); ImGui::Text(repair.device.color.c_str());
-        ImGui::Text("Price:    "); ImGui::SameLine(); ImGui::Text("%.2f", repair.price);
+  CenterAlign();
+  if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+     ImGui::Text("Do you want to insert repair with this details?");
+    ImGui::Separator();
+    ImGui::ViewCustomer(repair.customer);
+    ImGui::ViewRepair(repair);
 
-        if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
-        ImGui::SetItemDefaultFocus();
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); result = ConfirmResult::CONFIRM_CANCEL; }
-        ImGui::EndPopup();
-    }
+    if (ImGui::Button("OK", ImVec2(120, 0))) 
+      { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
+    ImGui::SetItemDefaultFocus();
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0))) 
+      { ImGui::CloseCurrentPopup(); result = ConfirmResult::CONFIRM_CANCEL; }
+    ImGui::EndPopup();
+  }
 }
-
-
-const char** vectorToCharArray(const std::vector<std::string>& strings) {
-    const char** charArray = new const char* [strings.size()];
-
-    for (size_t i = 0; i < strings.size(); ++i) {
-        charArray[i] = strings[i].c_str();
-    }
-    return charArray;
-}
-
-#include <sstream>
 
 std::string SeperateData(const char* data, const char* label) {
     std::string data_string(data);
@@ -69,43 +65,46 @@ std::string SeperateData(const char* data, const char* label) {
     }
 }
 
-void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, bool* selected, const char* label) {
-    std::unordered_map<const char*, bool> prefix_text_on_popup = {
-    {"##Phone", true},
-    {"##PartialPhone", false},
-    {nullptr, false},
-    };
+void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, 
+                                        bool* selected, const char* label) {
+  std::unordered_map<const char*, bool> prefix_text_on_popup = {
+  {"##Phone", true},
+  {"##PartialPhone", false},
+  {nullptr, false},
+  };
 
-    field.is_input_active = ImGui::IsItemActive();
-    field.is_input_activated = ImGui::IsItemActivated();
+  field.is_input_active = ImGui::IsItemActive();
+  field.is_input_activated = ImGui::IsItemActivated();
 
-    if (field.is_input_activated) {
-        ImGui::OpenPopup(label);
-        std::cout << &field << label << std::endl;
-    }
+  if (field.is_input_activated) {
+      ImGui::OpenPopup(label);
+      std::cout << &field << label << std::endl;
+  }
 
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
-    if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
+  ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
+  if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar 
+                        | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize 
+                        | ImGuiWindowFlags_ChildWindow))
+  {
+    if (!field.attribute.data.empty() && prefix_text_on_popup[label])
+      ImGui::Text("Customer already exists");
+    for (int i = 0; i < field.attribute.data.size(); i++)
     {
-        if (!field.attribute.data.empty() && prefix_text_on_popup[label])
-            ImGui::Text("Customer already exists");
-        for (int i = 0; i < field.attribute.data.size(); i++)
-        {
-            if (ImGui::Selectable(field.attribute.data[i].c_str()))
-            {
-                strcpy(field.input.buffer, SeperateData(field.attribute.data[i].c_str(), label).c_str());
-                field.input.validated = true;
-                field.attribute.name = field.attribute.data[i];
-                if (selected) {
-                    printf("PopupOnInputField run\n");
-                    *selected = true;
-                }
-            }
+      if (ImGui::Selectable(field.attribute.data[i].c_str()))
+      {
+        strcpy(field.input.buffer, SeperateData(field.attribute.data[i].c_str(),
+               label).c_str());
+        field.input.validated = true;
+        field.attribute.name = field.attribute.data[i];
+        if (selected) {
+            printf("PopupOnInputField run\n");
+            *selected = true;
         }
-        if ( /*field.is_input_enter_pressed ||*/ (!field.is_input_active && !ImGui::IsWindowFocused())) {
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
+      }
     }
-
+    if (!field.is_input_active && !ImGui::IsWindowFocused()) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
 }
