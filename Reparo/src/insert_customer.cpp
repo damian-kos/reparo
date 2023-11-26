@@ -1,10 +1,10 @@
 #include "insert_customer.h"
 
-InsertCustomer::InsertCustomer() : imgui_decorator() { 
+InsertCustomer::InsertCustomer()  { 
     std::cout << "InsertCustomer Created" << std::endl;
     }
 
-InsertCustomer::InsertCustomer(Customer& cust) : imgui_decorator(), customer(cust){ 
+InsertCustomer::InsertCustomer(Customer& cust) :  customer(cust){ 
     CopyToBuffer(phone.input.buffer, 
         customer.phone.c_str(), 
         phone.input.validated, 
@@ -31,8 +31,7 @@ void InsertCustomer::Render() {
 }
 
 void InsertCustomer::FieldsSection() {
-    imgui_decorator.SetTestValue(FieldsValidated());
-    imgui_decorator.DecorateSeparatorText("CUSTOMER: ");
+    ImGui::SeparatorDecorator("CUSTOMER: ", FieldsValidated());
     PhoneFieldSection();
     CreateInputField("##Name", "Name...", name, [&]() { return SimpleValidation(name.buffer, 3); });
     CreateInputField("##Surname", "Surname...", surname, [&]() { return SimpleValidation(surname.buffer, 3); });

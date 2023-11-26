@@ -137,7 +137,6 @@
     <ClInclude Include="src\edit_repair.h" />
     <ClInclude Include="src\enums.h" />
     <ClInclude Include="src\imguidatechooser.h" />
-    <ClInclude Include="src\imgui_decorator.h" />
     <ClInclude Include="src\imgui_viewer.h" />
     <ClInclude Include="src\insert_customer.h" />
     <ClInclude Include="src\helpmarker.h" />
@@ -161,7 +160,6 @@
     <ClCompile Include="src\database.cpp" />
     <ClCompile Include="src\edit_repair.cpp" />
     <ClCompile Include="src\imguidatechooser.cpp" />
-    <ClCompile Include="src\imgui_decorator.cpp" />
     <ClCompile Include="src\imgui_viewer.cpp" />
     <ClCompile Include="src\insert_customer.cpp" />
     <ClCompile Include="src\helpmarker.cpp" />

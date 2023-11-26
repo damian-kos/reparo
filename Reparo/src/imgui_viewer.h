@@ -18,6 +18,9 @@ struct Customer;  // defined in "structs.h"
 
 namespace ImGui {
     IMGUI_API void ViewCustomer(const Customer& customer);
+    IMGUI_API void ViewRepair(const Repair& repair);
+
+    IMGUI_API void SeparatorDecorator(const char* label, bool decorated);
 
 
 } // namespace ImGui

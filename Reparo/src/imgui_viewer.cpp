@@ -32,5 +32,24 @@ namespace ImGui {
         ImGui::Text("Email:    "); ImGui::SameLine(); ImGui::Text(customer.email.c_str());
     }
 
+    void ViewRepair(const Repair& repair) {
+        ImGui::ViewCustomer(repair.customer);
+        ImGui::Text("Model:    "); ImGui::SameLine(); ImGui::Text(repair.device.name.c_str());
+        ImGui::Text("Category: "); ImGui::SameLine(); ImGui::Text(repair.category.c_str());
+        ImGui::Text("Color:    "); ImGui::SameLine(); ImGui::Text(repair.device.color.c_str());
+        ImGui::Text("Price:    "); ImGui::SameLine(); ImGui::Text("%.2f", repair.price);
+    }
+
+    void SeparatorDecorator(const char* label, bool decorated) {
+        if (decorated) {
+            ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+        }
+        else {
+            ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+        }
+        ImGui::SeparatorText(label);
+
+        ImGui::PopStyleColor(1);
+    }
 }
 

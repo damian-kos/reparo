@@ -17,8 +17,8 @@ void EditRepair::StateSection() {
   static int selected = 1;
     static bool retreived = false;
     static std::map<int, std::string> states;
-    imgui_decorator.SetTestValue(true);
-    imgui_decorator.DecorateSeparatorText("STATE: ");
+
+    ImGui::SeparatorDecorator("STATE: ", true);
     if (!retreived) {
         states = db.GetRepairStates();
         retreived = !states.empty();

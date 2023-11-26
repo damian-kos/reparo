@@ -6,7 +6,6 @@
 #include <map>
 
 #include "imgui.h"
-#include "imgui_decorator.h"
 #include "database.h"
 #include "modals.h"
 
@@ -28,7 +27,6 @@ protected:
     Customer customer;
     ConfirmResult result = ConfirmResult::CONIFRM_IDLE;
     Database db;
-    ImGuiDecorator imgui_decorator;
     ModalController modals;
     bool selected = false;
     Customer* temp_customer = nullptr;

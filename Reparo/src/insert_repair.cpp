@@ -50,9 +50,8 @@ void InsertRepair::PhoneFieldSection() {
     
 }
 void InsertRepair::DeviceSection() {
-    imgui_decorator.SetTestValue(DeviceFieldsValidated());
-    imgui_decorator.DecorateSeparatorText("DEVICE: ");
-  
+    ImGui::SeparatorDecorator("DEVICE: ", DeviceFieldsValidated());
+
     InsertCustomer::CreateInputField("##Model",
         "Model of device...",
         model,
@@ -82,15 +81,14 @@ void InsertRepair::DeviceSection() {
 }
 
 void InsertRepair::NotesSection() {
-    imgui_decorator.SetTestValue(true);
-    imgui_decorator.DecorateSeparatorText("NOTES: ");
+    ImGui::SeparatorDecorator("NOTES: ", true);
+
     CreateInputField("##VisibleNote", "Note for customer...", visible_note);
     CreateInputField("##HiddenNote", "Note for shop...", hidden_note);
 }
 
 void InsertRepair::PriceSection() {
-    imgui_decorator.SetTestValue((price > 0) ? true : false);
-    imgui_decorator.DecorateSeparatorText("PRICE: ");
+    ImGui::SeparatorDecorator("PRICE: ", (price > 0) ? true : false);
     ImGui::InputDouble("##input float", &price, 0.1f, 1.0f, "%.2f");
 }
 
@@ -127,8 +125,8 @@ bool InsertRepair::BufferQueryOnDatabase(const char* label, const char* buffer) 
 }
 
 void InsertRepair::InsertRepairButtonEnabler() {
-    imgui_decorator.SetTestValue(true);
-    imgui_decorator.DecorateSeparatorText("SUBMIT: ");
+    ImGui::SeparatorDecorator("SUBMIT: ", true);
+
     if (!RepairValidated()) {
         ImGui::BeginDisabled(true);
     }
