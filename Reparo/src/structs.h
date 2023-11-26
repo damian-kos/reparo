@@ -40,7 +40,6 @@ struct Attribute {
 
 struct HintInputFieldsW_Popup  {
     HintInputField input { ImGuiInputTextFlags_EnterReturnsTrue };
-    size_t prev_len;
     bool is_input_enter_pressed;
     bool is_input_active;
     bool is_input_activated;

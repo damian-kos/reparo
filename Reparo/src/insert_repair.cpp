@@ -44,34 +44,13 @@ void InsertRepair::CustomerSection() {
 
 void InsertRepair::PhoneFieldSection() {
     CustomerSelectedOnPopup();
-    InsertCustomer::CreateInputField("##PartialPhone", "Phone number...", phone, [&]() { return SimpleValidation(phone.input.buffer, 8); });
-    InsertCustomer::PopupFields("##PartialPhone", phone);
-    modals.PopupOnInputField(phone, "##PartialPhone", selected);
-    
+    ImGui::InputTextWithPopup("##PartialPhone", "Phone number...", phone, [&]() { return LenValidation(phone.input.buffer, 8); }, &selected, nullptr, nullptr);    
 }
 void InsertRepair::DeviceSection() {
     ImGui::SeparatorDecorator("DEVICE: ", DeviceFieldsValidated());
-
-    InsertCustomer::CreateInputField("##Model",
-        "Model of device...",
-        model,
-        [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); });
-    InsertCustomer::PopupFields("##Model", model);
-    modals.PopupOnInputField(model, "model");
-
-    InsertCustomer::CreateInputField("##Category",
-        "Category...",
-        category,
-        [&]() { return BufferQueryOnDatabase("##Category", category.input.buffer); });
-    InsertCustomer::PopupFields("##Category", category);
-    modals.PopupOnInputField(category, "category");
-
-    InsertCustomer::CreateInputField("##Color",
-        "Color...",
-        color,
-        [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); });
-    PopupFields("##Color", color, model);
-    modals.PopupOnInputField(color, "color");
+    ImGui::InputTextWithPopup("##Model", "Model of device...", model, [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); }, nullptr, nullptr, nullptr);
+    ImGui::InputTextWithPopup("##Category", "Category...", category, [&]() { return BufferQueryOnDatabase("##Category", category.input.buffer); }, nullptr, nullptr, nullptr);
+    ImGui::InputTextWithPopup("##Color", "Color...", color, [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); }, nullptr, &model, nullptr);
     
     //Debugging
     ImGui::Text(model.input.validated ? "true" : "false");
@@ -82,9 +61,8 @@ void InsertRepair::DeviceSection() {
 
 void InsertRepair::NotesSection() {
     ImGui::SeparatorDecorator("NOTES: ", true);
-
-    CreateInputField("##VisibleNote", "Note for customer...", visible_note);
-    CreateInputField("##HiddenNote", "Note for shop...", hidden_note);
+    ImGui::InputTextWithHintExt("##VisibleN", "Note..", visible_note, nullptr, nullptr);
+    ImGui::InputTextWithHintExt("##HiddenNote", "Note for shop...", hidden_note, nullptr, nullptr);
 }
 
 void InsertRepair::PriceSection() {
@@ -96,10 +74,6 @@ void InsertRepair::StateSection() {
 
 }
 
-void InsertRepair::CreateInputField(const char* label, const char* hint, HintInputField& field) {
-    if (field.is_on) 
-        ImGui::InputTextWithHint(label, hint, field.buffer, 128, field.imgui_flags);
-}
 
 bool InsertRepair::DeviceFieldsValidated() {
     return (model.input.validated && category.input.validated && color.input.validated);
@@ -107,17 +81,6 @@ bool InsertRepair::DeviceFieldsValidated() {
 
 bool InsertRepair::RepairValidated() {
     return (DeviceFieldsValidated() && FieldsValidated() && price > 0);
-}
-
-void InsertRepair::PopupFields(const char* label, HintInputFieldsW_Popup& field, HintInputFieldsW_Popup& rel_field) {
-    if (rel_field.input.validated && !field.attribute.retreived) {
-        int id = db.GetIDForValue(label, rel_field.input.buffer);
-        db.ManageSearchState(label, field.attribute, field.input.buffer, id);
-        field.attribute.retreived = true;
-    }
-    if (!rel_field.input.validated && field.attribute.retreived) {
-        field.attribute.retreived = false;
-    }
 }
 
 bool InsertRepair::BufferQueryOnDatabase(const char* label, const char* buffer) {

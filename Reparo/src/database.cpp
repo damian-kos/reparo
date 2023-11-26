@@ -1,6 +1,8 @@
 #include "database.h"
 #include <sstream>
-Database::Database() {}
+Database::Database() {
+    printf("Database created\n");
+}
 
 Database::~Database() {
     std::cout << "Database destroyed" << std::endl;
@@ -13,6 +15,17 @@ void Database::OpenDB() {
         std::cout << "DATABASE CAN'T BE OPEN" << std::endl;
     }
     std::cout << "DB IS OPEN" << std::endl;
+}
+
+sqlite3* Database::PtrDB() {
+    sqlite3* db_ptr = nullptr;
+    int rc = sqlite3_open("parts_stock.db", &db_ptr);
+    if (rc != SQLITE_OK) {
+        std::cout << "DATABASE CAN'T BE OPEN" << std::endl;
+        return db_ptr;
+    }
+    std::cout << "DB IS OPEN" << std::endl;
+    return db_ptr;
 }
 
 int Database::QueryCustomerIDByPhone(std::string phone) {
@@ -107,7 +120,10 @@ void Database::InsertCustomer(Customer& customer, int* lastRowId) {
 void Database::ManageSearchState(const char* label, Attribute& attribute, const char* buffer) {
     std::cout << "ManageSearchState is running  w/ buffer: " << buffer << std::endl;
     
-    OpenDB();
+    sqlite3* db_ptr = PtrDB();
+    if (db_ptr == nullptr)
+        return;
+    //OpenDB();
     static std::map<const char*, const char*> queries = {
     {"##Model", "SELECT model FROM models WHERE model LIKE ?"},
     {"##Category", "SELECT category FROM categories WHERE category LIKE ?"},
@@ -116,7 +132,7 @@ void Database::ManageSearchState(const char* label, Attribute& attribute, const 
 
     };
     sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, queries[label], -1, &stmt, NULL) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db_ptr, queries[label], -1, &stmt, NULL) == SQLITE_OK) {
         std::string buffer_str = buffer;
         std::string like_query = (label != "##Phone") ? "%" + buffer_str + "%" : buffer_str;
         sqlite3_bind_text(stmt, 1, like_query.c_str(), -1, SQLITE_STATIC);
@@ -150,22 +166,21 @@ void Database::ManageSearchState(const char* label, Attribute& attribute, const 
         }
     }
     else {
-        std::cerr << "Error preparing SQL statement ManageSearchState (3 param): " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Error preparing SQL statement ManageSearchState (3 param): " << sqlite3_errmsg(db_ptr) << std::endl;
     }
     sqlite3_finalize(stmt);
-    sqlite3_close(db);
+    sqlite3_close(db_ptr);
 
 }
 
-void Database::ManageSearchState(const char* label, Attribute& attribute, const char* buffer, int rel_id) {
-    std::cout << "ManageSearchState 2 is running  " << std::endl;
-
-    OpenDB();
+void Database::ManageSearchState(const char* label, Attribute& attribute, int rel_id, const char* buffer) {
+    std::cout << "ManageSearchState 2 is running  STATIC  with ID: " << rel_id << std::endl;
+    sqlite3* db_ptr = PtrDB(); 
     static std::map<const char*, const char*> queries = {
-    {"##Color", "SELECT color FROM colors WHERE color_id IN (SELECT color_id FROM model_color WHERE model_id = ?)"},
+    {"##Color", "SELECT color FROM colors WHERE color_id IN (SELECT color_id FROM model_color WHERE model_id = ?)"}, 
     };
     sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, queries[label], -1, &stmt, NULL) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db_ptr, queries[label], -1, &stmt, NULL) == SQLITE_OK) {
         sqlite3_bind_int(stmt, 1, rel_id);
         attribute.data.clear();
         while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -173,16 +188,16 @@ void Database::ManageSearchState(const char* label, Attribute& attribute, const 
         }
     }
     else {
-        std::cerr << "Error preparing SQL statement ManageSearchState (4 param): " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Error preparing SQL statement ManageSearchState (4 param): " << sqlite3_errmsg(db_ptr) << std::endl;
     }
     sqlite3_finalize(stmt);
-    sqlite3_close(db);
+    sqlite3_close(db_ptr);
 }
 
-int Database::GetIDForValue(const char* label, const char* value) {
-    std::cout << "GetIDForValue is running  " << std::endl;
+int Database::GetIDForValueS(const char* label, const char* value) {
+    std::cout << "GetIDForValue is running S with value:|" << value << "|" << std::endl;
 
-    OpenDB();
+    sqlite3* db_ptr = PtrDB();
     static std::map<const char*, const char*> queries = {
     {"##Customer", "SELECT customer_id FROM customers WHERE LOWER(phone) = LOWER(?)"},
     {"##Model", "SELECT model_id FROM models WHERE LOWER(model) = LOWER(?)"},
@@ -194,7 +209,7 @@ int Database::GetIDForValue(const char* label, const char* value) {
     int id = -1;
     sqlite3_stmt* stmt;
 
-    if (sqlite3_prepare_v2(db, queries[label], -1, &stmt, NULL) == SQLITE_OK) {
+    if (sqlite3_prepare_v2(db_ptr, queries[label], -1, &stmt, NULL) == SQLITE_OK) {
         sqlite3_bind_text(stmt, 1, value, -1, SQLITE_STATIC);
         if (sqlite3_step(stmt) == SQLITE_ROW) {
             id = sqlite3_column_int(stmt, 0);
@@ -204,12 +219,12 @@ int Database::GetIDForValue(const char* label, const char* value) {
         }
     }
     else {
-        std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db) << std::endl;
+        std::cerr << "Error preparing SQL statement: GetIDForValueS   " << sqlite3_errmsg(db_ptr) << std::endl;
         id = -1; // error
     }
 
     sqlite3_finalize(stmt);
-    sqlite3_close(db);
+    sqlite3_close(db_ptr);
 
     return id;
 }
@@ -249,10 +264,10 @@ bool Database::GetBoolForValue(const char* label, const char* buffer) {
 
 void Database::InsertRepair(Repair repair) {
     std::cout << "InsertRepair is running  " << std::endl;
-    static int customer_id = GetIDForValue("##Customer", repair.customer.phone.c_str());
-    static int model_id = GetIDForValue("##Model", repair.device.name.c_str());
-    static int category_id = GetIDForValue("##Category", repair.category.c_str());
-    static int color_id = GetIDForValue("##Color2", repair.device.color.c_str());
+    static int customer_id = GetIDForValueS("##Customer", repair.customer.phone.c_str());
+    static int model_id = GetIDForValueS("##Model", repair.device.name.c_str());
+    static int category_id = GetIDForValueS("##Category", repair.category.c_str());
+    static int color_id = GetIDForValueS("##Color2", repair.device.color.c_str());
     OpenDB();
     sqlite3_stmt* stmt; 
     const char* query = "INSERT INTO repairs"
@@ -384,9 +399,9 @@ void Database::UpdateCustomer(Customer& customer, int id) {
 
 void Database::UpdateRepair(Repair& repair, int id) {
     std::cout << "UpdateRepair is running" << std::endl;
-    static int model_id = GetIDForValue("##Model", repair.device.name.c_str());
-    static int category_id = GetIDForValue("##Category", repair.category.c_str());
-    static int color_id = GetIDForValue("##Color2", repair.device.color.c_str());
+    static int model_id = GetIDForValueS("##Model", repair.device.name.c_str());
+    static int category_id = GetIDForValueS("##Category", repair.category.c_str());
+    static int color_id = GetIDForValueS("##Color2", repair.device.color.c_str());
     OpenDB();
     sqlite3_stmt* stmt;
     const char* query = "UPDATE repairs SET model_id = ?, category_id = ?, color_id = ?, repair_desc = ?, repair_desc_hidden = ?, price = ?, repair_state_id = ? WHERE repair_id = ?";
@@ -400,7 +415,7 @@ void Database::UpdateRepair(Repair& repair, int id) {
         sqlite3_bind_text(stmt, 5, repair.hidden_note.c_str(), -1, SQLITE_STATIC);
         sqlite3_bind_double(stmt, 6, repair.price);
         std::cout << "Repair State: |" << repair.state << "|" << std::endl;
-        int state_id = GetIDForValue("##State", repair.state.c_str());
+        int state_id = GetIDForValueS("##State", repair.state.c_str());
         sqlite3_bind_int(stmt, 7, state_id);
         sqlite3_bind_int(stmt, 8, id);
         if (sqlite3_step(stmt) != SQLITE_DONE) {

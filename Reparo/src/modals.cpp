@@ -69,45 +69,13 @@ std::string SeperateData(const char* data, const char* label) {
     }
 }
 
-void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const char* label) {
-
-    field.is_input_active = ImGui::IsItemActive();
-    field.is_input_activated = ImGui::IsItemActivated();
-
-    if (field.is_input_activated) {
-        ImGui::OpenPopup(label);
-        std::cout << &field << label << std::endl;
-    }
-
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
-    if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
-    {
-        //const char** autocomplete = vectorToCharArray(field.attribute.data);
-        for (int i = 0; i < field.attribute.data.size(); i++)
-        {
-            if (ImGui::Selectable(field.attribute.data[i].c_str()))
-            {
-                strcpy(field.input.buffer, SeperateData(field.attribute.data[i].c_str(), label).c_str());
-                field.input.validated = true;
-                field.attribute.name = field.attribute.data[i];
-            }
-        }
-        if ( /*field.is_input_enter_pressed ||*/ (!field.is_input_active && !ImGui::IsWindowFocused())) {
-            ImGui::CloseCurrentPopup();
-            std::cout << "CloseCurrentPopup" << std::endl;
-
-        }
-        ImGui::EndPopup();
-        std::cout << "EndPopup" << std::endl;
-    }
-}
-
-void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const char* label, bool& selected) {
+void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, bool* selected, const char* label) {
     std::unordered_map<const char*, bool> prefix_text_on_popup = {
     {"##Phone", true},
     {"##PartialPhone", false},
-
+    {nullptr, false},
     };
+
     field.is_input_active = ImGui::IsItemActive();
     field.is_input_activated = ImGui::IsItemActivated();
 
@@ -119,9 +87,8 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
     ImGui::SetNextWindowPos(ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y));
     if (ImGui::BeginPopup(label, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_ChildWindow))
     {
-        if(!field.attribute.data.empty() && prefix_text_on_popup[label])
+        if (!field.attribute.data.empty() && prefix_text_on_popup[label])
             ImGui::Text("Customer already exists");
-        /*const char** autocomplete = vectorToCharArray(field.attribute.data);*/
         for (int i = 0; i < field.attribute.data.size(); i++)
         {
             if (ImGui::Selectable(field.attribute.data[i].c_str()))
@@ -129,7 +96,10 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
                 strcpy(field.input.buffer, SeperateData(field.attribute.data[i].c_str(), label).c_str());
                 field.input.validated = true;
                 field.attribute.name = field.attribute.data[i];
-                selected = true;
+                if (selected) {
+                    printf("PopupOnInputField run\n");
+                    *selected = true;
+                }
             }
         }
         if ( /*field.is_input_enter_pressed ||*/ (!field.is_input_active && !ImGui::IsWindowFocused())) {
@@ -137,4 +107,5 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field, const cha
         }
         ImGui::EndPopup();
     }
+
 }

@@ -18,9 +18,11 @@ public:
     int QueryCustomerIDByPhone(std::string phone);
     Customer* QueryCustomerByPhone(std::string phone);
     void InsertCustomer(Customer& customer, int* last_row_id);
-    void ManageSearchState(const char* label, Attribute& attribute, const char* buffer);
-    void ManageSearchState(const char* label, Attribute& attribute, const char* buffer, int rel_id);
-    int GetIDForValue(const char* label, const char* value);
+    
+    static void ManageSearchState(const char* label, Attribute& attribute, const char* buffer);
+    static void ManageSearchState(const char* label, Attribute& attribute, int rel_id, const char* buffer);
+    static int GetIDForValueS(const char* value, const char* label);
+
     bool GetBoolForValue(const char* label, const char* buffer);
     void InsertRepair(Repair repair);
     std::map<int, Repair> RetreiveRepairsOfState(int state);
@@ -28,6 +30,7 @@ public:
     void UpdateCustomer(Customer& customer, int id);
     void UpdateRepair(Repair& repair, int id);
     int GetIDForID(int id, std::string table);
+    static sqlite3* PtrDB();
 
 private:
     sqlite3* db = nullptr;

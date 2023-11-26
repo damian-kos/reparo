@@ -36,10 +36,8 @@ protected:
     virtual void StateSection();
     void InsertRepairButtonEnabler();
     virtual void InsertRepairButton();
-    void CreateInputField(const char* label, const char* hint, HintInputField& field);
     bool DeviceFieldsValidated();
     bool RepairValidated();
-    void PopupFields(const char* label, HintInputFieldsW_Popup& field, HintInputFieldsW_Popup& rel_field);
     bool BufferQueryOnDatabase(const char* label, const char* buffer);
     virtual Repair InitRepair();
     virtual void InitModal() override;

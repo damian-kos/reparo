@@ -8,13 +8,13 @@ InsertCustomer::InsertCustomer(Customer& cust) :  customer(cust){
     CopyToBuffer(phone.input.buffer, 
         customer.phone.c_str(), 
         phone.input.validated, 
-        [&]() { return SimpleValidation(phone.input.buffer, 8); });
+        [&]() { return LenValidation(phone.input.buffer, 8); });
     CopyToBuffer(name.buffer, 
         customer.name.c_str(), 
-        name.validated, [&]() { return SimpleValidation(name.buffer, 3); });
+        name.validated, [&]() { return LenValidation(name.buffer, 3); });
     CopyToBuffer(surname.buffer, 
         customer.surname.c_str(), 
-        surname.validated, [&]() { return SimpleValidation(surname.buffer, 3); });
+        surname.validated, [&]() { return LenValidation(surname.buffer, 3); });
     CopyToBuffer(email.buffer,
         customer.email.c_str(),
         email.validated, [&]() { return IsEmailValid(email.buffer); });
@@ -27,15 +27,22 @@ InsertCustomer::~InsertCustomer() {
 void InsertCustomer::Render() {
     FieldsSection();
     ImGui::Text(validation_feedback.c_str());
+    UpdateValidationMsg();
     SubmitButton();
 }
 
 void InsertCustomer::FieldsSection() {
     ImGui::SeparatorDecorator("CUSTOMER: ", FieldsValidated());
     PhoneFieldSection();
-    CreateInputField("##Name", "Name...", name, [&]() { return SimpleValidation(name.buffer, 3); });
-    CreateInputField("##Surname", "Surname...", surname, [&]() { return SimpleValidation(surname.buffer, 3); });
-    CreateInputField("##Email", "Email...", email, [&]() {return IsEmailValid(email.buffer); });
+    ImGui::InputTextWithHintExt("##Name", "Name...", name, 
+                                [&]() { return LenValidation(name.buffer, 3); },
+                                &feedback); 
+    ImGui::InputTextWithHintExt("##Surname", "Surname...", surname, 
+                                [&]() { return LenValidation(surname.buffer, 3); },
+                                &feedback);
+    ImGui::InputTextWithHintExt("##Email", "Email...", email, 
+                                [&]() {return IsEmailValid(email.buffer); }, 
+                                &feedback);
 
     //Debugging
     ImGui::Text(phone.input.validated ? "true" : "false");
@@ -46,56 +53,27 @@ void InsertCustomer::FieldsSection() {
 }
 void InsertCustomer::PhoneFieldSection() {
     CustomerSelectedOnPopup();
-    CreateInputField("##Phone", "Phone number...", phone, [&]() { return SimpleValidation(phone.input.buffer, 8); });
-    PopupFields("##Phone", phone);
-    modals.PopupOnInputField(phone, "##Phone", selected);
+    ImGui::InputTextWithPopup("##Phone", "Phone number...", phone,
+                              [&]() { return LenValidation(phone.input.buffer, 8); },
+                              &selected, nullptr, &feedback);
 }
-
-
-void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function) {
-    if (field.is_on) {
-        ImGui::InputTextWithHint(label, hint, field.buffer, 128, field.imgui_flags);
-        if (ImGui::IsItemActive()) {
-            field.validated = validation_function();
-        }
-        if (ImGui::IsItemDeactivated()) {
-            UpdateValidationMsg();
-        }
-    }
-}
-
 void InsertCustomer::CustomerSelectedOnPopup() {
     if (phone.input.validated) {
         if (selected) {
             temp_customer = db.QueryCustomerByPhone(phone.input.buffer);
             if (temp_customer != nullptr) {
-                CopyToBuffer(name.buffer, temp_customer->name.c_str(), name.validated, [&]() { return SimpleValidation(name.buffer, 3); });
-                CopyToBuffer(surname.buffer, temp_customer->surname.c_str(), surname.validated, [&]() { return SimpleValidation(surname.buffer, 3); });
-                CopyToBuffer(email.buffer, temp_customer->email.c_str(), email.validated, [&]() { return IsEmailValid(email.buffer); });
+                CopyToBuffer(name.buffer, temp_customer->name.c_str(), 
+                             name.validated, 
+                             [&]() { return LenValidation(name.buffer, 3); });
+                CopyToBuffer(surname.buffer, 
+                             temp_customer->surname.c_str(), surname.validated, 
+                             [&]() { return LenValidation(surname.buffer, 3); });
+                CopyToBuffer(email.buffer, temp_customer->email.c_str(), 
+                             email.validated, 
+                             [&]() { return IsEmailValid(email.buffer); });
             }
             selected = false;
-
         }
-    }
-}
-
-void InsertCustomer::CreateInputField(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function) {
-    if (field.input.is_on) {
-        ImGui::InputTextWithHint(label, hint, field.input.buffer, 128, field.input.imgui_flags);
-        field.is_input_activated = ImGui::IsItemActivated();
-        if (ImGui::IsItemEdited()) {
-            field.input.validated = validation_function();
-        }
-        
-        if (ImGui::IsItemDeactivated()) {
-
-        }
-    }
-}
-
-void InsertCustomer::PopupFields(const char* label, HintInputFieldsW_Popup& field) {
-    if (ImGui::IsItemEdited() || ImGui::IsItemActivated()) {
-        db.ManageSearchState(label, field.attribute, field.input.buffer);
     }
 }
 
@@ -120,7 +98,7 @@ bool InsertCustomer::IsEmailValid(std::string buffer) {
     return (atPos != std::string::npos && dotPos != std::string::npos);
 }
 
-bool InsertCustomer::SimpleValidation(const char* buffer, int length) {
+bool InsertCustomer::LenValidation(const char* buffer, int length) {
     return (strlen(buffer) >= length);
 }
 
@@ -148,12 +126,15 @@ void InsertCustomer::UpdateValidationMsg() {
     {2, "Wrong surname!"},
     {3, "Wrong email!"},
     };
-    int error_code = SetValidaitonErr();
-    if (error_code != -1) {
-        validation_feedback = validation_error_messages[error_code];
-    }
-    else {
-        validation_feedback = "";
+    if (feedback) {
+        int error_code = SetValidaitonErr();
+        if (error_code != -1) {
+            validation_feedback = validation_error_messages[error_code];
+        }
+        else {
+            validation_feedback = "";
+        }
+        feedback = false;
     }
 }
 

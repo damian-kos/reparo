@@ -9,8 +9,8 @@ public:
     void RenderModal(const char* modal_title);
     void SubmitConfirm(const char* modal_title, Customer& customer, ConfirmResult&);
     void SubmitConfirm(const char* modal_title, Repair& repair, ConfirmResult& result);
-    void PopupOnInputField(HintInputFieldsW_Popup& field, const char* label);
-    void PopupOnInputField(HintInputFieldsW_Popup& field, const char* label, bool& selected);
+    static void PopupOnInputField(HintInputFieldsW_Popup& field, bool* selected, const char* label);
+
 private:
     void CenterAlign();
 
