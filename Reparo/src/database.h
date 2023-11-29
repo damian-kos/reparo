@@ -23,7 +23,7 @@ public:
     static int GetIDForValueS(const char* value, const char* label);
     static bool GetBoolForValue(const char* label, const char* buffer);
     static void InsertRepair(Repair repair);
-    static std::unordered_map<int, Repair> RetreiveRepairsOfState(int state);
+    static std::map<int, Repair> RetreiveRepairsOfState(int state, int order=0, int column = 0);
     static std::unordered_map<int, std::string> GetRepairStates();
     static void UpdateCustomer(Customer& customer, int id);
     static void UpdateRepair(Repair& repair, int id);

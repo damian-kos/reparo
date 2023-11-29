@@ -40,18 +40,21 @@ void EditRepair::StateSection() {
 }
 
 void EditRepair::InsertRepairButton() {
-    // Debugging
-    static std::string editing = "Currently editing: " + std::to_string(repair_id);
-    ImGui::Text(editing.c_str());
-    // End of debugging
+  //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
+  //static std::string editing = "Currently editing: " + std::to_string(repair_id);
+  //ImGui::Text(editing.c_str());
+  //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     if (ImGui::Button("Update Repair")) {
-        //repair = InitRepair();
-        InitModal();
+      if (CustomerModified()) 
+        t_customer = std::make_shared<Customer>(InitCustomer());
+      if (RepairModified())
+        t_repair = std::make_shared<Repair>(InitRepair());
+      InitModal();
     }
 }
 
 void EditRepair::RunModal(Repair& repair){
-  ModalController::SubmitConfirm(modal_message, repair, result);
+  ModalController::SubmitConfirm(modal_message, repair, t_repair, t_customer, result);
   if (result == ConfirmResult::CONIFRM_SUBMIT) {
     if (CustomerModified()) {
       Customer temp_customer = InsertCustomer::InitCustomer();
@@ -68,7 +71,7 @@ void EditRepair::RunModal(Repair& repair){
     }
     if (RepairModified()) {
       Repair temp_repair = InitRepair();
-      Database::UpdateRepair(temp_repair, repair_id);
+      Database::UpdateRepair(temp_repair, repair_id); // this can be changed to pointer, since we already have t_repair & t_customer
     }
     //ResetFields();
     result = ConfirmResult::CONIFRM_IDLE;
@@ -79,14 +82,6 @@ Repair EditRepair::InitRepair() {
   Device device(model.input.buffer, color.input.buffer);
   Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer, selected_state, str_date);
   return init_repair;
-}
-
-void EditRepair::TestButton() {
-    std::string modified = RepairModified() ? "true" : "false";
-    std::string modified_c = CustomerModified() ? "true" : "Cust false";
-
-    ImGui::Text("Repair modified: %s", modified.c_str());
-    ImGui::Text("Customer modified: %s", modified_c.c_str());
 }
 
 bool EditRepair::CustomerModified() {
@@ -108,3 +103,12 @@ bool EditRepair::RepairModified() {
         repair.state == selected_state
         );
 }
+
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
+void EditRepair::TestButton() {
+//    std::string modified = RepairModified() ? "true" : "false";
+//    std::string modified_c = CustomerModified() ? "true" : "Cust false";
+//    ImGui::Text("Repair modified: %s", modified.c_str());
+//    ImGui::Text("Customer modified: %s", modified_c.c_str());
+}
+//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 

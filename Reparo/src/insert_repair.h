@@ -5,7 +5,6 @@
 #include "insert_customer.h"
 #include "imguidatechooser.h"
 
-
 class InsertRepair : public InsertCustomer {
 public:
     InsertRepair();
@@ -15,13 +14,13 @@ public:
     void Render() override;
 
 protected:
+    HintInputFieldsW_Popup model;
+    HintInputFieldsW_Popup category;
+    HintInputFieldsW_Popup color;
     Repair repair;
     const char* modal_message = "";
     double price = 0;
     bool device_validated = false;
-    HintInputFieldsW_Popup model;
-    HintInputFieldsW_Popup category;
-    HintInputFieldsW_Popup color;
     HintInputField visible_note;
     HintInputField hidden_note;
     tm date = {};

@@ -48,5 +48,6 @@ protected:
     virtual void InitModal();
     void RunModal(Customer& customer);
     virtual void ResetFields();
-    void CopyToBuffer(char* buffer, std::string, bool& field_validation, std::function<bool()> validation_function);
+    void CopyToBuffer(char* buffer, std::string, bool& field_validation, 
+                      std::function<bool()> validation_function);
 };

@@ -44,12 +44,13 @@ void InsertCustomer::FieldsSection() {
                               [&]() {return IsEmailValid(email.buffer); }, 
                               &feedback);
 
-  //Debugging
-  ImGui::Text(phone.input.validated ? "true" : "false");
-  ImGui::SameLine(); ImGui::Text(name.validated ? "true" : "false");
-  ImGui::SameLine(); ImGui::Text(surname.validated ? "true" : "false");
-  ImGui::SameLine(); ImGui::Text(email.validated ? "true" : "false");
-  //
+  //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
+  //ImGui::Text(phone.input.validated ? "true" : "false");
+  //ImGui::SameLine(); ImGui::Text(name.validated ? "true" : "false");
+  //ImGui::SameLine(); ImGui::Text(surname.validated ? "true" : "false");
+  //ImGui::SameLine(); ImGui::Text(email.validated ? "true" : "false");
+  //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 }
 void InsertCustomer::PhoneFieldSection() {
   CustomerSelectedOnPopup();
@@ -57,6 +58,7 @@ void InsertCustomer::PhoneFieldSection() {
                             [&]() { return LenValidation(phone.input.buffer, 8); },
                             &selected, nullptr, &feedback);
 }
+
 void InsertCustomer::CustomerSelectedOnPopup() {
   if (phone.input.validated) {
     if (selected) {
@@ -80,14 +82,14 @@ void InsertCustomer::CustomerSelectedOnPopup() {
 void InsertCustomer::SubmitButton() {
   //static Customer customer;
   if (!FieldsValidated()) {
-      ImGui::BeginDisabled(true);
+    ImGui::BeginDisabled(true);
   }
   if (ImGui::Button("Submit Customer Details")) {
-      customer = InitCustomer();
-      InitModal();        
+    customer = InitCustomer();
+    InitModal();        
   }
   if (!FieldsValidated()) {
-      ImGui::EndDisabled();
+    ImGui::EndDisabled();
   }
   RunModal(customer);
 }
@@ -99,7 +101,7 @@ bool InsertCustomer::IsEmailValid(std::string buffer) {
 }
 
 bool InsertCustomer::LenValidation(const char* buffer, int length) {
-   return (strlen(buffer) >= length);
+  return (strlen(buffer) >= length);
 }
 
 bool InsertCustomer::FieldsValidated() {

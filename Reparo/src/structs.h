@@ -70,6 +70,9 @@ struct Repair {
 
     Repair(const Customer& cust, const Device& dev, std::string cat, double price, std::string visible_note, std::string hidden_note, std::string state, std::string date)
         : customer(cust), device(dev), category(cat), price(price), visible_note(visible_note), hidden_note(hidden_note), state(state), date(date) {}
+   
+    ~Repair() { /*std::cout << "Repair destroyed " << std::endl;*/ }
+
     Customer customer;
     Device device;
     std::string category;

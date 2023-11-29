@@ -31,11 +31,18 @@ void RepairsView::Render() {
     RepairsToTable(repairs);
     ImGui::EndTabBar();
   }
+  if (ImGui::Button("Test Map")) {
+    std::cout << "++++++++++++++++++++++++++++++++++++" << std::endl;
+
+    for (auto& pair : repairs) {
+      std::cout << "ID: " << pair.first << std::endl;
+    }
+  }
 
 }
 
-void RepairsView::RepairsToTable(const std::unordered_map<int, Repair>& retreived_repairs) {
-    static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs) {
+    static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable;
     static int selected = -1;
     if (ImGui::BeginTable("##states", 11, flags)) {
         ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
@@ -52,6 +59,19 @@ void RepairsView::RepairsToTable(const std::unordered_map<int, Repair>& retreive
 
 
         ImGui::TableHeadersRow();
+
+        if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs())
+          if (sort_specs->SpecsDirty)
+          {
+            printf("Sorted\n");
+            repairs.clear();
+            std::cout << sort_specs->Specs->SortDirection << std::endl;
+            std::cout << sort_specs->Specs->ColumnIndex << std::endl;
+
+            repairs = Database::RetreiveRepairsOfState(1, sort_specs->Specs->SortDirection, sort_specs->Specs->ColumnIndex);
+
+            sort_specs->SpecsDirty = false;
+          }
         for (auto& pair : retreived_repairs) {
             const bool is_selected = (selected == pair.first);
             ImGui::TableNextRow();

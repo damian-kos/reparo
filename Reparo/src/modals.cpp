@@ -24,7 +24,8 @@ void ModalController::SubmitConfirm(const char* modal_title, Customer& customer,
   {
     ImGui::Text("Do you want to insert customer with this details?");
     ImGui::Separator();
-    ImGui::ViewCustomer(customer);
+
+    ImGui::ViewCustomer(customer, nullptr);
     if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
     ImGui::SetItemDefaultFocus();
     ImGui::SameLine();
@@ -37,10 +38,9 @@ void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, Con
   CenterAlign();
   if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
   {
-     ImGui::Text("Do you want to insert repair with this details?");
+    ImGui::Text("Do you want to insert repair with this details?");
     ImGui::Separator();
-    ImGui::ViewCustomer(repair.customer);
-    ImGui::ViewRepair(repair);
+    ImGui::ViewRepair(repair, nullptr, nullptr);
 
     if (ImGui::Button("OK", ImVec2(120, 0))) 
       { ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT; }
@@ -48,6 +48,31 @@ void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, Con
     ImGui::SameLine();
     if (ImGui::Button("Cancel", ImVec2(120, 0))) 
       { ImGui::CloseCurrentPopup(); result = ConfirmResult::CONFIRM_CANCEL; }
+    ImGui::EndPopup();
+  }
+}
+
+void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, 
+                                    std::shared_ptr<Repair> temp_repair, 
+                                    std::shared_ptr<Customer> temp_customer, 
+                                    ConfirmResult& result) {
+  CenterAlign();
+  if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Text("Do you want to update repair with this details?");
+    ImGui::Separator();
+    ImGui::ViewRepair(repair, temp_repair, temp_customer);
+
+    if (ImGui::Button("OK", ImVec2(120, 0)))
+    {
+      ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT;
+    }
+    ImGui::SetItemDefaultFocus();
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0)))
+    {
+      ImGui::CloseCurrentPopup(); result = ConfirmResult::CONFIRM_CANCEL;
+    }
     ImGui::EndPopup();
   }
 }

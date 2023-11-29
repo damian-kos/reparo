@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <cmath>
 
 #ifndef IMGUIVIEWER_H_
 #define IMGUIVIEWER_H_
@@ -20,8 +21,10 @@ ImGui::TestDateChooser();
 struct Customer;  // defined in "structs.h"
 
 namespace ImGui {
-    IMGUI_API void ViewCustomer(const Customer& customer);
-    IMGUI_API void ViewRepair(const Repair& repair);
+    IMGUI_API void ViewCustomer(const Customer& customer, std::shared_ptr<Customer> t_customer);
+    IMGUI_API void ViewRepair(const Repair& repair, 
+                              std::shared_ptr<Repair> t_repair, 
+                              std::shared_ptr<Customer> t_customer);
 
     IMGUI_API void SeparatorDecorator(const char* label, bool decorated);
     IMGUI_API void InputTextWithHintExt(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function, bool* feedback);

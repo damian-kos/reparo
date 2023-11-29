@@ -294,22 +294,34 @@ void Database::InsertRepair(Repair repair) {
     sqlite3_close(db_ptr);
 }
 
-std::unordered_map<int, Repair> Database::RetreiveRepairsOfState(int state) {
+std::map<int, Repair> Database::RetreiveRepairsOfState(int state, int order, int column) {
     std::cout << "RetreiveRepairsOfState is running " << std::endl;
+    std::cout << "Order " << order << std::endl;
     sqlite3* db_ptr = PtrDB();
-    std::unordered_map<int, Repair> repairs;
+    std::unordered_map<int, std::string> sort_order = {
+      {0, "DESC"},
+      {1, "DESC"},
+      {2, "ASC"},
+    };
+    std::unordered_map<int, std::string> order_by = {
+      {0, "repair_id"},
+      {10, "r.date"}
+    };
+    std::map<int, Repair> repairs;
     sqlite3_stmt* stmt;
-    const char* query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date FROM repairs r "
+    std::string query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date FROM repairs r "
         "LEFT JOIN categories c ON r.category_id = c.category_id "
         "LEFT JOIN models m ON r.model_id = m.model_id "
         "LEFT JOIN colors co ON r.color_id = co.color_id "
         "LEFT JOIN repair_states rs ON r.repair_state_id = rs.repair_state_id "
         "LEFT JOIN customers cu ON r.customer_id = cu.customer_id "
-        "WHERE r.repair_state_id = ? ORDER BY r.date DESC";
-    if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
+        "WHERE r.repair_state_id = ? ORDER BY  " + order_by[column] + " " + sort_order[order];
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
         sqlite3_bind_int(stmt, 1, state);
+        std::cout << "++++++++++++++++++++++++++++++++++++" << std::endl;
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             int repair_id = sqlite3_column_int(stmt, 0);
+            std::cout << repair_id << std::endl;
             int customer_id = sqlite3_column_int(stmt, 1);
             int repair_model_id = sqlite3_column_int(stmt, 2);
             int repair_category_id = sqlite3_column_int(stmt, 3);
@@ -335,8 +347,8 @@ std::unordered_map<int, Repair> Database::RetreiveRepairsOfState(int state) {
             Customer customer(customer_phone, customer_name, customer_surname, customer_email);
 
             Repair repair(customer, device, category, price, visible_note, hidden_note, state, date_str);
-         
-            repairs.insert(std::make_pair(repair_id, repair));;
+            repairs.emplace(repair_id, repair);
+            //repairs.insert(std::make_pair(repair_id, repair));;
         }
     }
    

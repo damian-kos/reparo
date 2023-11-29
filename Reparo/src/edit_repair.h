@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <memory>
 #include "insert_repair.h"
 
 class EditRepair : public InsertRepair {
@@ -16,6 +17,9 @@ public:
     bool CustomerModified();
     bool RepairModified();
     static bool* show_repair;
+    std::shared_ptr<Customer> t_customer = nullptr;
+    std::shared_ptr<Repair> t_repair = nullptr;
+
     std::string selected_state;
 private:
     int repair_id;
