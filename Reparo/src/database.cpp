@@ -294,7 +294,7 @@ void Database::InsertRepair(Repair repair) {
     sqlite3_close(db_ptr);
 }
 
-std::map<int, Repair> Database::RetreiveRepairsOfState(int state, int order, int column) {
+RepairsSort Database::RetreiveRepairsOfState(int state, int order, int column) {
     std::cout << "RetreiveRepairsOfState is running " << std::endl;
     std::cout << "Order " << order << std::endl;
     sqlite3* db_ptr = PtrDB();
@@ -307,7 +307,7 @@ std::map<int, Repair> Database::RetreiveRepairsOfState(int state, int order, int
       {0, "repair_id"},
       {10, "r.date"}
     };
-    std::map<int, Repair> repairs;
+    RepairsSort retreived;
     sqlite3_stmt* stmt;
     std::string query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date FROM repairs r "
         "LEFT JOIN categories c ON r.category_id = c.category_id "
@@ -347,7 +347,8 @@ std::map<int, Repair> Database::RetreiveRepairsOfState(int state, int order, int
             Customer customer(customer_phone, customer_name, customer_surname, customer_email);
 
             Repair repair(customer, device, category, price, visible_note, hidden_note, state, date_str);
-            repairs.emplace(repair_id, repair);
+            retreived.repairs.emplace(repair_id, repair);
+            retreived.repairs_order.emplace_back(repair_id);
             //repairs.insert(std::make_pair(repair_id, repair));;
         }
     }
@@ -357,7 +358,7 @@ std::map<int, Repair> Database::RetreiveRepairsOfState(int state, int order, int
     }
     sqlite3_finalize(stmt);
     sqlite3_close(db_ptr);
-    return repairs;
+    return retreived;
 }
 
 std::unordered_map<int, std::string> Database::GetRepairStates() {

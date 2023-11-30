@@ -14,10 +14,10 @@ public:
     ~RepairsView();
 
     void Render();
-    void RepairsToTable(const std::map<int, Repair>& repairs);
+    void RepairsToTable(RepairsSort& repairs);
     std::shared_ptr<EditRepair> GetEditRepair();
 private:
-    std::map<int, Repair> repairs;
+    RepairsSort repairs;
     int prev_chosen_tab;
     int curr_chosen_tab;
     Repair repair_to_init;

@@ -34,14 +34,14 @@ void RepairsView::Render() {
   if (ImGui::Button("Test Map")) {
     std::cout << "++++++++++++++++++++++++++++++++++++" << std::endl;
 
-    for (auto& pair : repairs) {
+    for (auto& pair : repairs.repairs) {
       std::cout << "ID: " << pair.first << std::endl;
     }
   }
 
 }
 
-void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs) {
+void RepairsView::RepairsToTable(RepairsSort& retreived_repairs) {
     static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable;
     static int selected = -1;
     if (ImGui::BeginTable("##states", 11, flags)) {
@@ -64,7 +64,8 @@ void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs)
           if (sort_specs->SpecsDirty)
           {
             printf("Sorted\n");
-            repairs.clear();
+            repairs.repairs.clear();
+            repairs.repairs_order.clear();
             std::cout << sort_specs->Specs->SortDirection << std::endl;
             std::cout << sort_specs->Specs->ColumnIndex << std::endl;
 
@@ -72,43 +73,45 @@ void RepairsView::RepairsToTable(const std::map<int, Repair>& retreived_repairs)
 
             sort_specs->SpecsDirty = false;
           }
-        for (auto& pair : retreived_repairs) {
-            const bool is_selected = (selected == pair.first);
+        for (auto& pair : retreived_repairs.repairs_order) {
+            //const bool is_selected = (selected == pair.first);
+            const bool is_selected = (selected == pair);
+            retreived_repairs.repairs[1];
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             char label[32];
-            sprintf_s(label, "%d", pair.first);
+            sprintf_s(label, "%d", pair);
             if (ImGui::Selectable(label, is_selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
-                selected = pair.first;
+                selected = pair;
             }
             if (ImGui::BeginPopupContextItem()) {
                 if (ImGui::Button("Update repair")) {
                     *EditRepair::show_repair = true;
-                    repair_to_init = pair.second;
-                    edit_repair = std::make_shared<EditRepair>(repair_to_init, pair.first);
+                    repair_to_init = retreived_repairs.repairs[pair];
+                    edit_repair = std::make_shared<EditRepair>(repair_to_init, pair);
                 }
                 ImGui::EndPopup();
             }
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.device.name.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].device.name.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.category.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].category.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.device.color.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].device.color.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text("%.2f", pair.second.price);
+            ImGui::Text("%.2f", retreived_repairs.repairs[pair].price);
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.visible_note.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].visible_note.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.hidden_note.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].hidden_note.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.customer.phone.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].customer.phone.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.customer.name.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].customer.name.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.state.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].state.c_str());
             ImGui::TableNextColumn();
-            ImGui::Text(pair.second.date.c_str());
+            ImGui::Text(retreived_repairs.repairs[pair].date.c_str());
             }
         }
         ImGui::EndTable();
