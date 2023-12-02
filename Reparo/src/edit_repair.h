@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <cmath>
 #include <memory>
 #include "insert_repair.h"
@@ -11,9 +13,11 @@ public:
     EditRepair(Repair& repair, int passed_repair_id);
     ~EditRepair();
 
+    void Render() override;
     void StateSection() override;
     Repair InitRepair() override;
     void TestButton() override;
+    void UpdateSummary();
     bool CustomerModified();
     bool RepairModified();
     static bool* show_repair;
@@ -22,7 +26,10 @@ public:
 
     std::string selected_state;
 private:
+    std::vector<RepairUpdates> updates;
     int repair_id;
+    bool RepairValidated() override;
+
     void InsertRepairButton() override;
     void RunModal(Repair& repair) override;
     static int instance_count;

@@ -305,6 +305,9 @@ RepairsSort Database::RetreiveRepairsOfState(int state, int order, int column) {
     };
     std::unordered_map<int, std::string> order_by = {
       {0, "repair_id"},
+      {1, "m.model"},
+      {2, "c.category"},
+      {4, "r.price"},
       {10, "r.date"}
     };
     RepairsSort retreived;
@@ -320,36 +323,35 @@ RepairsSort Database::RetreiveRepairsOfState(int state, int order, int column) {
         sqlite3_bind_int(stmt, 1, state);
         std::cout << "++++++++++++++++++++++++++++++++++++" << std::endl;
         while (sqlite3_step(stmt) == SQLITE_ROW) {
-            int repair_id = sqlite3_column_int(stmt, 0);
-            std::cout << repair_id << std::endl;
-            int customer_id = sqlite3_column_int(stmt, 1);
-            int repair_model_id = sqlite3_column_int(stmt, 2);
-            int repair_category_id = sqlite3_column_int(stmt, 3);
-            int repair_color_id = sqlite3_column_int(stmt, 4);
-            std::string visible_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
-            std::string hidden_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
-            double price = sqlite3_column_double(stmt, 7);
-            std::string date_str = sqlite3_column_text(stmt, 9) ? reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9)) : "";
+          int repair_id = sqlite3_column_int(stmt, 0);
+          std::cout << repair_id << std::endl;
+          int customer_id = sqlite3_column_int(stmt, 1);
+          int repair_model_id = sqlite3_column_int(stmt, 2);
+          int repair_category_id = sqlite3_column_int(stmt, 3);
+          int repair_color_id = sqlite3_column_int(stmt, 4);
+          std::string visible_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+          std::string hidden_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+          double price = sqlite3_column_double(stmt, 7);
+          std::string date_str = sqlite3_column_text(stmt, 9) ? reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9)) : "";
 
-            std::string device_name = (repair_model_id > 0) ?
-                reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11)) : "N/A";
-            std::string color = (repair_color_id> 0) ?
-                reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12)) : "N/A";
-            Device device(device_name, color);
-            std::string category = (repair_category_id > 0) ?
-                reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10)) : "N/A";
-            std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 13));
+          std::string device_name = (repair_model_id > 0) ?
+              reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11)) : "N/A";
+          std::string color = (repair_color_id> 0) ?
+              reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12)) : "N/A";
+          Device device(device_name, color);
+          std::string category = (repair_category_id > 0) ?
+              reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10)) : "N/A";
+          std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 13));
             
-            std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 15));
-            std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
-            std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
-            std::string customer_phone = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 18));
-            Customer customer(customer_phone, customer_name, customer_surname, customer_email);
+          std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 15));
+          std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
+          std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
+          std::string customer_phone = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 18));
+          Customer customer(customer_phone, customer_name, customer_surname, customer_email);
 
-            Repair repair(customer, device, category, price, visible_note, hidden_note, state, date_str);
-            retreived.repairs.emplace(repair_id, repair);
-            retreived.repairs_order.emplace_back(repair_id);
-            //repairs.insert(std::make_pair(repair_id, repair));;
+          Repair repair(customer, device, category, price, visible_note, hidden_note, state, date_str);
+          retreived.repairs.emplace(repair_id, repair);
+          retreived.repairs_order.emplace_back(repair_id);
         }
     }
    
@@ -468,4 +470,47 @@ int Database::GetIDForID(int id, std::string table) {
     sqlite3_close(db_ptr);
 
     return found_id;
+}
+
+
+void Database::InsertRepairUpdateDesc(int& repair_id, std::string& desc) {
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
+  const char* query = "INSERT INTO repairs_update (repair_id, update_description, date) VALUES (?, ?, datetime('now', 'localtime'))";
+  if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
+    sqlite3_bind_int(stmt, 1, repair_id);
+    sqlite3_bind_text(stmt, 2, desc.c_str(), -1, SQLITE_STATIC);
+
+
+  }
+  if (sqlite3_step(stmt) == SQLITE_DONE) {
+    std::cout << "Update added: " << desc << std::endl;
+  }
+  else {
+    std::cout << "Error during adding an update information: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+  }
+  sqlite3_finalize(stmt);
+  sqlite3_close(db_ptr);
+}
+
+std::vector<RepairUpdates> Database::RetreiveRepairUdpdates(int& repair_id) {
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
+  std::vector<RepairUpdates> updates;
+  const char* query = "SELECT * FROM repairs_update WHERE repair_id = ? ORDER BY date DESC";
+  if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
+    sqlite3_bind_int(stmt, 1, repair_id);
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      RepairUpdates update;
+      update.note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+      update.date = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+      updates.emplace_back(update);
+    }
+  }
+  else {
+    std::cout << "Error during retreiving an update information: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+  }
+  sqlite3_finalize(stmt);
+  sqlite3_close(db_ptr);
+  return updates;
 }

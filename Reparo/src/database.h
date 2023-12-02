@@ -10,6 +10,11 @@
 #include "structs.h"
 #include "enums.h"
 
+struct RepairUpdates {
+  std::string date;
+  std::string note;
+};
+
 struct RepairsSort {
   std::unordered_map<int, Repair> repairs;
   std::vector<int> repairs_order;
@@ -33,6 +38,8 @@ public:
     static void UpdateCustomer(Customer& customer, int id);
     static void UpdateRepair(Repair& repair, int id);
     static int GetIDForID(int id, std::string table);
+    static void InsertRepairUpdateDesc(int& repair_id, std::string& desc);
+    static std::vector<RepairUpdates> RetreiveRepairUdpdates(int& repair_id);
     static sqlite3* PtrDB();
 
 private:

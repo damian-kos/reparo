@@ -170,38 +170,27 @@ int main(int, char**)
         style->ScrollbarRounding = 12.0f;
         style->GrabRounding = 12.0f;
 
-
-        //std::cout << "Name: " << std::endl;
-
      //    1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
-        
-  
-
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
+        //{
+        //    static float f = 0.0f;
+        //    static int counter = 0;
+        //    ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
+        //    ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
+        //    ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
+        //    ImGui::Checkbox("Another Window", &show_another_window);
+        //    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // Edit 1 float using a slider from 0.0f to 1.0f
+        //    ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
+        //    if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
+        //        counter++;
+        //    ImGui::SameLine();
+        //    ImGui::Text("counter = %d", counter);
+        //    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        //    ImGui::End();
+        //}
 
         // 3. Show another simple window.
         if (show_another_window)
@@ -243,24 +232,28 @@ int main(int, char**)
 
         if (show_insert_customer_win) {
             ImGui::Begin("Add customer", &show_insert_customer_win);
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
             insert_customer.Render();
             ImGui::End();
         }
 
         if (show_insert_repair) {
             ImGui::Begin("Insert Repair", &show_insert_repair);
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
             insert_repair.Render();
             ImGui::End();
         }
 
         if (show_repair_states_window) {
             ImGui::Begin("Repairs", &show_repair_states_window);
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
             repairs_view.Render();
             ImGui::End(); 
         }
 
         if (*EditRepair::show_repair) {
             ImGui::Begin("Edit Repair", EditRepair::show_repair);
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
             std::shared_ptr<EditRepair> edit_repair = repairs_view.GetEditRepair();
             if (edit_repair) {
                 edit_repair->Render();
@@ -268,9 +261,6 @@ int main(int, char**)
 
             ImGui::End();
         }
-
-
-
 
         // Rendering
         ImGui::Render();

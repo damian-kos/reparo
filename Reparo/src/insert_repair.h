@@ -11,7 +11,7 @@ public:
     InsertRepair(Repair& repair_);
 
 public:
-    void Render() override;
+    virtual void Render() override;
 
 protected:
     HintInputFieldsW_Popup model;
@@ -27,6 +27,7 @@ protected:
     std::string str_date = "";
 
 protected:
+    void ResetOnEmptyMain() override;
     void CustomerSection();
     void PhoneFieldSection() override;
     void DeviceSection();
@@ -36,7 +37,7 @@ protected:
     void InsertRepairButtonEnabler();
     virtual void InsertRepairButton();
     bool DeviceFieldsValidated();
-    bool RepairValidated();
+    virtual bool RepairValidated();
     bool BufferQueryOnDatabase(const char* label, const char* buffer);
     virtual Repair InitRepair();
     virtual void InitModal() override;
@@ -44,4 +45,7 @@ protected:
     void SubmitButton() override;
     void ResetFields() override;
     virtual void TestButton();
+
+private:
+  bool model_field_empty = false;
 };

@@ -27,6 +27,7 @@ namespace ImGui {
                               std::shared_ptr<Customer> t_customer);
 
     IMGUI_API void SeparatorDecorator(const char* label, bool decorated);
+    IMGUI_API void SeparatorTextAlignR(const char* label);
     IMGUI_API void InputTextWithHintExt(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function, bool* feedback);
 
 

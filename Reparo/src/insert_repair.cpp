@@ -34,6 +34,16 @@ InsertRepairButtonEnabler();
 TestButton();
 }
 
+void InsertRepair::ResetOnEmptyMain(){
+  InsertCustomer::ResetOnEmptyMain();
+  if (strlen(model.input.buffer) == 0 && !model_field_empty) {
+    //model = HintInputFieldsW_Popup();
+    category = HintInputFieldsW_Popup();
+    color = HintInputFieldsW_Popup();
+  }
+  if (strlen(model.input.buffer) > 0) { model_field_empty = false; }
+}
+
 void InsertRepair::CustomerSection() {
   InsertCustomer::Render();
 }

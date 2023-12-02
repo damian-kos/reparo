@@ -29,6 +29,15 @@ void InsertCustomer::Render() {
   ImGui::Text(validation_feedback.c_str());
   UpdateValidationMsg();
   SubmitButton();
+  ResetOnEmptyMain();
+}
+
+void InsertCustomer::ResetOnEmptyMain() {
+  if (strlen(phone.input.buffer) == 0 && !phone_field_empty) {
+    ResetFields();
+    phone_field_empty = true;
+  }
+  if (strlen(phone.input.buffer) > 0) { phone_field_empty = false; }
 }
 
 void InsertCustomer::FieldsSection() {

@@ -62,6 +62,7 @@ namespace ImGui {
     ImGui::Text("Model:    "); ImGui::SameLine(); ImGui::Text(repair.device.name.c_str());
     ImGui::Text("Category: "); ImGui::SameLine(); ImGui::Text(repair.category.c_str());
     ImGui::Text("Color:    "); ImGui::SameLine(); ImGui::Text(repair.device.color.c_str());
+    ImGui::Text("State:    "); ImGui::SameLine(); ImGui::Text(repair.state.c_str());
     ImGui::Text("Price:    "); ImGui::SameLine(); ImGui::Text("%.2f", repair.price);
     ImGui::EndGroup();
     if (t_repair) {
@@ -75,6 +76,8 @@ namespace ImGui {
                  tab.append(t_repair->category).c_str() : "");
     ImGui::Text((repair.device.color != t_repair->device.color) ?
                  tab.append(t_repair->device.color).c_str() : "");
+    ImGui::Text((repair.state != t_repair->state) ?
+      tab.append(t_repair->state).c_str() : "");
     double tolerance = 1e-3;
     if (!(std::abs(repair.price - t_repair->price) < tolerance)) {
       ImGui::Text("    >>>>    %.2f", t_repair->price);
@@ -91,9 +94,19 @@ namespace ImGui {
     else {
       ImGui::PushStyleColor(ImGuiCol_Separator, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     }
+    ImGui::PushItemWidth(100);
     ImGui::SeparatorText(label);
 
     ImGui::PopStyleColor(1);
+    ImGui::PopItemWidth();
+
+  }
+
+  void SeparatorTextAlignR(const char* label) {
+    ImGuiStyle* style = &ImGui::GetStyle();
+    style->SeparatorTextAlign = ImVec2(1.0f, 0.5f);
+    ImGui::SeparatorText(label);
+    style->SeparatorTextAlign = ImVec2(0.0f, 0.5f);
   }
 
   void InputTextWithHintExt(const char* label, const char* hint, HintInputField & field, std::function<bool()> validation_function, bool* feedback) {

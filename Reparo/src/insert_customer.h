@@ -19,6 +19,7 @@ public:
 public:
     virtual void Render();
 
+
 protected:
     HintInputFieldsW_Popup phone{ ImGuiInputTextFlags_CharsDecimal };
     HintInputField name;
@@ -28,6 +29,7 @@ protected:
     ConfirmResult result = ConfirmResult::CONIFRM_IDLE;
     bool selected = false;
     bool feedback = false;
+    bool phone_field_empty = false;
 
     Customer* temp_customer = nullptr;
 
@@ -35,6 +37,7 @@ private:
     std::string validation_feedback = "";
 
 protected:
+    virtual void ResetOnEmptyMain();
     void CustomerSelectedOnPopup();
     void FieldsSection();
     virtual void PhoneFieldSection();

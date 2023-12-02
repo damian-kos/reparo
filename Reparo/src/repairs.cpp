@@ -31,14 +31,6 @@ void RepairsView::Render() {
     RepairsToTable(repairs);
     ImGui::EndTabBar();
   }
-  if (ImGui::Button("Test Map")) {
-    std::cout << "++++++++++++++++++++++++++++++++++++" << std::endl;
-
-    for (auto& pair : repairs.repairs) {
-      std::cout << "ID: " << pair.first << std::endl;
-    }
-  }
-
 }
 
 void RepairsView::RepairsToTable(RepairsSort& retreived_repairs) {
@@ -66,53 +58,53 @@ void RepairsView::RepairsToTable(RepairsSort& retreived_repairs) {
             printf("Sorted\n");
             repairs.repairs.clear();
             repairs.repairs_order.clear();
-            std::cout << sort_specs->Specs->SortDirection << std::endl;
-            std::cout << sort_specs->Specs->ColumnIndex << std::endl;
 
-            repairs = Database::RetreiveRepairsOfState(1, sort_specs->Specs->SortDirection, sort_specs->Specs->ColumnIndex);
+            repairs = Database::RetreiveRepairsOfState(curr_chosen_tab+1, 
+                                                       sort_specs->Specs->SortDirection, 
+                                                       sort_specs->Specs->ColumnIndex);
 
             sort_specs->SpecsDirty = false;
           }
         for (auto& pair : retreived_repairs.repairs_order) {
-            //const bool is_selected = (selected == pair.first);
-            const bool is_selected = (selected == pair);
-            retreived_repairs.repairs[1];
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            char label[32];
-            sprintf_s(label, "%d", pair);
-            if (ImGui::Selectable(label, is_selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
-                selected = pair;
-            }
-            if (ImGui::BeginPopupContextItem()) {
-                if (ImGui::Button("Update repair")) {
-                    *EditRepair::show_repair = true;
-                    repair_to_init = retreived_repairs.repairs[pair];
-                    edit_repair = std::make_shared<EditRepair>(repair_to_init, pair);
-                }
-                ImGui::EndPopup();
-            }
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].device.name.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].category.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].device.color.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text("%.2f", retreived_repairs.repairs[pair].price);
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].visible_note.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].hidden_note.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].customer.phone.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].customer.name.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].state.c_str());
-            ImGui::TableNextColumn();
-            ImGui::Text(retreived_repairs.repairs[pair].date.c_str());
-            }
+          //const bool is_selected = (selected == pair.first);
+          const bool is_selected = (selected == pair);
+          retreived_repairs.repairs[1];
+          ImGui::TableNextRow();
+          ImGui::TableNextColumn();
+          char label[32];
+          sprintf_s(label, "%d", pair);
+          if (ImGui::Selectable(label, is_selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap)) {
+              selected = pair;
+          }
+          if (ImGui::BeginPopupContextItem()) {
+              if (ImGui::Button("Update repair")) {
+                  *EditRepair::show_repair = true;
+                  repair_to_init = retreived_repairs.repairs[pair];
+                  edit_repair = std::make_shared<EditRepair>(repair_to_init, pair);
+              }
+              ImGui::EndPopup();
+          }
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].device.name.c_str());
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].category.c_str());
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].device.color.c_str());
+          ImGui::TableNextColumn();
+          ImGui::Text("%.2f", retreived_repairs.repairs[pair].price);
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].visible_note.c_str());
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].hidden_note.c_str());
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].customer.phone.c_str());
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].customer.name.c_str());
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].state.c_str());
+          ImGui::TableNextColumn();
+          ImGui::Text(retreived_repairs.repairs[pair].date.c_str());
+          }
         }
         ImGui::EndTable();
 
