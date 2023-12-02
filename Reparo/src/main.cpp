@@ -2,23 +2,21 @@
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
-#include "imgui.h"
-#include "customer_input_window.h"
-#include "edit_customer.h"
-#include "helpmarker.h"
-#include "parts_stock_window.h"
-#include "add_repair.h"
-#include "repairs_states.h"
-
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <tchar.h>
-
 #include <iostream>
 #include <string>
+#include <memory>
 
-#include "parts_stock.h"
+
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
+#include "helpmarker.h"
+#include "insert_repair.h"
+#include "repairs.h"
+#include "edit_repair.h"
 
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
@@ -46,13 +44,10 @@ int main(int, char**)
 //    LPSTR lpCmdLine,
 //    int nShowCmd)
 {
-    CustomerInputWindow addCustomerWin("Poop", CustomerInputFlags_SubmitButton | CustomerInputFlags_SearchResultsOnPhoneNo);
-    CustomerEditWindow customerEditWin;
-    ModalController modalController;
-    PartsStockWindow partsStockWindow;
-    PartsStock partsStock;
-    AddRepair repair;
-    RepairMenu repair_menu;
+    InsertCustomer insert_customer;
+    InsertRepair insert_repair;
+    RepairsView repairs_view;
+
     // Create application window
     // ImGui_ImplWin32_EnableDpiAwareness();
     WNDCLASSEXW wc = {sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr};
@@ -60,7 +55,7 @@ int main(int, char**)
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 200, 300, screenWidth-600, screenHeight-500, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 400, 200, screenWidth-600, screenHeight-300, nullptr, nullptr, wc.hInstance, nullptr);
 
 
 
@@ -128,10 +123,12 @@ int main(int, char**)
     // Our state
     bool show_demo_window = true;
     bool show_another_window = false;
-    bool show_add_customer_window = false;
-    bool show_add_part_to_stock_window = false;
-    bool show_add_repair_window = false;
+    bool show_insert_customer_win = false;
+    bool show_insert_repair = false;
     bool show_repair_states_window = false;
+    
+
+    bool show_add_part_to_stock_window = false;
 
     char test[128] = "";
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -173,38 +170,27 @@ int main(int, char**)
         style->ScrollbarRounding = 12.0f;
         style->GrabRounding = 12.0f;
 
-
-        //std::cout << "Name: " << std::endl;
-
      //    1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
-        
-  
-
 
         // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        {
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
-
-            if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::End();
-        }
+        //{
+        //    static float f = 0.0f;
+        //    static int counter = 0;
+        //    ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
+        //    ImGui::Text("This is some useful text.");          // Display some text (you can use a format strings too)
+        //    ImGui::Checkbox("Demo Window", &show_demo_window); // Edit bools storing our window open/close state
+        //    ImGui::Checkbox("Another Window", &show_another_window);
+        //    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);             // Edit 1 float using a slider from 0.0f to 1.0f
+        //    ImGui::ColorEdit3("clear color", (float *)&clear_color); // Edit 3 floats representing a color
+        //    if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
+        //        counter++;
+        //    ImGui::SameLine();
+        //    ImGui::Text("counter = %d", counter);
+        //    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        //    ImGui::End();
+        //}
 
         // 3. Show another simple window.
         if (show_another_window)
@@ -219,61 +205,62 @@ int main(int, char**)
 
 
         ImGui::Begin("Main Menu");
+     
         // Window for Adding Customers
         if (ImGui::Button("Add customer"))
-            show_add_customer_window = !show_add_customer_window;
+            show_insert_customer_win = !show_insert_customer_win;
         ImGui::SameLine(); HelpMarker("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer");
         if (ImGui::Button("Add part to stock"))
             show_add_part_to_stock_window = !show_add_part_to_stock_window;
         ImGui::SameLine(); HelpMarker("Adding new part \nSearching for parts to update \nEditing existings ones");
 
         if (ImGui::Button("Add repair"))
-            show_add_repair_window = !show_add_repair_window;
+            show_insert_repair = !show_insert_repair;
         ImGui::SameLine(); HelpMarker("Adding new repair \nAdd new or chose existing customer details \n");
 
         if (ImGui::Button("Repairs"))
             show_repair_states_window = !show_repair_states_window;
         ImGui::SameLine(); HelpMarker("Repairs \nHistory and current tickets \n");
 
-        if (ImGui::Button("Create database")) {
-            //partsStock.OpenPartsStockDb();
-            //partsStock.CreateTable();
+        if (ImGui::Button("Test popup")) {
+            bool is_open = ImGui::IsPopupOpen("##Model");
+            std::cout << "Popup is: " << is_open << std::endl;
         }
 
    
         ImGui::End();
 
-        if (show_add_customer_window) {
-            ImGui::Begin("Add customer", &show_add_customer_window);
-            addCustomerWin.Render();
+        if (show_insert_customer_win) {
+            ImGui::Begin("Add customer", &show_insert_customer_win);
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+            insert_customer.Render();
             ImGui::End();
         }
 
-        
-        if (show_add_part_to_stock_window) {
-            partsStockWindow.GetBrands();
-            partsStockWindow.Render();
-        }
-      
-        if (repair_menu.repair_update_window_on)
-            repair_menu.UpdateRepairWin();
-        
-        if (customerEditWin.GetShouldRender()) {
-            customerEditWin.Render();
-        }
-
-        if (show_add_repair_window) {
-            ImGui::Begin("Add repair", &show_add_repair_window);
-            repair.AddRepairWindow();
+        if (show_insert_repair) {
+            ImGui::Begin("Insert Repair", &show_insert_repair);
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+            insert_repair.Render();
             ImGui::End();
         }
 
         if (show_repair_states_window) {
             ImGui::Begin("Repairs", &show_repair_states_window);
-            repair_menu.RepairMainWin();
-            ImGui::End();
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+            repairs_view.Render();
+            ImGui::End(); 
         }
 
+        if (*EditRepair::show_repair) {
+            ImGui::Begin("Edit Repair", EditRepair::show_repair);
+            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+            std::shared_ptr<EditRepair> edit_repair = repairs_view.GetEditRepair();
+            if (edit_repair) {
+                edit_repair->Render();
+            }
+
+            ImGui::End();
+        }
 
         // Rendering
         ImGui::Render();
