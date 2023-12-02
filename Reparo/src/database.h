@@ -40,6 +40,7 @@ public:
     static int GetIDForID(int id, std::string table);
     static void InsertRepairUpdateDesc(int& repair_id, std::string& desc);
     static std::vector<RepairUpdates> RetreiveRepairUdpdates(int& repair_id);
+    static std::vector<std::string> GetRepairStatesNames();
     static sqlite3* PtrDB();
 
 private:

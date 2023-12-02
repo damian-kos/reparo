@@ -16,6 +16,8 @@ public:
     void Render();
     void RepairsToTable(RepairsSort& repairs);
     std::shared_ptr<EditRepair> GetEditRepair();
+    std::vector<std::string> names;
+    bool* opened;
 private:
     RepairsSort repairs;
     int prev_chosen_tab;

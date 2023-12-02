@@ -514,3 +514,22 @@ std::vector<RepairUpdates> Database::RetreiveRepairUdpdates(int& repair_id) {
   sqlite3_close(db_ptr);
   return updates;
 }
+
+std::vector<std::string> Database::GetRepairStatesNames() {
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
+  std::vector<std::string> states;
+  const char* query = "SELECT repair_state FROM repair_states ORDER BY repair_state_id ASC";
+  if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+      states.emplace_back(state);
+    }
+  }
+  else {
+    std::cout << "Error during retreiving an update information: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+  }
+  sqlite3_finalize(stmt);
+  sqlite3_close(db_ptr);
+  return states;
+}
