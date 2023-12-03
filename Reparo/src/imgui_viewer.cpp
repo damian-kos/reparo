@@ -43,10 +43,10 @@ namespace ImGui {
       ImGui::SameLine();
       ImGui::BeginGroup();
       std::string tab = "    >>>>    ";
-      ImGui::Text((customer.phone != t_customer->phone) ? tab.append(t_customer->phone).c_str() : "");
-      ImGui::Text((customer.name != t_customer->name) ? tab.append(t_customer->name).c_str() : "");
-      ImGui::Text((customer.surname != t_customer->surname ) ? tab.append(t_customer->surname).c_str() : "");
-      ImGui::Text((customer.email != t_customer->email) ? tab.append(t_customer->email).c_str() : "");
+      ImGui::Text((customer.phone != t_customer->phone) ? (tab + (t_customer->phone)).c_str() : "");
+      ImGui::Text((customer.name != t_customer->name) ? (tab + (t_customer->name)).c_str() : "");
+      ImGui::Text((customer.surname != t_customer->surname ) ? (tab + (t_customer->surname)).c_str() : "");
+      ImGui::Text((customer.email != t_customer->email) ? (tab + (t_customer->email)).c_str() : "");
       ImGui::EndGroup();
     }
   }
@@ -71,11 +71,11 @@ namespace ImGui {
     ImGui::BeginGroup();
     std::string tab = "    >>>>    ";
     ImGui::Text((repair.device.name != t_repair->device.name) ?
-                 tab.append(t_repair->device.name).c_str() : "");
+                (tab + (t_repair->device.name)).c_str() : "");
     ImGui::Text((repair.category != t_repair->category) ?
-                 tab.append(t_repair->category).c_str() : "");
+                (tab + (t_repair->category)).c_str() : "");
     ImGui::Text((repair.device.color != t_repair->device.color) ?
-                 tab.append(t_repair->device.color).c_str() : "");
+                (tab + (t_repair->device.color)).c_str() : "");
     ImGui::Text((repair.state != t_repair->state) ?
       tab.append(t_repair->state).c_str() : "");
     double tolerance = 1e-3;
@@ -121,6 +121,21 @@ namespace ImGui {
       *feedback = true;
     }
   }
+
+  bool ButtonScaled(const char* label, float font_size, ImVec2 button_size)  {
+    float old_size = ImGui::GetFont()->Scale;
+    ImGui::GetFont()->Scale *= font_size;
+    ImGui::PushFont(ImGui::GetFont());
+    bool value = false;
+    if (ImGui::Button(label, button_size))
+      value = true;
+    ImGui::GetFont()->Scale = old_size;
+    ImGui::PopFont();
+    return value;
+
+  }
+
+
 
   void InputTextWithPopup(const char* label, const char* hint, HintInputFieldsW_Popup & field, std::function<bool()> validation_function, bool* selection, HintInputFieldsW_Popup * rel_field, bool* feedback) {
     if (field.input.is_on) {

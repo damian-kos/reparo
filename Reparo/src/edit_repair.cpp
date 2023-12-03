@@ -156,17 +156,16 @@ void EditRepair::TestButton() {
 void EditRepair::UpdateSummary() {
   std::string summary = "";
   if (CustomerModified()) {
-    summary += customer.phone != t_customer->phone ? "Phone updated: " + customer.phone + "  >>  " + t_customer->phone + "\n" : "";
-    summary += customer.name != t_customer->name ? "Name updated: " + customer.name + "  >>  " + t_customer->name + "\n" : "";
-    summary += customer.surname != t_customer->surname ? "Surname updated: " + customer.surname + "  >>  " + t_customer->surname + "\n" : "";
-    summary += customer.email != t_customer->email ? "Email updated: " + customer.email + "  >>  " + t_customer->email + "\n" : "";
+    summary += customer.phone != t_customer->phone ? "Phone updated: \n" + customer.phone + "  >>  " + t_customer->phone + "\n" : "";
+    summary += customer.name != t_customer->name ? "Name updated: \n" + customer.name + "  >>  " + t_customer->name + "\n" : "";
+    summary += customer.surname != t_customer->surname ? "Surname updated: \n" + customer.surname + "  >>  " + t_customer->surname + "\n" : "";
+    summary += customer.email != t_customer->email ? "Email updated: \n" + customer.email + "  >>  " + t_customer->email + "\n" : "";
   }
   if (RepairModified()) {
-    summary += repair.device.name != t_repair->device.name ? "Device name updated: " + repair.device.name + "  >>  " + t_repair->device.name + "\n" : "";
+    summary += repair.device.name != t_repair->device.name ? "Device updated: " + repair.device.name + "  >>  " + t_repair->device.name + "\n" : "";
     summary += repair.category != t_repair->category ? "Category updated: " + repair.category + "  >>  " + t_repair->category + "\n" : "";
-    summary += repair.device.color != t_repair->device.color ? "Device color updated: " + repair.device.color + "  >>  " + t_repair->device.color + "\n" : "";
+    summary += repair.device.color != t_repair->device.color ? "Color updated: " + repair.device.color + "  >>  " + t_repair->device.color + "\n" : "";
     summary += repair.state != t_repair->state ? "State updated: " + repair.state + "  >>  " + t_repair->state + "\n" : "";
-
     double tolerance = 1e-3;
     if (!(std::abs(repair.price - t_repair->price) < tolerance)) {
       std::stringstream ss;
@@ -177,6 +176,6 @@ void EditRepair::UpdateSummary() {
     }
   }
   Database::InsertRepairUpdateDesc(repair_id, summary);
-
-  std::cout << summary << std::endl;
+  updates = Database::RetreiveRepairUdpdates(repair_id);
+  
 }

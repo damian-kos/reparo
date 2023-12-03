@@ -17,6 +17,7 @@
 #include "insert_repair.h"
 #include "repairs.h"
 #include "edit_repair.h"
+#include "finances.h"
 
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
@@ -47,6 +48,7 @@ int main(int, char**)
     InsertCustomer insert_customer;
     InsertRepair insert_repair;
     RepairsView repairs_view;
+    Finances finances;
 
     // Create application window
     // ImGui_ImplWin32_EnableDpiAwareness();
@@ -85,8 +87,8 @@ int main(int, char**)
     // io.ConfigViewportsNoDefaultParent = true;
     // io.ConfigDockingAlwaysTabBar = true;
     // io.ConfigDockingTransparentPayload = true;
-    // io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
-    // io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
+     io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
+     io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
 
     // Setup Dear ImGui style
     // ImGui::StyleColorsDark();
@@ -114,10 +116,13 @@ int main(int, char**)
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
      //io.Fonts->AddFontDefault();
      //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    // ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
+    
+     //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/DroidSans.ttf", 16.0f);
+     //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Roboto-Medium.ttf", 16.0f);
+     //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Cousine-Regular.ttf", 15.0f);
+     //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Assistant.ttf", 22.0f);
+
+     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     // IM_ASSERT(font != nullptr);
 
     // Our state
@@ -128,7 +133,7 @@ int main(int, char**)
     bool show_repair_states_window = false;
     
 
-    bool show_add_part_to_stock_window = false;
+    bool show_finances = false;
 
     char test[128] = "";
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -137,6 +142,7 @@ int main(int, char**)
     bool done = false;
     while (!done)
     {
+
         // Poll and handle messages (inputs, window resize, etc.)
         // See the WndProc() function below for our to dispatch events to the Win32 backend.
         MSG msg;
@@ -210,8 +216,9 @@ int main(int, char**)
         if (ImGui::Button("Add customer"))
             show_insert_customer_win = !show_insert_customer_win;
         ImGui::SameLine(); HelpMarker("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer");
-        if (ImGui::Button("Add part to stock"))
-            show_add_part_to_stock_window = !show_add_part_to_stock_window;
+
+        if (ImGui::Button("Finances"))
+            show_finances = !show_finances;
         ImGui::SameLine(); HelpMarker("Adding new part \nSearching for parts to update \nEditing existings ones");
 
         if (ImGui::Button("Add repair"))
@@ -235,6 +242,12 @@ int main(int, char**)
             ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
             insert_customer.Render();
             ImGui::End();
+        }
+
+        if (show_finances) {
+          ImGui::Begin("Finances", &show_finances);
+          finances.Render();
+          ImGui::End();
         }
 
         if (show_insert_repair) {

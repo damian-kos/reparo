@@ -81,6 +81,9 @@
     <ClInclude Include="src\imgui_viewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\finances.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="vendor\imgui\imgui.cpp">
@@ -137,6 +140,9 @@
     <ClCompile Include="src\imgui_viewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\finances.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="devices.json" />
@@ -144,5 +150,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="vendor\sqlite3\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="vendor\imgui\msc\fonts\DroidSans.ttf" />
+    <Font Include="..\..\..\..\..\Pobrane\Assistant\Assistant-VariableFont_wght.ttf" />
   </ItemGroup>
 </Project>

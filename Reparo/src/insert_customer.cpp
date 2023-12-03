@@ -34,7 +34,9 @@ void InsertCustomer::Render() {
 
 void InsertCustomer::ResetOnEmptyMain() {
   if (strlen(phone.input.buffer) == 0 && !phone_field_empty) {
-    ResetFields();
+    name = HintInputField();
+    surname = HintInputField();
+    email = HintInputField();
     phone_field_empty = true;
   }
   if (strlen(phone.input.buffer) > 0) { phone_field_empty = false; }

@@ -1,4 +1,5 @@
 #pragma once
+#include "structs.h"
 #include <functional>
 #include <cmath>
 
@@ -29,7 +30,7 @@ namespace ImGui {
     IMGUI_API void SeparatorDecorator(const char* label, bool decorated);
     IMGUI_API void SeparatorTextAlignR(const char* label);
     IMGUI_API void InputTextWithHintExt(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function, bool* feedback);
-
+    IMGUI_API bool ButtonScaled(const char* label, float font_size, ImVec2 button_size);
 
     IMGUI_API void InputTextWithPopup(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function, bool* selection, HintInputFieldsW_Popup* rel_field, bool* feedback);
         

@@ -14,18 +14,11 @@ RepairsView::RepairsView() {
 RepairsView::~RepairsView() { std::cout << "RepairsView dESTROYED " << std::endl; }
 
 void RepairsView::Render() {
-  if (ImGui::Button("Test button")) {
-    for (auto& name : names)
-      std::cout << name << std::endl;
-  }
-  static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs;
-  //const char* names[5] = { "To do", "Processing", "Warranty", "Awaiting Parts", "Completed"};
-  //static bool opened[5] = { true, true, true, true , true};
-  //std::vector<bool> opened = { true, true, true, true , true };
-  //static bool* opened = new bool[5];
-  //for (int i = 0; i < 5; i++) {
-  //  opened[i] = true;
+  //if (ImGui::Button("Test button")) {
+  //  for (auto& name : names)
+  //    std::cout << name << std::endl;
   //}
+  static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs;
   if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
   {
     for (int n = 0; n < names.size(); n++) {

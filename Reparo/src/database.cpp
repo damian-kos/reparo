@@ -321,10 +321,9 @@ RepairsSort Database::RetreiveRepairsOfState(int state, int order, int column) {
         "WHERE r.repair_state_id = ? ORDER BY  " + order_by[column] + " " + sort_order[order];
     if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
         sqlite3_bind_int(stmt, 1, state);
-        std::cout << "++++++++++++++++++++++++++++++++++++" << std::endl;
+  
         while (sqlite3_step(stmt) == SQLITE_ROW) {
           int repair_id = sqlite3_column_int(stmt, 0);
-          std::cout << repair_id << std::endl;
           int customer_id = sqlite3_column_int(stmt, 1);
           int repair_model_id = sqlite3_column_int(stmt, 2);
           int repair_category_id = sqlite3_column_int(stmt, 3);
@@ -480,7 +479,6 @@ void Database::InsertRepairUpdateDesc(int& repair_id, std::string& desc) {
   if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
     sqlite3_bind_int(stmt, 1, repair_id);
     sqlite3_bind_text(stmt, 2, desc.c_str(), -1, SQLITE_STATIC);
-
 
   }
   if (sqlite3_step(stmt) == SQLITE_DONE) {
