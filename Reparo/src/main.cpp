@@ -87,8 +87,8 @@ int main(int, char**)
     // io.ConfigViewportsNoDefaultParent = true;
     // io.ConfigDockingAlwaysTabBar = true;
     // io.ConfigDockingTransparentPayload = true;
-     io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
-     io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
+    io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
+    io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
 
     // Setup Dear ImGui style
     // ImGui::StyleColorsDark();
@@ -105,6 +105,12 @@ int main(int, char**)
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+    
+    // setup
+    ImFontConfig font_config;
+    font_config.OversampleH = 1; // FreeType does not support those, reset so stb_truetype will produce similar results
+    font_config.OversampleV = 1;
+
 
     // Load Fonts
     // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -114,15 +120,21 @@ int main(int, char**)
     // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
     // - Read 'docs/FONTS.md' for more instructions and details.
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-     //io.Fonts->AddFontDefault();
-     //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+    font_config.RasterizerDensity = 4.0f;
+    auto font_d = io.Fonts->AddFontDefault(&font_config);
+    font_d->Scale = 1.0f;
+    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+    ImGui::SetFonts();
+    //font_config.RasterizerDensity = 2.0f;
+    //auto font_a = io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/DroidSans.ttf", 24.0f, &font_config);
+    //font_a->Scale = 1.0f;
     
-     //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/DroidSans.ttf", 16.0f);
-     //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Roboto-Medium.ttf", 16.0f);
-     //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Cousine-Regular.ttf", 15.0f);
-     //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Assistant.ttf", 22.0f);
+    //ImGui::GetFontV(font_a);
+    //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Roboto-Medium.ttf", 16.0f);
+    //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Cousine-Regular.ttf", 15.0f);
+    //io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/Assistant.ttf", 22.0f);
 
-     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
+    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     // IM_ASSERT(font != nullptr);
 
     // Our state

@@ -29,8 +29,21 @@ namespace ImGui {
   //    std::string email;
   //};
 
+  ImFont* font;
+
+  void SetFonts() {
+    ImGuiIO& io = ImGui::GetIO();
+    ImFontConfig font_config;
+    font_config.OversampleH = 1; // FreeType does not support those, reset so stb_truetype will produce similar results
+    font_config.OversampleV = 1;
+    font_config.RasterizerDensity = 2.0f;
+    font = io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/DroidSans.ttf", 24.0f, &font_config);
+    font->Scale = 1.0f;
+
+  }
 
   void ViewCustomer(const Customer& customer, std::shared_ptr<Customer> t_customer) {
+    ImGuiIO& io = ImGui::GetIO();
     ImGui::TableNextColumn();
     ImGui::BeginGroup();
     ImGui::Text("Phone:    "); ImGui::SameLine(); ImGui::Text(customer.phone.c_str());
@@ -122,14 +135,16 @@ namespace ImGui {
     }
   }
 
+  void GetFontV(ImFont* font_t) {
+    font = font_t;
+  }
+
   bool ButtonScaled(const char* label, float font_size, ImVec2 button_size)  {
     float old_size = ImGui::GetFont()->Scale;
-    ImGui::GetFont()->Scale *= font_size;
-    ImGui::PushFont(ImGui::GetFont());
+    ImGui::PushFont(font);
     bool value = false;
     if (ImGui::Button(label, button_size))
       value = true;
-    ImGui::GetFont()->Scale = old_size;
     ImGui::PopFont();
     return value;
 

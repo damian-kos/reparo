@@ -5,9 +5,14 @@ Finances::Finances() { printf("Finances Created"); }
 Finances::~Finances() { printf("Finances Destroyed"); }
 
 void Finances::Render() {
-  ImGui::ButtonScaled("Last 30 days\n   £1000", 1.5f, ImVec2(200, 80));
+  ImGui::BeginGroup();
+  ImGui::Text("Last 30 days");
+  ImGui::ButtonScaled("   £1000", 1.5f, ImVec2(200, 80));
+  ImGui::EndGroup();
   ImGui::SameLine();
-  ImGui::ButtonScaled("Ongoing Repairs\n   £1000", 1.5f, ImVec2(200, 80));
-
+  ImGui::BeginGroup();
+  ImGui::Text("Ongoing Repairs");
+  ImGui::ButtonScaled("   £1000", 1.5f, ImVec2(200, 80));
+  ImGui::EndGroup();
   
 }
