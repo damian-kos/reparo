@@ -37,6 +37,7 @@ void RepairsView::Render() {
     RepairsToTable(repairs);
     ImGui::EndTabBar();
   }
+  RunModal();
 }
 
 void RepairsView::RepairsToTable(RepairsSort& retreived_repairs) {
@@ -84,9 +85,14 @@ void RepairsView::RepairsToTable(RepairsSort& retreived_repairs) {
           }
           if (ImGui::BeginPopupContextItem()) {
               if (ImGui::Button("Update repair")) {
-                  *EditRepair::show_repair = true;
-                  repair_to_init = retreived_repairs.repairs[pair];
-                  edit_repair = std::make_shared<EditRepair>(repair_to_init, pair);
+                *EditRepair::show_repair = true;
+                repair_to_init = retreived_repairs.repairs[pair];
+                edit_repair = std::make_shared<EditRepair>(repair_to_init, pair);
+              }
+              if (ImGui::Button("Delete")) {
+                modal = true;
+                repair_to_init = retreived_repairs.repairs[pair];
+                modal_on_id = pair;
               }
               ImGui::EndPopup();
           }
@@ -115,6 +121,20 @@ void RepairsView::RepairsToTable(RepairsSort& retreived_repairs) {
         ImGui::EndTable();
 
 }
+
+void RepairsView::RunModal() {
+  if (modal) {
+    ModalController::RenderModal("Delete this repair?");
+    modal = false;
+  }
+  ModalController::SubmitConfirm("Delete this repair?", repair_to_init, deletion);
+  if (deletion == ConfirmResult::CONIFRM_SUBMIT) {
+    Database::DeleteRepair(modal_on_id);
+    repairs = Database::RetreiveRepairsOfState(curr_chosen_tab + 1);
+    deletion = ConfirmResult::CONIFRM_IDLE;
+  }
+}
+
 
 std::shared_ptr<EditRepair> RepairsView::GetEditRepair() {
     return edit_repair;

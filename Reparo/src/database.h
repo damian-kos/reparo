@@ -41,6 +41,8 @@ public:
     static void InsertRepairUpdateDesc(int& repair_id, std::string& desc);
     static std::vector<RepairUpdates> RetreiveRepairUdpdates(int& repair_id);
     static std::vector<std::string> GetRepairStatesNames();
+    static void DeleteRepair(int& repair_id);
+    static void RetreiveRepairsByDate(std::string date);
     static sqlite3* PtrDB();
 
 private:

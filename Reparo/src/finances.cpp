@@ -6,13 +6,23 @@ Finances::~Finances() { printf("Finances Destroyed"); }
 
 void Finances::Render() {
   ImGui::BeginGroup();
-  ImGui::Text("Last 30 days");
-  ImGui::ButtonScaled("   £1000", 1.5f, ImVec2(200, 80));
+  if (ImGui::ButtonScaled("   £1000.68", 1.5f, ImVec2(200, 80))) {
+    ImGui::OpenPopup("my popup");
+  }
+
   ImGui::EndGroup();
   ImGui::SameLine();
-  ImGui::BeginGroup();
-  ImGui::Text("Ongoing Repairs");
-  ImGui::ButtonScaled("   £1000", 1.5f, ImVec2(200, 80));
+  ImGui::BeginGroup();;
+ 
   ImGui::EndGroup();
   
+  if (ImGui::BeginPopupContextItem("my popup"))
+  {
+    if (ImGui::Selectable("To do")) {
+      std::cout << "To do" << std::endl;
+      Database::RetreiveRepairsByDate("2023-11-16");
+    }
+
+    ImGui::EndPopup();
+  }
 }

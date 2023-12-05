@@ -22,7 +22,7 @@ void ModalController::SubmitConfirm(const char* modal_title, Customer& customer,
   CenterAlign();
   if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
   {
-    ImGui::Text("Do you want to insert customer with this details?");
+    //ImGui::Text("Do you want to insert customer with this details?");
     ImGui::Separator();
 
     ImGui::ViewCustomer(customer, nullptr);
@@ -36,9 +36,10 @@ void ModalController::SubmitConfirm(const char* modal_title, Customer& customer,
 
 void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, ConfirmResult& result) {
   CenterAlign();
+
   if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
   {
-    ImGui::Text("Do you want to insert repair with this details?");
+    //ImGui::Text("Do you want to insert repair with this details?");
     ImGui::Separator();
     ImGui::ViewRepair(repair, nullptr, nullptr);
 

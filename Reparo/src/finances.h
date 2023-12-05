@@ -4,6 +4,7 @@
 
 #include "imgui.h"
 #include "imgui_viewer.h"
+#include "database.h"
 
 class Finances {
 public:
