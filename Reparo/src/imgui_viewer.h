@@ -30,7 +30,10 @@ namespace ImGui {
                               std::shared_ptr<Customer> t_customer);
 
     IMGUI_API void SeparatorDecorator(const char* label, bool decorated);
+    IMGUI_API void SeparatorTextAlignC(const char* label, int width);
     IMGUI_API void SeparatorTextAlignR(const char* label);
+    IMGUI_API bool CenteredButton(const char* label, const ImVec2& size_arg, std::string test);
+    IMGUI_API void CenteredText(const char* label, const ImVec2& size_arg);
     IMGUI_API void InputTextWithHintExt(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function, bool* feedback);
     IMGUI_API void GetFontV(ImFont* font_t);
     IMGUI_API bool ButtonScaled(const char* label, float font_size, ImVec2 button_size);

@@ -1,12 +1,15 @@
   #pragma once
+// To implement maths operators for ImVec2 (disabled by default to not conflict with using IM_VEC2_CLASS_EXTRA with your own math types+operators), use:
+
+#define IMGUI_DEFINE_MATH_OPERATORS
+
+
   #include <imgui.h>
   #include <imgui_internal.h>
   #include "structs.h"
   #include "imgui_viewer.h"
   #include "database.h"
   #include "modals.h"
-
-
 
 namespace ImGui {
   //Database db;
@@ -115,11 +118,111 @@ namespace ImGui {
 
   }
 
+
+  void SeparatorTextAlignC(const char* label, int width) {
+    ImGuiStyle* style = &ImGui::GetStyle();
+    PushID(label);
+    ImVec2 label_size = CalcTextSize(label);
+    bool ret = ButtonEx(label, label_size + style->FramePadding * 2);
+    RenderTextClipped(label_size + style->FramePadding,  style->FramePadding, label, NULL, &label_size, style->ButtonTextAlign);
+
+    // render your text here
+    PopID();
+  }
+
   void SeparatorTextAlignR(const char* label) {
     ImGuiStyle* style = &ImGui::GetStyle();
     style->SeparatorTextAlign = ImVec2(1.0f, 0.5f);
     ImGui::SeparatorText(label);
     style->SeparatorTextAlign = ImVec2(0.0f, 0.5f);
+  }
+  
+  void breakApartLF(std::string line, std::vector<std::string>* v)
+  {
+    int pos;
+    std::string delimiter = "\n";
+
+    pos = line.find(delimiter);
+    while (pos != -1) {
+      v->push_back(line.substr(0, pos));
+      line.erase(0, pos + 1);
+
+      pos = line.find(delimiter);
+    }
+    v->push_back(line);
+  }
+
+  bool CenteredButton(const char* label, const ImVec2& size_arg, std::string test) {
+    ImGuiWindow* window = GetCurrentWindow();
+    
+    ImGuiContext& g = *GImGui;
+    const ImGuiStyle& style = g.Style;
+    const ImGuiID id = window->GetID(label);
+    const ImVec2 label_size = CalcTextSize(test.c_str(), NULL, true);
+
+    ImVec2 pos = window->DC.CursorPos;
+    ImVec2 size = CalcItemSize(size_arg, label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 2.0f);
+
+    const ImRect bb(pos, pos + size);
+
+    std::vector<std::string> str_vector;
+    breakApartLF(test, &str_vector);
+
+    PushID(label);
+    bool ret = ButtonEx("##label", size);
+    PopID();
+    ImVec2 line_size;
+    ImVec2 text_start;
+    int offset_x, offset_y; 
+    ImDrawList* DrawList = ImGui::GetWindowDrawList();
+    ImVec2 padding_regular = g.Style.TouchExtraPadding;
+    ImVec2 padding_for_resize = g.IO.ConfigWindowsResizeFromEdges ? g.WindowsHoverPadding : padding_regular;
+
+    float font_height = g.FontSize;
+
+    for (int i = 0; i < str_vector.size(); i++)
+    {
+      line_size = CalcTextSize(str_vector[i].c_str(), NULL, true);
+      offset_x = (size.x - line_size.x) / 2;
+      if (line_size.y != 0) {
+        offset_y = (size.y / str_vector.size()) * i + padding_for_resize.y;
+      }
+      else {
+        offset_y = font_height * i + padding_for_resize.y;
+      }
+      text_start.x = bb.Min.x + offset_x;
+      text_start.y = bb.Min.y + offset_y;
+      DrawList->AddText(text_start, ImGui::GetColorU32(ImGuiCol_Text), str_vector[i].c_str());
+    }
+    return ret;
+  }
+ 
+
+  void CenteredText(const char* label, const ImVec2& size_arg)
+  {
+    ImGuiWindow* window = GetCurrentWindow();
+
+    ImGuiContext& g = *GImGui;
+    const ImGuiStyle& style = g.Style;
+    const ImGuiID id = window->GetID(label);
+    const ImVec2 label_size = CalcTextSize(label, NULL, true);
+
+    ImVec2 pos = window->DC.CursorPos;
+    ImVec2 size = CalcItemSize(size_arg, label_size.x + style.FramePadding.x * 2.0f, label_size.y + style.FramePadding.y * 2.0f);
+
+    const ImVec2 pos2 = ImVec2((pos.x + size.x), (pos.y + size.y));
+    const ImRect bb(pos, pos2);
+
+    ItemSize(size, style.FramePadding.y);
+
+    const ImVec2 pos_min = ImVec2((bb.Min.x + style.FramePadding.x), (bb.Min.y + style.FramePadding.y));
+    const ImVec2 pos_max = ImVec2((bb.Max.x - style.FramePadding.x), (bb.Max.y - style.FramePadding.y));
+
+    const ImVec2 pos_min2 = ImVec2((bb.Min.x + style.FramePadding.x), (bb.Min.y + style.FramePadding.y-15));
+    const ImVec2 pos_max2 = ImVec2((bb.Max.x - style.FramePadding.x), (bb.Max.y - style.FramePadding.y-15));
+
+    RenderTextClipped(pos_min2, pos_max2, label , NULL, &label_size, style.ButtonTextAlign, &bb);
+    RenderTextClipped(pos_min, pos_max, label, NULL, &label_size, style.ButtonTextAlign, &bb);
   }
 
   void InputTextWithHintExt(const char* label, const char* hint, HintInputField & field, std::function<bool()> validation_function, bool* feedback) {

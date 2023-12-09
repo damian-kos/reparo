@@ -551,22 +551,42 @@ void Database::DeleteRepair(int& repair_id) {
   sqlite3_close(db_ptr);
 }
 
-void Database::RetreiveRepairsByDate(std::string date) {
-  printf("DeleteRepair is running\n");
+void Database::RetreiveRepairsByDate(std::string* date_1, int variant, std::string* date_2) {
+  printf("RetreiveRepairsByDate is running\n with value: %d", variant);
   sqlite3* db_ptr = PtrDB();
   sqlite3_stmt* stmt;
+  std::string query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date FROM repairs r "
+    "LEFT JOIN categories c ON r.category_id = c.category_id "
+    "LEFT JOIN models m ON r.model_id = m.model_id "
+    "LEFT JOIN colors co ON r.color_id = co.color_id "
+    "LEFT JOIN repair_states rs ON r.repair_state_id = rs.repair_state_id "
+    "LEFT JOIN customers cu ON r.customer_id = cu.customer_id ";
+    
+  std::unordered_map<int, std::string> queries = {
+    {1, " WHERE DATE(r.date) > DATE(?)"}, // after this date
+    {2, " WHERE DATE(r.date) < DATE(? )"}, // before this date
+    {3, " WHERE DATE(r.date) BETWEEN ? AND ?"}, // before this date
+  };
   std::vector<std::string> states;
-  const char* query = "SELECT * FROM repairs WHERE DATE(date) < DATE(?)";
-  
-  if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
-    std::string inputDate = date + " 00:00:00"; 
+  std::string date_1_str;
+  std::string date_2_str;
+  query += queries[variant];
+  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+    date_1_str = *date_1 + " 00:00:00"; 
+    sqlite3_bind_text(stmt, 1, date_1_str.c_str(), -1, SQLITE_STATIC);
+    printf("Date 1: |%s|\n", date_1_str.c_str());
 
-    if(sqlite3_bind_text(stmt, 1, inputDate.c_str(), -1, SQLITE_STATIC) == SQLITE_OK) {
-      while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int repair_id = sqlite3_column_int(stmt, 0);
-        std::cout << "Repair ID: " << repair_id << std::endl;
-      }
+    if (date_2) {
+      date_2_str = *date_2 + " 00:00:00";
+      printf("Date 2: |%s|\n", date_2_str.c_str());
+      sqlite3_bind_text(stmt, 2, date_2_str.c_str(), -1, SQLITE_STATIC);
     }
+    printf("SQL Query is: %s\n", queries[variant].c_str());
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      int repair_id = sqlite3_column_int(stmt, 0);
+      std::cout << "Repair ID: " << repair_id << std::endl;
+    }
+    
   }
   else {
     std::cout << "Error during deleting a repair: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
@@ -574,3 +594,5 @@ void Database::RetreiveRepairsByDate(std::string date) {
   sqlite3_finalize(stmt);
   sqlite3_close(db_ptr);
 }
+
+

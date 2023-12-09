@@ -5,13 +5,15 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+
 //-----------------------------------------------------------------------------------------------------------------
 
 
 #include "imguidatechooser.h"
 #include <time.h>               // very simple and common plain C header file (it's NOT the c++ <sys/time.h>). If not available it's probably better to implement it yourself rather than modifying this file.
-#include <ctype.h>  // toupper()
-
+#include <ctype.h> 
+#include <iomanip>
+#include <sstream>// toupper()
 namespace ImGui {
 
 
@@ -79,6 +81,12 @@ void SetDateToday(tm* date)    {
     return;
 }
 
+
+std::string rightJustify(std::string str) {
+  std::ostringstream oss;
+  oss << std::setw(11) << std::right << str;
+  return oss.str();
+}
 
 #ifndef IMGUIDATECHOOSER_ORIGINAL_IMPLEMENTATION
 // Not as good as the original version...
@@ -218,7 +226,7 @@ bool DateChooser(const char* label, tm& dateOut,const char* dateFormat,bool clos
     //ImGui::PushStyleColor(ImGuiCol_ChildBg, style.Colors[ImGuiCol_PopupBg]);
     ImGui::Spacing();
 
-    static const ImVec4 transparent(1,1,1,0);
+    static const ImVec4 transparent(1,1,0,0);
     ImGui::PushStyleColor(ImGuiCol_Button,transparent);
 
     static char yearString[12]="";sprintf(yearString,"%d",1900+d.tm_year);
@@ -233,7 +241,10 @@ bool DateChooser(const char* label, tm& dateOut,const char* dateFormat,bool clos
     ImGui::SameLine();
     //#       undef  IMGUIVARIOUSCONTROLS_H_
     //#       ifndef IMGUIVARIOUSCONTROLS_H_
-    ImGui::Text("%s",monthNames[d.tm_mon]);
+
+    std::string monthName = monthNames[d.tm_mon];
+    std::string month_r_just = rightJustify(monthName);
+    ImGui::Text("%s", month_r_just.c_str());
     /*#       else //IMGUIVARIOUSCONTROLS_H_
         static ImGui::PopupMenuSimpleParams popupMonthParams;
 
@@ -282,17 +293,18 @@ bool DateChooser(const char* label, tm& dateOut,const char* dateFormat,bool clos
     const static int numDaysPerMonth[12]={31,28,31,30,31,30,31,31,30,31,30,31};
     int maxDayOfCurMonth = numDaysPerMonth[d.tm_mon];   // This could be calculated only when needed (but I guess it's fast in any case...)
     if (maxDayOfCurMonth==28)   {
-        const int year = d.tm_year+1900;
+        const int year = d.tm_year+1900; 
         const bool bis = ((year%4)==0) && ((year%100)!=0 || (year%400)==0);
         if (bis) maxDayOfCurMonth=29;
     }
     static char curDayStr[3]="";
 
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered,style.Colors[ImGuiCol_HeaderHovered]);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, style.Colors[ImGuiCol_HeaderHovered]);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive,style.Colors[ImGuiCol_HeaderActive]);
 
     ImGui::Separator();
-
+    static tm cur_date = GetCurrentDate();
+    //RecalculateDateDependentFields(cur_date);
     IM_ASSERT(d.tm_mday==1);    // Otherwise the algo does not work
     // Display items
     for (int dw=0;dw<7;dw++)    {
@@ -306,14 +318,19 @@ bool DateChooser(const char* label, tm& dateOut,const char* dateFormat,bool clos
         if (dw==0) ImGui::Separator();
         ImGui::Spacing();
         //-----------------------------------------------------------------------
-        int curDay = dw-d.tm_wday;      // tm_wday is in [0,6]. For this to work here d must point to the first day of the month: i.e.: d.tm_mday = 1;
+        int curDay = dw-d.tm_wday; 
+        // tm_wday is in [0,6]. For this to work here d must point to the first day of the month: i.e.: d.tm_mday = 1;
         for (int row=0;row<7;row++) {
             int cday=curDay+7*row;
             if (cday>=0 && cday<maxDayOfCurMonth)  {
                 ImGui::PushID(row*10+dw);
                 if (cday<9) sprintf(curDayStr," %d",cday+1);
                 else sprintf(curDayStr,"%d",cday+1);
+                if (cday == cur_date.tm_mday && d.tm_mon == cur_date.tm_mon && d.tm_year == cur_date.tm_year) 
+                  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1,0,0,1));
+
                 if (ImGui::SmallButton(curDayStr)) {
+                    printf("\nDay is %d : %d\n", d.tm_mon, d.tm_mday);
                     //-------------------------
                     value_changed = true;
                     SetItemDefaultFocus();
@@ -323,6 +340,9 @@ bool DateChooser(const char* label, tm& dateOut,const char* dateFormat,bool clos
                     d=dateOut;
                     //fprintf(stderr,"Chosen date: %d-%d-%d/n",dateOut.tm_mday,dateOut.tm_mon+1,dateOut.tm_year+1900);
                 }
+                if (cday == cur_date.tm_mday && d.tm_mon == cur_date.tm_mon && d.tm_year == cur_date.tm_year) 
+                  ImGui::PopStyleColor();
+
                 ImGui::PopID();
             }
             else ImGui::TextUnformatted(" ");

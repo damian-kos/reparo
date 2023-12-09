@@ -25,6 +25,10 @@ price = repair_.price;
 }
 
 void InsertRepair::Render() {
+static tm date_from = {};
+ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
+ImGui::DateChooser("##From", date_from);
+ImGui::PopItemWidth();
 CustomerSection();
 DeviceSection();
 NotesSection();
