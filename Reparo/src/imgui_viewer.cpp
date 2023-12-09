@@ -193,6 +193,7 @@ namespace ImGui {
       text_start.x = bb.Min.x + offset_x;
       text_start.y = bb.Min.y + offset_y;
       DrawList->AddText(text_start, ImGui::GetColorU32(ImGuiCol_Text), str_vector[i].c_str());
+      
     }
     return ret;
   }
@@ -218,10 +219,6 @@ namespace ImGui {
     const ImVec2 pos_min = ImVec2((bb.Min.x + style.FramePadding.x), (bb.Min.y + style.FramePadding.y));
     const ImVec2 pos_max = ImVec2((bb.Max.x - style.FramePadding.x), (bb.Max.y - style.FramePadding.y));
 
-    const ImVec2 pos_min2 = ImVec2((bb.Min.x + style.FramePadding.x), (bb.Min.y + style.FramePadding.y-15));
-    const ImVec2 pos_max2 = ImVec2((bb.Max.x - style.FramePadding.x), (bb.Max.y - style.FramePadding.y-15));
-
-    RenderTextClipped(pos_min2, pos_max2, label , NULL, &label_size, style.ButtonTextAlign, &bb);
     RenderTextClipped(pos_min, pos_max, label, NULL, &label_size, style.ButtonTextAlign, &bb);
   }
 

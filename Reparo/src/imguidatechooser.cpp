@@ -326,7 +326,7 @@ bool DateChooser(const char* label, tm& dateOut,const char* dateFormat,bool clos
                 ImGui::PushID(row*10+dw);
                 if (cday<9) sprintf(curDayStr," %d",cday+1);
                 else sprintf(curDayStr,"%d",cday+1);
-                if (cday == cur_date.tm_mday && d.tm_mon == cur_date.tm_mon && d.tm_year == cur_date.tm_year) 
+                if (cday+1 == cur_date.tm_mday && d.tm_mon == cur_date.tm_mon && d.tm_year == cur_date.tm_year) 
                   ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1,0,0,1));
 
                 if (ImGui::SmallButton(curDayStr)) {
@@ -340,7 +340,7 @@ bool DateChooser(const char* label, tm& dateOut,const char* dateFormat,bool clos
                     d=dateOut;
                     //fprintf(stderr,"Chosen date: %d-%d-%d/n",dateOut.tm_mday,dateOut.tm_mon+1,dateOut.tm_year+1900);
                 }
-                if (cday == cur_date.tm_mday && d.tm_mon == cur_date.tm_mon && d.tm_year == cur_date.tm_year) 
+                if (cday+1 == cur_date.tm_mday && d.tm_mon == cur_date.tm_mon && d.tm_year == cur_date.tm_year) 
                   ImGui::PopStyleColor();
 
                 ImGui::PopID();

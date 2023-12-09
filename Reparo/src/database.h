@@ -18,6 +18,7 @@ struct RepairUpdates {
 struct RepairsSort {
   std::unordered_map<int, Repair> repairs;
   std::vector<int> repairs_order;
+  double total = 0.0f;
 };
 
 class Database {
@@ -42,7 +43,10 @@ public:
     static std::vector<RepairUpdates> RetreiveRepairUdpdates(int& repair_id);
     static std::vector<std::string> GetRepairStatesNames();
     static void DeleteRepair(int& repair_id);
-    static void RetreiveRepairsByDate(std::string* date, int variant = 1, std::string* date_2 = nullptr);
+    static RepairsSort RetreiveRepairsByDate(std::string* date, 
+                                             int variant = 1, 
+                                             std::string* date_2 = nullptr, 
+                                             int state = 0);
     static sqlite3* PtrDB();
 
 private:

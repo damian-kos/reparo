@@ -74,6 +74,9 @@
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
     <IncludePath>$(ProjectDir)vendor\sqlite3;$(ProjectDir)vendor\nlohmann;$(ProjectDir)vendor\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>..\$(TargetName)\src\vendor\imgui;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -180,15 +183,20 @@
     <ClCompile Include="vendor\sqlite3\sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="devices.json" />
+    <None Include="vendor\parts_stock.db" />
     <None Include="vendor\sqlite3\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="vendor\sqlite3\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="..\..\..\..\..\Pobrane\Assistant\Assistant-VariableFont_wght.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\Assistant.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\Cousine-Regular.ttf" />
     <Font Include="vendor\imgui\msc\fonts\DroidSans.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\Karla-Regular.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\ProggyClean.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\ProggyTiny.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\Roboto-Medium.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

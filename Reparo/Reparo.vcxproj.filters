@@ -145,14 +145,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="devices.json" />
     <None Include="vendor\sqlite3\README.md" />
+    <None Include="vendor\parts_stock.db" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="vendor\sqlite3\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="vendor\imgui\msc\fonts\DroidSans.ttf" />
-    <Font Include="..\..\..\..\..\Pobrane\Assistant\Assistant-VariableFont_wght.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\Cousine-Regular.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\Assistant.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\Karla-Regular.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\ProggyClean.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\ProggyTiny.ttf" />
+    <Font Include="vendor\imgui\msc\fonts\Roboto-Medium.ttf" />
   </ItemGroup>
 </Project>

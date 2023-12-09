@@ -4,11 +4,11 @@ RepairsView::RepairsView() {
     std::cout << "RepairsView Created empty" << std::endl;
 
     names = Database::GetRepairStatesNames();
-    opened = new bool[5];
-    for (int i = 0; i < 5; i++) {
-      opened[i] = true;
-    }
-    repairs = Database::RetreiveRepairsOfState(curr_chosen_tab+1);
+    opened = new bool[names.size()];
+    //for (int i = 0; i < names.size(); i++) {
+    //  opened[i] = true;
+    //}
+    all_repairs_of_state = Database::RetreiveRepairsOfState(curr_chosen_tab+1);
 }
 
 RepairsView::~RepairsView() { std::cout << "RepairsView dESTROYED " << std::endl; }
@@ -27,50 +27,45 @@ void RepairsView::Render() {
         curr_chosen_tab = n;
         if (curr_chosen_tab != prev_chosen_tab) {
           std::cout << "Reload repairs for this tab: " << n+1 << std::endl;
-          repairs = Database::RetreiveRepairsOfState(n + 1);
+          all_repairs_of_state = Database::RetreiveRepairsOfState(n + 1);
           prev_chosen_tab = curr_chosen_tab;
         }
 
         ImGui::EndTabItem();
       }
     }
-    RepairsToTable(repairs);
+    RepairsToTable(all_repairs_of_state, curr_chosen_tab, true);
     ImGui::EndTabBar();
   }
   RunModal();
 }
 
-void RepairsView::RepairsToTable(RepairsSort& retreived_repairs) {
+void RepairsView::RepairsToTable(RepairsSort& retreived_repairs, int& state, bool sorting) {
   static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable;
   static int selected = -1;
   if (ImGui::BeginTable("##states", 11, flags)) {
-    ImGui::TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
-    ImGui::TableSetupColumn("Model", ImGuiTableColumnFlags_WidthFixed);
-    ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed);
-    ImGui::TableSetupColumn("Color", ImGuiTableColumnFlags_WidthFixed);
-    ImGui::TableSetupColumn("Price", ImGuiTableColumnFlags_WidthFixed);
-    ImGui::TableSetupColumn("Note", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableSetupColumn("Note Hidden", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableSetupColumn("Cust. Phone number", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableSetupColumn("Cust. Name", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableSetupColumn("State", ImGuiTableColumnFlags_WidthStretch);
-    ImGui::TableSetupColumn("Date", ImGuiTableColumnFlags_WidthStretch);
+    std::vector<std::string> col_names = { "ID", "Model", "Category", "Color", 
+                                           "Price", "Note", "Note hidden", 
+                                           "Cust. Phone Number", "Cust. Name", 
+                                           "State", "Date" };
+    
+    for(auto& name : col_names)
+      ImGui::TableSetupColumn(name.c_str(), ImGuiTableColumnFlags_WidthFixed);
 
     ImGui::TableHeadersRow();
+    if (sorting)
+      if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs())
+        if (sort_specs->SpecsDirty)
+        {
+          printf("Sorted\n");
+          retreived_repairs.repairs.clear();
+          retreived_repairs.repairs_order.clear();
+          retreived_repairs = Database::RetreiveRepairsOfState(state + 1,
+                                                      sort_specs->Specs->SortDirection, 
+                                                      sort_specs->Specs->ColumnIndex);
 
-    if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs())
-      if (sort_specs->SpecsDirty)
-      {
-        printf("Sorted\n");
-        retreived_repairs.repairs.clear();
-        retreived_repairs.repairs_order.clear();
-
-        retreived_repairs = Database::RetreiveRepairsOfState(curr_chosen_tab+1,
-                                                    sort_specs->Specs->SortDirection, 
-                                                    sort_specs->Specs->ColumnIndex);
-
-        sort_specs->SpecsDirty = false;
-      }
+          sort_specs->SpecsDirty = false;
+        }
     for (auto& pair : retreived_repairs.repairs_order) {
       //const bool is_selected = (selected == pair.first);
       const bool is_selected = (selected == pair);
@@ -129,7 +124,7 @@ void RepairsView::RunModal() {
   ModalController::SubmitConfirm("Delete this repair?", repair_to_init, deletion);
   if (deletion == ConfirmResult::CONIFRM_SUBMIT) {
     Database::DeleteRepair(modal_on_id);
-    repairs = Database::RetreiveRepairsOfState(curr_chosen_tab + 1);
+    all_repairs_of_state = Database::RetreiveRepairsOfState(curr_chosen_tab + 1);
     deletion = ConfirmResult::CONIFRM_IDLE;
   }
 }
