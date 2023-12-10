@@ -9,15 +9,8 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imgui_viewer.h"
-#include "database.h"
-#include "imguidatechooser.h"
 #include "repairs.h"
 
-struct r_tm {
-  tm _tm = {};
-  bool changed = false;
-  std::string* str = nullptr;
-};
 
 class Finances : RepairsView {
 public:
@@ -28,20 +21,21 @@ public:
   void Render() override;
 
 private:
-  static int relation_chosen;
-  RepairsSort all_repairs_by_date;
+  int fi_table_select = -1;
+  date_rel fi_relation;
+  r_tm fi_date_from;
+  r_tm fi_date_to;
+  RepairsSort fi_all_repair_by_query;
+
+private:
   RepairsSort* repairs_to_table;
   int selected_state = 0;
   std::vector<RepairsSort> repairs_per_state;
-  r_tm date_from;
-  r_tm date_to;
+  Repair repair_to_init;
+
 
 private:
-  void Calendar(int ID, r_tm& date);
   void Summary();
   void PartialSummaries();
-  void LeadingZero(int& date_int, std::string& date_str);
-  void DateToStr(r_tm& date);
-  void DateDirection();
-  void RefreshRepairs();
+  void RefreshRepairs() override;
 };

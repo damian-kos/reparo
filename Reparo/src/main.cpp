@@ -57,7 +57,7 @@ int main(int, char**)
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 400, 200, screenWidth-600, screenHeight-300, nullptr, nullptr, wc.hInstance, nullptr);
+    HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 400, 50, screenWidth-500, screenHeight-100, nullptr, nullptr, wc.hInstance, nullptr);
 
 
 
@@ -270,6 +270,7 @@ int main(int, char**)
         }
 
         if (show_repair_states_window) {
+
             ImGui::Begin("Repairs", &show_repair_states_window);
             ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
             repairs_view.Render();

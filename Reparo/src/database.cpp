@@ -294,73 +294,6 @@ void Database::InsertRepair(Repair repair) {
     sqlite3_close(db_ptr);
 }
 
-RepairsSort Database::RetreiveRepairsOfState(int state, int order, int column) {
-    std::cout << "RetreiveRepairsOfState is running " << std::endl;
-    std::cout << "Order " << order << std::endl;
-    sqlite3* db_ptr = PtrDB();
-    std::unordered_map<int, std::string> sort_order = {
-      {0, "DESC"},
-      {1, "DESC"},
-      {2, "ASC"},
-    };
-    std::unordered_map<int, std::string> order_by = {
-      {0, "repair_id"},
-      {1, "m.model"},
-      {2, "c.category"},
-      {4, "r.price"},
-      {10, "r.date"}
-    };
-    RepairsSort retreived;
-    sqlite3_stmt* stmt;
-    std::string query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date FROM repairs r "
-        "LEFT JOIN categories c ON r.category_id = c.category_id "
-        "LEFT JOIN models m ON r.model_id = m.model_id "
-        "LEFT JOIN colors co ON r.color_id = co.color_id "
-        "LEFT JOIN repair_states rs ON r.repair_state_id = rs.repair_state_id "
-        "LEFT JOIN customers cu ON r.customer_id = cu.customer_id "
-        "WHERE r.repair_state_id = ? ORDER BY  " + order_by[column] + " " + sort_order[order];
-    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
-        sqlite3_bind_int(stmt, 1, state);
-  
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-          int repair_id = sqlite3_column_int(stmt, 0);
-          int customer_id = sqlite3_column_int(stmt, 1);
-          int repair_model_id = sqlite3_column_int(stmt, 2);
-          int repair_category_id = sqlite3_column_int(stmt, 3);
-          int repair_color_id = sqlite3_column_int(stmt, 4);
-          std::string visible_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
-          std::string hidden_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
-          double price = sqlite3_column_double(stmt, 7);
-          std::string date_str = sqlite3_column_text(stmt, 9) ? reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9)) : "";
-
-          std::string device_name = (repair_model_id > 0) ?
-              reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11)) : "N/A";
-          std::string color = (repair_color_id> 0) ?
-              reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12)) : "N/A";
-          Device device(device_name, color);
-          std::string category = (repair_category_id > 0) ?
-              reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10)) : "N/A";
-          std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 13));
-            
-          std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 15));
-          std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
-          std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
-          std::string customer_phone = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 18));
-          Customer customer(customer_phone, customer_name, customer_surname, customer_email);
-
-          Repair repair(customer, device, category, price, visible_note, hidden_note, state, date_str);
-          retreived.repairs.emplace(repair_id, repair);
-          retreived.repairs_order.emplace_back(repair_id);
-        }
-    }
-   
-    else {
-        std::cout << "Repairs couldn't be retreived " << sqlite3_errmsg(db_ptr) << std::endl;
-    }
-    sqlite3_finalize(stmt);
-    sqlite3_close(db_ptr);
-    return retreived;
-}
 
 std::unordered_map<int, std::string> Database::GetRepairStates() {
     std::cout << "GetRepairsStates is running " << std::endl;
@@ -551,10 +484,80 @@ void Database::DeleteRepair(int& repair_id) {
   sqlite3_close(db_ptr);
 }
 
-RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int variant, std::string* date_2, int state) {
-  printf("RetreiveRepairsByDate is running with VARIANT: %d\n", variant);
+RepairsSort Database::RetreiveRepairsOfState(int state, int order, int column) {
+  std::cout << "RetreiveRepairsOfState is running " << std::endl;
+  std::cout << "Order " << order << std::endl;
+  sqlite3* db_ptr = PtrDB();
+  std::unordered_map<int, std::string> sort_order = {
+    {0, "DESC"},
+    {1, "DESC"},
+    {2, "ASC"},
+  };
+  std::unordered_map<int, std::string> order_by = {
+    {0, "repair_id"},
+    {1, "m.model"},
+    {2, "c.category"},
+    {4, "r.price"},
+    {10, "r.date"}
+  };
+  RepairsSort retreived;
+  sqlite3_stmt* stmt;
+  std::string query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date FROM repairs r "
+    "LEFT JOIN categories c ON r.category_id = c.category_id "
+    "LEFT JOIN models m ON r.model_id = m.model_id "
+    "LEFT JOIN colors co ON r.color_id = co.color_id "
+    "LEFT JOIN repair_states rs ON r.repair_state_id = rs.repair_state_id "
+    "LEFT JOIN customers cu ON r.customer_id = cu.customer_id "
+    "WHERE r.repair_state_id = ? ORDER BY  " + order_by[column] + " " + sort_order[order];
+  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+    sqlite3_bind_int(stmt, 1, state);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      int repair_id = sqlite3_column_int(stmt, 0);
+      int customer_id = sqlite3_column_int(stmt, 1);
+      int repair_model_id = sqlite3_column_int(stmt, 2);
+      int repair_category_id = sqlite3_column_int(stmt, 3);
+      int repair_color_id = sqlite3_column_int(stmt, 4);
+      std::string visible_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+      std::string hidden_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
+      double price = sqlite3_column_double(stmt, 7);
+      std::string date_str = sqlite3_column_text(stmt, 9) ? reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9)) : "";
+
+      std::string device_name = (repair_model_id > 0) ?
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11)) : "N/A";
+      std::string color = (repair_color_id > 0) ?
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12)) : "N/A";
+      Device device(device_name, color);
+      std::string category = (repair_category_id > 0) ?
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10)) : "N/A";
+      std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 13));
+
+      std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 15));
+      std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
+      std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
+      std::string customer_phone = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 18));
+      Customer customer(customer_phone, customer_name, customer_surname, customer_email);
+
+      Repair repair(customer, device, category, price, visible_note, hidden_note, state, date_str);
+      retreived.repairs.emplace(repair_id, repair);
+      retreived.repairs_order.emplace_back(repair_id);
+      retreived.total += price;
+    }
+  }
+
+  else {
+    std::cout << "Repairs couldn't be retreived " << sqlite3_errmsg(db_ptr) << std::endl;
+  }
+  sqlite3_finalize(stmt);
+  sqlite3_close(db_ptr);
+  return retreived;
+}
+
+RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direction, std::string* date_2, int state, int asc_desc, int order) {
+  printf("RetreiveRepairsByDate is running with VARIANT: %d STATE: %d DIRECTION: %d ORDER: %d\n", date_direction, state, asc_desc, order);
   sqlite3* db_ptr = PtrDB();
   sqlite3_stmt* stmt;
+
   std::string query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date FROM repairs r "
     "LEFT JOIN categories c ON r.category_id = c.category_id "
     "LEFT JOIN models m ON r.model_id = m.model_id "
@@ -563,40 +566,71 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int variant, st
     "LEFT JOIN customers cu ON r.customer_id = cu.customer_id ";
 
   std::unordered_map<int, std::string> queries = {
-    {1, " WHERE DATE(r.date) < DATE(?)"}, // after this date
-    {2, " WHERE DATE(r.date) > DATE(? )"}, // before this date
+    {0, " WHERE DATE(r.date) <= datetime('now', 'localtime')"},
+    {1, " WHERE DATE(r.date) <= DATE(?)"}, // after this date
+    {2, " WHERE DATE(r.date) >= DATE(? )"}, // before this date
     {3, " WHERE DATE(r.date) BETWEEN ? AND ?"}, // before this date
   };
-
-  std::vector<std::string> states;
-  std::string date_1_str;
-  std::string date_2_str;
-  query += queries[variant];
+  if(date_1)
+    query += queries[date_direction];
+  else {
+    query += queries[0];
+  }
   if (state != 0) {
-    printf("STATE ID: %d\n", state);
     query += " AND r.repair_state_id = ?";
   }
-  //printf(query.c_str());
-  RepairsSort retreived;
-  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
-    date_1_str = *date_1 + " 00:00:00"; 
-    sqlite3_bind_text(stmt, 1, date_1_str.c_str(), -1, SQLITE_STATIC);
-    printf("Date 1: |%s|\n", date_1_str.c_str());
 
-    if (date_2) {
-      date_2_str = *date_2 + " 00:00:00";
-      printf("Date 2: |%s|\n", date_2_str.c_str());
-      sqlite3_bind_text(stmt, 2, date_2_str.c_str(), -1, SQLITE_STATIC);
-      if (state != 0) {
-        sqlite3_bind_int(stmt, 3, state);
+  std::unordered_map<int, std::string> sort_order = {
+  {1, "DESC"},
+  {2, "ASC"},
+  };
+  std::unordered_map<int, std::string> order_by = {
+  {0, "repair_id"},
+  {1, "m.model"},
+  {2, "c.category"},
+  {4, "r.price"},
+  {10, "r.date"}
+  };
+
+  query += " ORDER BY " + order_by[order] + " " + sort_order[asc_desc];
+
+
+  RepairsSort retreived;
+  std::string date_1_str, date_2_str;
+
+
+  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+    std::string sum_query = "RUN WITH: ";
+    if (date_1) {
+      date_1_str = *date_1 + " 00:00:00";
+      sqlite3_bind_text(stmt, 1, date_1_str.c_str(), -1, SQLITE_STATIC);
+      sum_query += "DATE_1 ";
+      if (date_2) {
+        date_2_str = *date_2 + " 00:00:00";
+        sqlite3_bind_text(stmt, 2, date_2_str.c_str(), -1, SQLITE_STATIC);
+        sum_query += "DATE_2 ";
+        if (state != 0) {
+          sqlite3_bind_int(stmt, 3, state);
+          sum_query += "STATE-BIND-3 ";
+
+        }
+      }
+      else {
+        if (state != 0) {
+          sqlite3_bind_int(stmt, 2, state);
+          sum_query += "STATE-BIND-2 ";
+
+        }
       }
     }
     else {
       if (state != 0) {
-        sqlite3_bind_int(stmt, 2, state);
+        sqlite3_bind_int(stmt, 1, state);
+        sum_query += "STATE-BIND-1 ";
       }
     }
-
+    printf("%s\n", sum_query.c_str());
+    printf("Query is: %s\n", query.c_str());
     //printf("SQL Query is: %s\n", queries[variant].c_str());
     while (sqlite3_step(stmt) == SQLITE_ROW) {
       int repair_id = sqlite3_column_int(stmt, 0);
@@ -625,7 +659,7 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int variant, st
       Customer customer(customer_phone, customer_name, customer_surname, customer_email);
 
       Repair repair(customer, device, category, price, visible_note, hidden_note, state, date_str);
-      printf("Repair ID: %d = %.2f\n", repair_id, price);
+      //printf("Repair ID: %d = %.2f\n", repair_id, price);
       retreived.repairs.emplace(repair_id, repair);
       retreived.repairs_order.emplace_back(repair_id);
       retreived.total += price;

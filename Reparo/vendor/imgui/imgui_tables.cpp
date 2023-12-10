@@ -539,7 +539,7 @@ bool    ImGui::BeginTableEx(const char* name, ImGuiID id, int columns_count, ImG
     {
         // Initialize
         table->SettingsOffset = -1;
-        table->IsSortSpecsDirty = true;
+        table->IsSortSpecsDirty = false;
         table->InstanceInteracted = -1;
         table->ContextPopupColumn = -1;
         table->ReorderColumn = table->ResizedColumn = table->LastResizedColumn = -1;

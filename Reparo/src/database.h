@@ -44,9 +44,10 @@ public:
     static std::vector<std::string> GetRepairStatesNames();
     static void DeleteRepair(int& repair_id);
     static RepairsSort RetreiveRepairsByDate(std::string* date, 
-                                             int variant = 1, 
+                                             int date_direction = 0, 
                                              std::string* date_2 = nullptr, 
-                                             int state = 0);
+                                             int state = 0, int asc_desc = 1,
+                                             int order_by = 10);
     static sqlite3* PtrDB();
 
 private:
