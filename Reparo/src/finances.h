@@ -12,13 +12,14 @@
 #include "repairs.h"
 
 
-class Finances : RepairsView {
+class Finances : public RepairsView {
 public:
   Finances();
   ~Finances();
 
 public:
   void Render() override;
+  std::shared_ptr<EditRepair> GetEditRepair() override;
 
 private:
   int fi_table_select = -1;
@@ -31,8 +32,6 @@ private:
   RepairsSort* repairs_to_table;
   int selected_state = 0;
   std::vector<RepairsSort> repairs_per_state;
-  Repair repair_to_init;
-
 
 private:
   void Summary();

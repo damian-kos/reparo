@@ -248,13 +248,16 @@ int main(int, char**)
 
    
         ImGui::End();
-
         if (show_insert_customer_win) {
+           
             ImGui::Begin("Add customer", &show_insert_customer_win);
+            //static InsertCustomer insert_customer;
             ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
             insert_customer.Render();
             ImGui::End();
         }
+
+       
 
         if (show_finances) {
           ImGui::Begin("Finances", &show_finances);
@@ -270,7 +273,6 @@ int main(int, char**)
         }
 
         if (show_repair_states_window) {
-
             ImGui::Begin("Repairs", &show_repair_states_window);
             ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
             repairs_view.Render();
@@ -278,14 +280,13 @@ int main(int, char**)
         }
 
         if (*EditRepair::show_repair) {
-            ImGui::Begin("Edit Repair", EditRepair::show_repair);
-            ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
-            std::shared_ptr<EditRepair> edit_repair = repairs_view.GetEditRepair();
-            if (edit_repair) {
-                edit_repair->Render();
-            }
-
-            ImGui::End();
+          ImGui::Begin("Edit Repair", EditRepair::show_repair);
+          ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+          EditRepair* edit_repair = EditRepair::Get();
+          if (edit_repair) {
+              edit_repair->Render();
+          }
+          ImGui::End();
         }
 
         // Rendering

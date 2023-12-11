@@ -10,6 +10,9 @@ Finances::Finances() {
 Finances::~Finances() { printf("Finances Destroyed"); }
 
 void Finances::Render() {
+  //if (ImGui::IsWindowFocused()) {
+  //  printf("Finances Focused\n");
+  //}
   if (ImGui::Button("Test Button")) {
     printf("RelationChosen: %d\n", fi_relation.number);
   }
@@ -31,6 +34,7 @@ void Finances::Render() {
   if(repairs_to_table)
     RepairsView::RepairsToTable(fi_date_from, fi_relation.number, fi_date_to, state_tmp, *repairs_to_table, fi_table_select);
   RepairsView::RunModal();
+  Test();
 }
 
 void Finances::Summary() {
@@ -77,6 +81,11 @@ void Finances::RefreshRepairs() {
     new_repairs = Database::RetreiveRepairsByDate(fi_date_from.str, fi_relation.number, fi_date_to.str, i + 1);
     repairs_per_state.emplace_back(new_repairs);
   }
+}
+
+std::shared_ptr<EditRepair> Finances::GetEditRepair()
+{
+  return RepairsView::GetEditRepair();
 }
 
 

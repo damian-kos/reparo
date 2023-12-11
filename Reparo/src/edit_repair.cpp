@@ -2,6 +2,8 @@
 #include "edit_repair.h"
 
 int EditRepair::instance_count = 0;
+
+EditRepair* EditRepair::instance = nullptr;
 bool* EditRepair::show_repair = new bool(false);
 
 EditRepair::EditRepair(Repair& repair, int passed_repair_id) : InsertRepair(repair), repair_id(passed_repair_id) {
@@ -10,6 +12,10 @@ EditRepair::EditRepair(Repair& repair, int passed_repair_id) : InsertRepair(repa
     selected_state = repair.state;
     updates = Database::RetreiveRepairUdpdates(passed_repair_id);
     std::cout << "EditRepair created " << instance_count << std::endl;
+    if (instance != nullptr) {
+      delete instance;
+    }
+    instance = this;
 }
 
 EditRepair::~EditRepair() { instance_count--;  std::cout << "EditRepair destroyed " << instance_count << std::endl;  }
@@ -178,4 +184,8 @@ void EditRepair::UpdateSummary() {
   Database::InsertRepairUpdateDesc(repair_id, summary);
   updates = Database::RetreiveRepairUdpdates(repair_id);
   
+}
+
+EditRepair* EditRepair::Get() {
+  return instance;
 }

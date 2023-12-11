@@ -25,25 +25,29 @@ public:
 
 public:
   virtual void Render();
+  //Date related methods
   void OnDatesChanged(r_tm& date_from, int& relation, r_tm& date_to,  RepairsSort& repairs, int state = 0);
   void OnDatesDirectionChange(r_tm& date_from, date_rel& relation, r_tm& date_to, RepairsSort& repairs, int state);
   void Calendar(int ID, r_tm& date);
   void DateToStr(r_tm& date);
   void DateDirection(date_rel& relation);
   void CalendarsRender(const int& relation, r_tm& date_from, r_tm& date_to);
+  // More ImGui::Related methods
   void RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, const int state, RepairsSort& repairs, int& selected);
   void RunModal();
-  std::shared_ptr<EditRepair> GetEditRepair();
+  virtual std::shared_ptr<EditRepair> GetEditRepair();
   virtual void RefreshRepairs();
+
+  void Test();
 
 private:
   void StatesTabBar();
   void LeadingZero(int& date_int, std::string& date_str);
 
 protected:
-  bool* opened;
-  std::vector<std::string> names; // names of states in Db
-
+  std::vector<std::string> names; // Names of states in Db
+  std::shared_ptr<EditRepair> edit_repair;
+  bool refresh_repairs = false;
 
 private:
   int rv_table_select = -1;
@@ -51,13 +55,13 @@ private:
   r_tm rv_date_from;
   r_tm rv_date_to;
   RepairsSort rv_all_repairs_by_query;
+  Repair repair_to_init;
 
 private:
+  bool* opened; // Based on num of names
   int prev_chosen_tab;
   int curr_chosen_tab;
-  Repair repair_to_init;
   bool modal;
   int modal_on_id;
   ConfirmResult deletion = ConfirmResult::CONIFRM_IDLE;
-  std::shared_ptr<EditRepair> edit_repair;
 };

@@ -9,9 +9,12 @@ RepairsView::RepairsView() {
     opened = new bool[names.size()];
 }
 
-RepairsView::~RepairsView() { std::cout << "RepairsView dESTROYED " << std::endl; }
+RepairsView::~RepairsView() { std::cout << "RepairsView Destroyed " << std::endl; }
 
 void RepairsView::Render() {
+  //if (ImGui::IsWindowFocused()) {
+  //  printf("Repairs Focused\n");
+  //}
   if (ImGui::Button("Test Button")) {
     printf("RelationChosen: %d\n", rv_relation.number);
   }
@@ -24,6 +27,7 @@ void RepairsView::Render() {
 
   StatesTabBar();
   RunModal();
+  Test();
 }
 
 void RepairsView::StatesTabBar()
@@ -203,9 +207,8 @@ void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, 
       }
       if (ImGui::BeginPopupContextItem()) {
         if (ImGui::Button("Update repair")) {
+          EditRepair* edit_repair = new EditRepair(retreived.repairs[pair], pair);
           *EditRepair::show_repair = true;
-          repair_to_init = retreived.repairs[pair];
-          edit_repair = std::make_shared<EditRepair>(repair_to_init, pair);
         }
         if (ImGui::Button("Delete")) {
           modal = true;
@@ -248,7 +251,8 @@ void RepairsView::RunModal() {
   ModalController::SubmitConfirm("Delete this repair?", repair_to_init, deletion);
   if (deletion == ConfirmResult::CONIFRM_SUBMIT) {
     Database::DeleteRepair(modal_on_id);
-    rv_all_repairs_by_query = Database::RetreiveRepairsOfState(curr_chosen_tab + 1);
+    //RefreshRepairs();
+    refresh_repairs = true;
     deletion = ConfirmResult::CONIFRM_IDLE;
   }
 }
@@ -259,5 +263,15 @@ std::shared_ptr<EditRepair> RepairsView::GetEditRepair() {
 }
 
 void RepairsView::RefreshRepairs() {
+  rv_all_repairs_by_query = Database::RetreiveRepairsByDate(rv_date_from.str, rv_relation.number, rv_date_to.str, curr_chosen_tab+1);
+}
 
+
+void RepairsView::Test() {
+
+  //refresh_repairs = true;
+  if (refresh_repairs) {
+    printf("Repairs in RV to be refreshed");
+    refresh_repairs = false;
+  }
 }
