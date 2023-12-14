@@ -136,6 +136,7 @@ void InsertRepair::RunModal(Repair& repair) {
       }
       Database::InsertRepair(repair);
       //ResetFields();
+      Notify();
       result = ConfirmResult::CONIFRM_IDLE;
 
   }
@@ -161,3 +162,20 @@ void InsertRepair::TestButton() {
 //  }
 }
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
+
+
+
+void InsertRepair::Attach(IObserver* observer) {
+  list_observer.push_back(observer);
+}
+
+void InsertRepair::Detach(IObserver* observer) {
+  list_observer.erase(std::remove(list_observer.begin(), list_observer.end(), observer), list_observer.end());
+}
+
+void InsertRepair::Notify() {
+  for (IObserver* observer : list_observer) {
+    observer->Update(1);
+  }
+}
+

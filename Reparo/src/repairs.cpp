@@ -23,11 +23,10 @@ void RepairsView::Render() {
   OnDatesChanged(rv_date_from, rv_relation.number, rv_date_to,
                  rv_all_repairs_by_query, curr_chosen_tab+1);
   OnDatesDirectionChange(rv_date_from, rv_relation, rv_date_to,
-    rv_all_repairs_by_query, curr_chosen_tab + 1);
-
+                         rv_all_repairs_by_query);
   StatesTabBar();
   RunModal();
-  Test();
+
 }
 
 void RepairsView::StatesTabBar()
@@ -37,28 +36,26 @@ void RepairsView::StatesTabBar()
   if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
   {
     for (int n = 0; n < names.size(); n++) {
-      if (opened[n] && ImGui::BeginTabItem(names[n].c_str(), &opened[n], ImGuiTabItemFlags_None))
-      {
+      if (opened[n] && ImGui::BeginTabItem(names[n].c_str(), &opened[n], ImGuiTabItemFlags_None)) {
         curr_chosen_tab = n;
-       
         if (curr_chosen_tab != prev_chosen_tab) {
           std::cout << "Reload repairs for this tab: " << n + 1 << std::endl;
-          //rv_all_repairs_by_query = Database::RetreiveRepairsByDate(nullptr, 0, nullptr, n + 1);
           printf("Called from RepairsView StatesTabBar\n");
-
           rv_all_repairs_by_query = Database::RetreiveRepairsByDate(rv_date_from.str, rv_relation.number, rv_date_to.str, n + 1);
           prev_chosen_tab = curr_chosen_tab;
         }
-
         ImGui::EndTabItem();
       }
     }
-    RepairsToTable(rv_date_from, rv_relation.number, rv_date_to, curr_chosen_tab+1, rv_all_repairs_by_query, rv_table_select);
+    RepairsToTable(rv_date_from, rv_relation.number, rv_date_to, 
+                   curr_chosen_tab+1, rv_all_repairs_by_query, rv_table_select);
     ImGui::EndTabBar();
   }
 }
 
-void RepairsView::OnDatesChanged(r_tm & date_from, int& relation, r_tm & date_to,  RepairsSort& repairs, int state) {
+void RepairsView::OnDatesChanged(r_tm & date_from, int& relation, r_tm & date_to,  
+                                 RepairsSort& repairs, int state) {
+
   if (!(relation == 3)) {
     if (date_to.str) {
       printf("DATE TO POINTER DELETED \n");
@@ -67,11 +64,13 @@ void RepairsView::OnDatesChanged(r_tm & date_from, int& relation, r_tm & date_to
     }
   }
   if (date_from.changed) {
-    printf("STATE ID IS: %d", state);
+    printf("STATE ID IS: %d\n", state);
     if (date_to.str) 
-      repairs = Database::RetreiveRepairsByDate(date_from.str, relation, date_to.str, state);
+      repairs = Database::RetreiveRepairsByDate(date_from.str, relation, 
+                                                date_to.str, state);
     else
-      repairs = Database::RetreiveRepairsByDate(date_from.str, relation, nullptr, state);
+      repairs = Database::RetreiveRepairsByDate(date_from.str, relation, 
+                                                nullptr, state);
     RefreshRepairs();
     date_from.changed = false;
   }
@@ -84,7 +83,7 @@ void RepairsView::OnDatesChanged(r_tm & date_from, int& relation, r_tm & date_to
   }
 }
 
-void RepairsView::OnDatesDirectionChange(r_tm& date_from, date_rel& relation, r_tm& date_to, RepairsSort& repairs, int state) {
+void RepairsView::OnDatesDirectionChange(r_tm& date_from, date_rel& relation, r_tm& date_to, RepairsSort& repairs) {
   if (relation.changed) {
     printf("RELATION CHANGED\n");
     if (relation.number == 3 && date_to.str == nullptr) {
@@ -99,7 +98,6 @@ void RepairsView::OnDatesDirectionChange(r_tm& date_from, date_rel& relation, r_
       DateToStr(date_from);
       date_from.changed = true;
     }
-    //repairs = Database::RetreiveRepairsByDate(date_from.str, relation.number, date_to.str, state);
   }
   relation.changed = false;
 
@@ -250,9 +248,10 @@ void RepairsView::RunModal() {
   }
   ModalController::SubmitConfirm("Delete this repair?", repair_to_init, deletion);
   if (deletion == ConfirmResult::CONIFRM_SUBMIT) {
-    Database::DeleteRepair(modal_on_id);
+    //Database::DeleteRepair(modal_on_id);
     //RefreshRepairs();
-    refresh_repairs = true;
+    Notify();
+
     deletion = ConfirmResult::CONIFRM_IDLE;
   }
 }
@@ -266,12 +265,19 @@ void RepairsView::RefreshRepairs() {
   rv_all_repairs_by_query = Database::RetreiveRepairsByDate(rv_date_from.str, rv_relation.number, rv_date_to.str, curr_chosen_tab+1);
 }
 
+void RepairsView::Attach(IObserver* observer) {
+  list_observer.push_back(observer);
+}
 
-void RepairsView::Test() {
+void RepairsView::Detach(IObserver* observer) {
+  list_observer.erase(std::remove(list_observer.begin(), list_observer.end(), observer), list_observer.end());
+}
 
-  //refresh_repairs = true;
-  if (refresh_repairs) {
-    printf("Repairs in RV to be refreshed");
-    refresh_repairs = false;
+void RepairsView::Notify() {
+  for (IObserver* observer : list_observer) {
+    observer->Update(1);
   }
+}
+void RepairsView::Update(const int& passed_int) {
+  RefreshRepairs();
 }

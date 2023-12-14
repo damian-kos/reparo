@@ -13,6 +13,8 @@ EditRepair::EditRepair(Repair& repair, int passed_repair_id) : InsertRepair(repa
     updates = Database::RetreiveRepairUdpdates(passed_repair_id);
     std::cout << "EditRepair created " << instance_count << std::endl;
     if (instance != nullptr) {
+      list_observer.clear();
+      observers_attached = false;
       delete instance;
     }
     instance = this;

@@ -5,6 +5,7 @@
 
 #include "imgui.h"
 #include "edit_repair.h"
+#include "include/IObserver.h"
 
 struct r_tm {
   tm _tm = {};
@@ -17,7 +18,7 @@ struct date_rel {
   bool changed = false;
 };
 
-class RepairsView {
+class RepairsView :  public ISubject, public IObserver {
 public:
   RepairsView();
 
@@ -27,7 +28,7 @@ public:
   virtual void Render();
   //Date related methods
   void OnDatesChanged(r_tm& date_from, int& relation, r_tm& date_to,  RepairsSort& repairs, int state = 0);
-  void OnDatesDirectionChange(r_tm& date_from, date_rel& relation, r_tm& date_to, RepairsSort& repairs, int state);
+  void OnDatesDirectionChange(r_tm& date_from, date_rel& relation, r_tm& date_to, RepairsSort& repairs);
   void Calendar(int ID, r_tm& date);
   void DateToStr(r_tm& date);
   void DateDirection(date_rel& relation);
@@ -38,7 +39,6 @@ public:
   virtual std::shared_ptr<EditRepair> GetEditRepair();
   virtual void RefreshRepairs();
 
-  void Test();
 
 private:
   void StatesTabBar();
@@ -64,4 +64,14 @@ private:
   bool modal;
   int modal_on_id;
   ConfirmResult deletion = ConfirmResult::CONIFRM_IDLE;
+
+  // IObserver / ISubject
+public:
+  void Attach(IObserver* observer) override;
+  void Detach(IObserver* observer) override;
+
+protected: 
+  void Notify() override;
+  void Update(const int& passed_int) override;
+  std::vector<IObserver*> list_observer;
 };

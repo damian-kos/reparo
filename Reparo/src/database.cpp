@@ -561,8 +561,8 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
         sum_query += "STATE-BIND-1 ";
       }
     }
-    printf("%s\n", sum_query.c_str());
-    printf("Query is: %s\n", query.c_str());
+    //printf("%s\n", sum_query.c_str());
+    //printf("Query is: %s\n", query.c_str());
     //printf("SQL Query is: %s\n", queries[variant].c_str());
     while (sqlite3_step(stmt) == SQLITE_ROW) {
       int repair_id = sqlite3_column_int(stmt, 0);

@@ -4,8 +4,9 @@
 
 #include "insert_customer.h"
 #include "imguidatechooser.h"
+#include "include/IObserver.h"
 
-class InsertRepair : public InsertCustomer {
+class InsertRepair : public InsertCustomer, public ISubject {
 public:
     InsertRepair();
     InsertRepair(Repair& repair_);
@@ -48,4 +49,16 @@ protected:
 
 private:
   bool model_field_empty = false;
+
+// ISubject
+public:
+  void Attach(IObserver* observer) override;
+  void Detach(IObserver* observer) override;
+
+private:  
+  void Notify() override;
+
+protected:
+  std::vector<IObserver*> list_observer;
+
 };

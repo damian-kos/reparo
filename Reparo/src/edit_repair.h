@@ -24,6 +24,7 @@ public:
     std::shared_ptr<Customer> t_customer = nullptr;
     std::shared_ptr<Repair> t_repair = nullptr;
     std::string selected_state;
+    bool observers_attached = false;
 
 private:
   static EditRepair* instance;
@@ -32,7 +33,6 @@ private:
     std::vector<RepairUpdates> updates;
     int repair_id;
     bool RepairValidated() override;
-
     void InsertRepairButton() override;
     void RunModal(Repair& repair) override;
     static int instance_count;

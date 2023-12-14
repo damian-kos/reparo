@@ -143,6 +143,7 @@
     <ClInclude Include="src\finances.h" />
     <ClInclude Include="src\imguidatechooser.h" />
     <ClInclude Include="src\imgui_viewer.h" />
+    <ClInclude Include="src\include\IObserver.h" />
     <ClInclude Include="src\insert_customer.h" />
     <ClInclude Include="src\helpmarker.h" />
     <ClInclude Include="src\insert_repair.h" />
