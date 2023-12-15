@@ -106,9 +106,13 @@ void EditRepair::RunModal(Repair& repair){
       Repair temp_repair = InitRepair();
       Database::UpdateRepair(temp_repair, repair_id); // this can be changed to pointer, since we already have t_repair & t_customer
     }
-    if(RepairModified() || CustomerModified())
+    
+    if (RepairModified() || CustomerModified()) {
       UpdateSummary();
-    //ResetFields();
+      Notify();
+      repair = InitRepair();
+    }
+    
     result = ConfirmResult::CONIFRM_IDLE;
   }
 }
@@ -149,13 +153,13 @@ void EditRepair::TestButton() {
   if (ImGui::Button("Test button")) {
     std::cout << "Repair ID:" << repair_id << std::endl;
   }
-    //std::string modified = RepairModified() ? "true" : "false";
-    //std::string modified_c = CustomerModified() ? "true" : "false";
-    //std::string validated_r = InsertRepair::RepairValidated() ? "true" : "false";
+    std::string modified = RepairModified() ? "true" : "false";
+    std::string modified_c = CustomerModified() ? "true" : "false";
+    std::string validated_r = InsertRepair::RepairValidated() ? "true" : "false";
 
-    //ImGui::Text("Repair modified: %s", modified.c_str());
-    //ImGui::Text("Customer modified: %s", modified_c.c_str());
-    //ImGui::Text("Repair validated: %s", validated_r.c_str());
+    ImGui::Text("Repair modified: %s", modified.c_str());
+    ImGui::Text("Customer modified: %s", modified_c.c_str());
+    ImGui::Text("Repair validated: %s", validated_r.c_str());
 
 }
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 

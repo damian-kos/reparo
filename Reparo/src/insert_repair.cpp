@@ -6,7 +6,7 @@ std::cout << "InsertRepair created " << std::endl;
 }
 
 InsertRepair::InsertRepair(Repair& repair_) : InsertCustomer(repair_.customer), 
-                                            repair(repair_) {
+                                              repair(repair_) {
 InsertCustomer::CopyToBuffer(model.input.buffer,
                               repair_.device.name.c_str(),
                               model.input.validated,

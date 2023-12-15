@@ -55,10 +55,12 @@ public:
   void Attach(IObserver* observer) override;
   void Detach(IObserver* observer) override;
 
-private:  
+protected:
   void Notify() override;
+  std::vector<IObserver*> list_observer;
+
+private:  
 
 protected:
-  std::vector<IObserver*> list_observer;
 
 };

@@ -20,6 +20,7 @@ InsertCustomer::InsertCustomer(Customer& cust) :  customer(cust){
                email.validated, [&]() { return IsEmailValid(email.buffer); });
 }
 
+
 InsertCustomer::~InsertCustomer() {
   std::cout << "Insert Customer destroyed" << std::endl;
 }
