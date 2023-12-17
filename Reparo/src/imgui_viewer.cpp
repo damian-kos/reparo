@@ -252,7 +252,7 @@ namespace ImGui {
 
 
 
-  void InputTextWithPopup(const char* label, const char* hint, HintInputFieldsW_Popup & field, std::function<bool()> validation_function, bool* selection, HintInputFieldsW_Popup * rel_field, bool* feedback) {
+  void InputTextWithPopup(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function, bool* selection, HintInputFieldsW_Popup* rel_field, bool* feedback) {
     if (field.input.is_on) {
       ImGui::InputTextWithHintExt(label, hint, field.input, validation_function, feedback);
       if (rel_field) {

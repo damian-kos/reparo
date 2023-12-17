@@ -3,21 +3,19 @@
 
 int EditRepair::instance_count = 0;
 
-EditRepair* EditRepair::instance = nullptr;
+std::shared_ptr<EditRepair> EditRepair::instance = nullptr;
 bool* EditRepair::show_repair = new bool(false);
 
 EditRepair::EditRepair(Repair& repair, int passed_repair_id) : InsertRepair(repair), repair_id(passed_repair_id) {
     instance_count++;
-    modal_message = "Confirm Update Repair";
+    modal_message = "ModalConfirm Update Repair";
     selected_state = repair.state;
     updates = Database::RetreiveRepairUdpdates(passed_repair_id);
-    std::cout << "EditRepair created " << instance_count << std::endl;
-    if (instance != nullptr) {
-      list_observer.clear();
-      observers_attached = false;
-      delete instance;
-    }
-    instance = this;
+    std::cout << "EditRepair created " << instance_count << std::endl;    
+    list_observer.clear();
+    observers_attached = false;
+
+
 }
 
 EditRepair::~EditRepair() { instance_count--;  std::cout << "EditRepair destroyed " << instance_count << std::endl;  }
@@ -34,8 +32,6 @@ void EditRepair::Render() {
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::SeparatorTextAlignR(update.date.c_str());
-        //ImGui::TableNextRow();
-        //ImGui::TableNextColumn();
         ImGui::Text(update.note.c_str());
         ImGui::Spacing();
         ImGui::Spacing();
@@ -87,7 +83,7 @@ void EditRepair::InsertRepairButton() {
 }
 
 void EditRepair::RunModal(Repair& repair){
-  ModalController::SubmitConfirm(modal_message, repair, t_repair, t_customer, result);
+  ModalController::ModalConfirm(modal_message, repair, t_repair, t_customer, result);
   if (result == ConfirmResult::CONIFRM_SUBMIT) {
     if (CustomerModified()) {
       Customer temp_customer = InsertCustomer::InitCustomer();
@@ -119,7 +115,7 @@ void EditRepair::RunModal(Repair& repair){
 
 Repair EditRepair::InitRepair() {
   Device device(model.input.buffer, color.input.buffer);
-  Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer, selected_state, str_date);
+  Repair init_repair(InitCustomer(), device, category.input.buffer, price, visible_note.buffer, hidden_note.buffer, sn_imei.buffer, selected_state);
   return init_repair;
 }
 
@@ -138,6 +134,8 @@ bool EditRepair::RepairModified() {
         repair.device.color == std::string(color.input.buffer) &&
         repair.visible_note == std::string(visible_note.buffer) &&
         repair.hidden_note == std::string(hidden_note.buffer) &&
+        repair.sn_imei == std::string(sn_imei.buffer) &&
+
         (std::abs(repair.price - price) < tolerance) &&
         repair.state == selected_state
         );
@@ -153,13 +151,13 @@ void EditRepair::TestButton() {
   if (ImGui::Button("Test button")) {
     std::cout << "Repair ID:" << repair_id << std::endl;
   }
-    std::string modified = RepairModified() ? "true" : "false";
-    std::string modified_c = CustomerModified() ? "true" : "false";
-    std::string validated_r = InsertRepair::RepairValidated() ? "true" : "false";
+    //std::string modified = RepairModified() ? "true" : "false";
+    //std::string modified_c = CustomerModified() ? "true" : "false";
+    //std::string validated_r = InsertRepair::RepairValidated() ? "true" : "false";
 
-    ImGui::Text("Repair modified: %s", modified.c_str());
-    ImGui::Text("Customer modified: %s", modified_c.c_str());
-    ImGui::Text("Repair validated: %s", validated_r.c_str());
+    //ImGui::Text("Repair modified: %s", modified.c_str());
+    //ImGui::Text("Customer modified: %s", modified_c.c_str());
+    //ImGui::Text("Repair validated: %s", validated_r.c_str());
 
 }
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 
@@ -174,10 +172,13 @@ void EditRepair::UpdateSummary() {
     summary += customer.email != t_customer->email ? "Email updated: \n" + customer.email + "  >>  " + t_customer->email + "\n" : "";
   }
   if (RepairModified()) {
-    summary += repair.device.name != t_repair->device.name ? "Device updated: " + repair.device.name + "  >>  " + t_repair->device.name + "\n" : "";
-    summary += repair.category != t_repair->category ? "Category updated: " + repair.category + "  >>  " + t_repair->category + "\n" : "";
-    summary += repair.device.color != t_repair->device.color ? "Color updated: " + repair.device.color + "  >>  " + t_repair->device.color + "\n" : "";
-    summary += repair.state != t_repair->state ? "State updated: " + repair.state + "  >>  " + t_repair->state + "\n" : "";
+    summary += repair.device.name != t_repair->device.name ? "Device updated: \n" + repair.device.name + "  >>  " + t_repair->device.name + "\n" : "";
+    summary += repair.category != t_repair->category ? "Category updated: \n" + repair.category + "  >>  " + t_repair->category + "\n" : "";
+    summary += repair.device.color != t_repair->device.color ? "Color updated: \n" + repair.device.color + "  >>  " + t_repair->device.color + "\n" : "";
+    summary += repair.state != t_repair->state ? "State updated: \n" + repair.state + "  >>  " + t_repair->state + "\n" : "";
+    summary += repair.sn_imei != t_repair->sn_imei ? "SN / IMEI updated: \n" + repair.sn_imei + "  >>  " + t_repair->sn_imei + "\n" : "";
+    summary += repair.visible_note != t_repair->visible_note ? "Note updated: \n" + repair.visible_note + "  >>  " + t_repair->visible_note + "\n" : "";
+
     double tolerance = 1e-3;
     if (!(std::abs(repair.price - t_repair->price) < tolerance)) {
       std::stringstream ss;
@@ -189,9 +190,12 @@ void EditRepair::UpdateSummary() {
   }
   Database::InsertRepairUpdateDesc(repair_id, summary);
   updates = Database::RetreiveRepairUdpdates(repair_id);
-  
 }
 
-EditRepair* EditRepair::Get() {
+void EditRepair::Set(std::shared_ptr<EditRepair> edit_repair) {
+  instance = edit_repair;
+}
+
+std::shared_ptr<EditRepair> EditRepair::Get() {
   return instance;
 }

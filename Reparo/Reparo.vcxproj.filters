@@ -45,46 +45,49 @@
     <ClInclude Include="vendor\nlohmann\json_fwd.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\helpmarker.h">
+    <ClInclude Include="src\include\helpmarker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vendor\sqlite3\sqlite3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\structs.h">
+    <ClInclude Include="src\include\structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\insert_customer.h">
+    <ClInclude Include="src\include\insert_customer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\database.h">
+    <ClInclude Include="src\include\database.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\modals.h">
+    <ClInclude Include="src\include\modals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\enums.h">
+    <ClInclude Include="src\include\enums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\insert_repair.h">
+    <ClInclude Include="src\include\insert_repair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\repairs.h">
+    <ClInclude Include="src\include\repairs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\edit_repair.h">
+    <ClInclude Include="src\include\edit_repair.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imguidatechooser.h">
+    <ClInclude Include="src\include\imguidatechooser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui_viewer.h">
+    <ClInclude Include="src\include\imgui_viewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\finances.h">
+    <ClInclude Include="src\include\finances.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\include\IObserver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\include\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -144,6 +147,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\finances.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

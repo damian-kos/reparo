@@ -18,7 +18,7 @@ void ModalController::CenterAlign() {
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 }
 
-void ModalController::SubmitConfirm(const char* modal_title, Customer& customer, ConfirmResult& result) {
+void ModalController::ModalConfirm(const char* modal_title, Customer& customer, ConfirmResult& result) {
   CenterAlign();
   if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
   {
@@ -34,7 +34,7 @@ void ModalController::SubmitConfirm(const char* modal_title, Customer& customer,
   }
 }
 
-void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, ConfirmResult& result) {
+void ModalController::ModalConfirm(const char* modal_title, Repair& repair, ConfirmResult& result) {
   CenterAlign();
 
   if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -53,7 +53,7 @@ void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, Con
   }
 }
 
-void ModalController::SubmitConfirm(const char* modal_title, Repair& repair, 
+void ModalController::ModalConfirm(const char* modal_title, Repair& repair, 
                                     std::shared_ptr<Repair> temp_repair, 
                                     std::shared_ptr<Customer> temp_customer, 
                                     ConfirmResult& result) {

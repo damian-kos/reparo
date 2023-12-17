@@ -13,11 +13,11 @@ public:
 public:
 
     static void RenderModal(const char* modal_title);
-    static void SubmitConfirm(const char* modal_title, Customer& customer, 
+    static void ModalConfirm(const char* modal_title, Customer& customer, 
                               ConfirmResult& result);
-    static void SubmitConfirm(const char* modal_title, Repair& repair, 
+    static void ModalConfirm(const char* modal_title, Repair& repair, 
                               ConfirmResult& result);
-    static void SubmitConfirm(const char* modal_title, Repair& repair, 
+    static void ModalConfirm(const char* modal_title, Repair& repair, 
                               std::shared_ptr<Repair> temp_repair, 
                               std::shared_ptr<Customer> temp_customer,
                               ConfirmResult& result);

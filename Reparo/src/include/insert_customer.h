@@ -41,7 +41,7 @@ protected:
     void CustomerSelectedOnPopup();
     void FieldsSection();
     virtual void PhoneFieldSection();
-    virtual void SubmitButton();
+    virtual void InsertCustButton();
     bool IsEmailValid(std::string email);
     bool LenValidation(const char* buffer, int length);
     bool FieldsValidated();

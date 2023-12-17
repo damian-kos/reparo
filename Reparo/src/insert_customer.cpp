@@ -26,10 +26,20 @@ InsertCustomer::~InsertCustomer() {
 }
 
 void InsertCustomer::Render() {
+  if (ImGui::BeginMenuBar()) {
+    if (ImGui::BeginMenu("Options")) {
+      if (ImGui::MenuItem("Fields")) {
+
+      }
+      ImGui::EndMenu();
+    }
+    ImGui::EndMenuBar();
+  }
+
   FieldsSection();
   ImGui::Text(validation_feedback.c_str());
   UpdateValidationMsg();
-  SubmitButton();
+  InsertCustButton();
   ResetOnEmptyMain();
 }
 
@@ -91,7 +101,7 @@ void InsertCustomer::CustomerSelectedOnPopup() {
   }
 }
 
-void InsertCustomer::SubmitButton() {
+void InsertCustomer::InsertCustButton() {
   //static Customer customer;
   if (!FieldsValidated()) {
     ImGui::BeginDisabled(true);
@@ -160,11 +170,11 @@ Customer InsertCustomer::InitCustomer() {
 }
 
 void InsertCustomer::InitModal() {
-  ModalController::RenderModal("Confirm Customer Details");
+  ModalController::RenderModal("ModalConfirm Customer Details");
 }
 
 void InsertCustomer::RunModal(Customer& customer) {
-  ModalController::SubmitConfirm("Confirm Customer Details", customer, result);
+  ModalController::ModalConfirm("ModalConfirm Customer Details", customer, result);
   if (result == ConfirmResult::CONIFRM_SUBMIT) {
     int customerID = Database::QueryCustomerIDByPhone(phone.input.buffer);
     if (customerID == 0) {

@@ -21,11 +21,10 @@ protected:
     Repair repair;
     const char* modal_message = "";
     double price = 0;
-    bool device_validated = false;
     HintInputField visible_note;
     HintInputField hidden_note;
-    tm date = {};
-    std::string str_date = "";
+    HintInputField sn_imei;
+
 
 protected:
     void ResetOnEmptyMain() override;
@@ -34,6 +33,7 @@ protected:
     void DeviceSection();
     void NotesSection();
     void PriceSection();
+    void SerialNumSection();
     virtual void StateSection();
     void InsertRepairButtonEnabler();
     virtual void InsertRepairButton();
@@ -43,7 +43,7 @@ protected:
     virtual Repair InitRepair();
     virtual void InitModal() override;
     virtual void RunModal(Repair& repair);
-    void SubmitButton() override;
+    void InsertCustButton() override;
     void ResetFields() override;
     virtual void TestButton();
 

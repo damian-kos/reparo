@@ -8,7 +8,6 @@
 #include <string>
 #include <memory>
 
-
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
@@ -18,6 +17,9 @@
 #include "repairs.h"
 #include "edit_repair.h"
 #include "finances.h"
+#include "config.h"
+
+json loaded = RO_Config::GetConfig();
 
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
@@ -34,9 +36,6 @@ void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 
-
-
-
 int main(int, char**)
 // Main code
 //int WinMain(
@@ -49,6 +48,7 @@ int main(int, char**)
   InsertRepair insert_repair;
   RepairsView repairs_view;
   Finances finances;
+  json data;
 
   insert_repair.Attach(&repairs_view);
   insert_repair.Attach(&finances);
@@ -87,11 +87,13 @@ int main(int, char**)
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
   io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
+
+
   // io.ConfigViewportsNoAutoMerge = true;
   // io.ConfigViewportsNoTaskBarIcon = true;
   // io.ConfigViewportsNoDefaultParent = true;
-  // io.ConfigDockingAlwaysTabBar = true;
-  // io.ConfigDockingTransparentPayload = true;
+   io.ConfigDockingAlwaysTabBar = true;
+   //io.ConfigDockingTransparentPayload = true;
   io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
   io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
 
@@ -106,7 +108,7 @@ int main(int, char**)
       style.WindowRounding = 0.0f;
       style.Colors[ImGuiCol_WindowBg].w = 1.0f;
   }
-      
+
   // Setup Platform/Renderer backends
   ImGui_ImplWin32_Init(hwnd);
   ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
@@ -145,12 +147,15 @@ int main(int, char**)
   // Our state
   bool show_demo_window = true;
   bool show_another_window = false;
-  bool show_insert_customer_win = false;
-  bool show_insert_repair = false;
-  bool show_repair_states_window = false;
-    
+  bool show_insert_customer_win =  loaded["insert_customer"].contains("window_on") ? 
+                                   loaded["insert_customer"]["window_on"].get<bool>() : false;
+  bool show_insert_repair =        loaded["insert_repair"].contains("window_on") ? 
+                                   loaded["insert_repair"]["window_on"].get<bool>() : false;
+  bool show_repair_states_window = loaded["repairs"].contains("window_on") ? 
+                                   loaded["repairs"]["window_on"].get<bool>() : false;
+  bool show_finances =             loaded["finances"].contains("window_on") ? 
+                                   loaded["finances"]["window_on"].get<bool>() : false;
 
-  bool show_finances = false;
 
   char test[128] = "";
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -186,6 +191,10 @@ int main(int, char**)
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
+
+    
     ImGuiStyle* style = &ImGui::GetStyle();
     style->FrameRounding = 12.0f;
     style->WindowRounding = 12.0f;
@@ -196,7 +205,6 @@ int main(int, char**)
   //    1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     if (show_demo_window)
       ImGui::ShowDemoWindow(&show_demo_window);
-
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     //{
     //    static float f = 0.0f;
@@ -224,44 +232,52 @@ int main(int, char**)
           show_another_window = false;
       ImGui::End();
     }
+      
 
+    if (ImGui::BeginMainMenuBar()) {
+      if (ImGui::BeginMenu("Customers")) {
+        if (ImGui::MenuItem("New Customer")) {
+          show_insert_customer_win = !show_insert_customer_win;
+          data["insert_customer"]["window_on"] = show_insert_customer_win;
+          RO_Config::UpdateCreateConfig(data);
+        }
+          ImGui::SetItemTooltip("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer", ImGui::GetStyle().HoverDelayNormal);
+        ImGui::EndMenu();
+      }
+      if (ImGui::BeginMenu("Repairs")) {
+        if (ImGui::MenuItem("New Repair")) { 
+          show_insert_repair = !show_insert_repair;
+          data["insert_repair"]["window_on"] = show_insert_repair;
+          RO_Config::UpdateCreateConfig(data);
+        }
+          ImGui::SetItemTooltip("Adding new repair \nAdd new or chose existing customer details \n", ImGui::GetStyle().HoverDelayNormal);
+        if (ImGui::MenuItem("Search")) { /*To add */ }
+        if (ImGui::MenuItem("View")) { 
+          show_repair_states_window = !show_repair_states_window;
+          data["repairs"]["window_on"] = show_repair_states_window;
+          RO_Config::UpdateCreateConfig(data);
+        }
+          ImGui::SetItemTooltip("Repairs \nHistory and current tickets \n", ImGui::GetStyle().HoverDelayNormal);
 
+        if (ImGui::MenuItem("Finances & Accounting")) { 
+          show_finances = !show_finances;
+          data["finances"]["window_on"] = show_finances;
+          RO_Config::UpdateCreateConfig(data);
+        }
+          ImGui::SetItemTooltip("Adding new part \nSearching for parts to update \nEditing existings ones", ImGui::GetStyle().HoverDelayNormal);
 
-    ImGui::Begin("Main Menu");
-     
-    // Window for Adding Customers
-    if (ImGui::Button("Add customer"))
-      show_insert_customer_win = !show_insert_customer_win;
-    ImGui::SameLine(); HelpMarker("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer");
-
-    if (ImGui::Button("Finances"))
-       show_finances = !show_finances;
-    ImGui::SameLine(); HelpMarker("Adding new part \nSearching for parts to update \nEditing existings ones");
-
-    if (ImGui::Button("Add repair"))
-        show_insert_repair = !show_insert_repair;
-    ImGui::SameLine(); HelpMarker("Adding new repair \nAdd new or chose existing customer details \n");
-
-    if (ImGui::Button("Repairs"))
-        show_repair_states_window = !show_repair_states_window;
-    ImGui::SameLine(); HelpMarker("Repairs \nHistory and current tickets \n");
-
-    if (ImGui::Button("Test popup")) {
-        bool is_open = ImGui::IsPopupOpen("##Model");
-        std::cout << "Popup is: " << is_open << std::endl;
+        ImGui::EndMenu();
+      }
+      ImGui::EndMainMenuBar();
     }
 
-   
-    ImGui::End();
+ 
     if (show_insert_customer_win) {
-           
-        ImGui::Begin("Add customer", &show_insert_customer_win);
-        //static InsertCustomer insert_customer;
-        ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
-        insert_customer.Render();
-        ImGui::End();
+      ImGui::Begin("Add customer", &show_insert_customer_win, ImGuiWindowFlags_MenuBar);
+      ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+      insert_customer.Render();
+      ImGui::End();
     }
-
        
 
     if (show_finances) {
@@ -271,8 +287,10 @@ int main(int, char**)
     }
 
     if (show_insert_repair) {
-      ImGui::Begin("Insert Repair", &show_insert_repair);
+      ImGui::Begin("Insert Repair", &show_insert_repair );
       ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
+
+      
       insert_repair.Render();
       ImGui::End();
     }
@@ -287,7 +305,7 @@ int main(int, char**)
     if (*EditRepair::show_repair) {
       ImGui::Begin("Edit Repair", EditRepair::show_repair);
       ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
-      static EditRepair* edit_repair = EditRepair::Get();
+      std::shared_ptr<EditRepair> edit_repair = EditRepair::Get();
           
       if (edit_repair) {
         if(!edit_repair->observers_attached) {

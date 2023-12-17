@@ -269,8 +269,8 @@ void Database::InsertRepair(Repair repair) {
     sqlite3* db_ptr = PtrDB();
     sqlite3_stmt* stmt; 
     const char* query = "INSERT INTO repairs"
-        "(customer_id, model_id, category_id, color_id, repair_desc, repair_desc_hidden, price, repair_state_id, date) "
-        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'))";
+        "(customer_id, model_id, category_id, color_id, repair_desc, repair_desc_hidden, price, repair_state_id, date, sn_imei) "
+        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), ?)";
     if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
 
         sqlite3_bind_int(stmt, 1, customer_id);
@@ -280,7 +280,9 @@ void Database::InsertRepair(Repair repair) {
         sqlite3_bind_text(stmt, 5, repair.visible_note.c_str(), -1, SQLITE_STATIC);
         sqlite3_bind_text(stmt, 6, repair.hidden_note.c_str(), -1, SQLITE_STATIC);
         sqlite3_bind_double(stmt, 7, repair.price);
-        sqlite3_bind_int(stmt, 8, static_cast<int>(RepairState::TO_DO));
+        sqlite3_bind_int(stmt, 8, static_cast<int>(RepairState::TO_DO)); // repair_state_id
+        sqlite3_bind_text(stmt, 9, repair.sn_imei.c_str(), -1, SQLITE_STATIC); // sn_imei
+
     }
 
     if (sqlite3_step(stmt) == SQLITE_DONE) {
@@ -349,7 +351,7 @@ void Database::UpdateRepair(Repair& repair, int id) {
   static int color_id = GetIDForValueS("##Color2", repair.device.color.c_str());
   sqlite3* db_ptr = PtrDB();
   sqlite3_stmt* stmt;
-  const char* query = "UPDATE repairs SET model_id = ?, category_id = ?, color_id = ?, repair_desc = ?, repair_desc_hidden = ?, price = ?, repair_state_id = ? WHERE repair_id = ?";
+  const char* query = "UPDATE repairs SET model_id = ?, category_id = ?, color_id = ?, repair_desc = ?, repair_desc_hidden = ?, price = ?, repair_state_id = ?, sn_imei = ? WHERE repair_id = ?";
   if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
     std::cout << "Update Repairwill happen" << std::endl;
     //std::cout << id << " / " << customer.name.c_str() << " / " << customer.surname.c_str() << " /  " << customer.email.c_str() << " / " << customer.phone.c_str() << std::endl;
@@ -362,7 +364,8 @@ void Database::UpdateRepair(Repair& repair, int id) {
     std::cout << "Repair State: |" << repair.state << "|" << std::endl;
     int state_id = GetIDForValueS("##State", repair.state.c_str());
     sqlite3_bind_int(stmt, 7, state_id);
-    sqlite3_bind_int(stmt, 8, id);
+    sqlite3_bind_text(stmt, 8, repair.sn_imei.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 9, id);
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         std::cerr << "Error updating repair: " << sqlite3_errmsg(db_ptr) << std::endl;
     }
@@ -561,7 +564,7 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
         sum_query += "STATE-BIND-1 ";
       }
     }
-    //printf("%s\n", sum_query.c_str());
+    printf("%s\n", sum_query.c_str());
     //printf("Query is: %s\n", query.c_str());
     //printf("SQL Query is: %s\n", queries[variant].c_str());
     while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -575,22 +578,24 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
       double price = sqlite3_column_double(stmt, 7);
       std::string date_str = sqlite3_column_text(stmt, 9) ? reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9)) : "";
 
+      std::string sn_imei = sqlite3_column_text(stmt, 10) ? reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10)) : "";
+
       std::string device_name = (repair_model_id > 0) ?
-        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11)) : "N/A";
-      std::string color = (repair_color_id > 0) ?
         reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12)) : "N/A";
+      std::string color = (repair_color_id > 0) ?
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 13)) : "N/A";
       Device device(device_name, color);
       std::string category = (repair_category_id > 0) ?
-        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10)) : "N/A";
-      std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 13));
+        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11)) : "N/A";
+      std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 14));
 
-      std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 15));
-      std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
-      std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
-      std::string customer_phone = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 18));
+      std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
+      std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
+      std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 18));
+      std::string customer_phone = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 19));
       Customer customer(customer_phone, customer_name, customer_surname, customer_email);
 
-      Repair repair(customer, device, category, price, visible_note, hidden_note, state, date_str);
+      Repair repair(customer, device, category, price, visible_note, hidden_note, sn_imei, state, date_str);
       //printf("Repair ID: %d = %.2f\n", repair_id, price);
       retreived.repairs.emplace(repair_id, repair);
       retreived.repairs_order.emplace_back(repair_id);
@@ -598,11 +603,11 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
     }  
   }
   else {
-    std::cout << "Error during deleting a repair: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    std::cout << "Error during retreiving a repair: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
   }
   sqlite3_finalize(stmt);
   sqlite3_close(db_ptr);
-  printf("\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
+  //printf("\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
   return retreived;
 }
 

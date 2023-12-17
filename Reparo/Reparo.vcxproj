@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(ProjectDir)vendor\sqlite3;$(ProjectDir)vendor\nlohmann;$(ProjectDir)vendor\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src\include;$(ProjectDir)vendor\sqlite3;$(ProjectDir)vendor\nlohmann;$(ProjectDir)vendor\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>..\$(TargetName)\src\vendor\imgui;$(IncludePath)</IncludePath>
@@ -137,19 +137,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\database.h" />
-    <ClInclude Include="src\edit_repair.h" />
-    <ClInclude Include="src\enums.h" />
-    <ClInclude Include="src\finances.h" />
-    <ClInclude Include="src\imguidatechooser.h" />
-    <ClInclude Include="src\imgui_viewer.h" />
+    <ClInclude Include="src\include\database.h" />
+    <ClInclude Include="src\include\edit_repair.h" />
+    <ClInclude Include="src\include\enums.h" />
+    <ClInclude Include="src\include\finances.h" />
+    <ClInclude Include="src\include\imguidatechooser.h" />
+    <ClInclude Include="src\include\imgui_viewer.h" />
+    <ClInclude Include="src\include\config.h" />
     <ClInclude Include="src\include\IObserver.h" />
-    <ClInclude Include="src\insert_customer.h" />
-    <ClInclude Include="src\helpmarker.h" />
-    <ClInclude Include="src\insert_repair.h" />
-    <ClInclude Include="src\modals.h" />
-    <ClInclude Include="src\repairs.h" />
-    <ClInclude Include="src\structs.h" />
+    <ClInclude Include="src\include\insert_customer.h" />
+    <ClInclude Include="src\include\helpmarker.h" />
+    <ClInclude Include="src\include\insert_repair.h" />
+    <ClInclude Include="src\include\modals.h" />
+    <ClInclude Include="src\include\repairs.h" />
+    <ClInclude Include="src\include\structs.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_dx11.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="vendor\sqlite3\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\config.cpp" />
     <ClCompile Include="src\database.cpp" />
     <ClCompile Include="src\edit_repair.cpp" />
     <ClCompile Include="src\finances.cpp" />

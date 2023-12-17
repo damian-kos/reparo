@@ -168,11 +168,11 @@ void RepairsView::CalendarsRender(const int& relation, r_tm& date_from, r_tm& da
 void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, const int state, RepairsSort& retreived, int& selected) {
 
   static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable;
-  if (ImGui::BeginTable("##states", 11, flags)) {
+  if (ImGui::BeginTable("##states", 12, flags)) {
     std::vector<std::string> col_names = { "ID", "Model", "Category", "Color", 
                                            "Price", "Note", "Note hidden", 
                                            "Cust. Phone Number", "Cust. Name", 
-                                           "State", "Date" };
+                                           "State", "Date", "SN_IMEI"};
     
     for(auto& name : col_names)
       ImGui::TableSetupColumn(name.c_str(), ImGuiTableColumnFlags_WidthFixed);
@@ -205,7 +205,8 @@ void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, 
       }
       if (ImGui::BeginPopupContextItem()) {
         if (ImGui::Button("Update repair")) {
-          EditRepair* edit_repair = new EditRepair(retreived.repairs[pair], pair);
+          EditRepair::Set(std::make_shared<EditRepair>(retreived.repairs[pair], pair));
+          //std::shared_ptr<EditRepair> edit_repair = std::make_shared<EditRepair>(retreived.repairs[pair], pair);
           *EditRepair::show_repair = true;
         }
         if (ImGui::Button("Delete")) {
@@ -235,6 +236,8 @@ void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, 
       ImGui::Text(retreived.repairs[pair].state.c_str());
       ImGui::TableNextColumn();
       ImGui::Text(retreived.repairs[pair].date.c_str());
+      ImGui::TableNextColumn();
+      ImGui::Text(retreived.repairs[pair].sn_imei.c_str());
       }
     }
     ImGui::EndTable();
@@ -246,7 +249,7 @@ void RepairsView::RunModal() {
     ModalController::RenderModal("Delete this repair?");
     modal = false;
   }
-  ModalController::SubmitConfirm("Delete this repair?", repair_to_init, deletion);
+  ModalController::ModalConfirm("Delete this repair?", repair_to_init, deletion);
   if (deletion == ConfirmResult::CONIFRM_SUBMIT) {
     //Database::DeleteRepair(modal_on_id);
     //RefreshRepairs();

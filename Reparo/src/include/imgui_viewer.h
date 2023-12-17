@@ -34,11 +34,19 @@ namespace ImGui {
     IMGUI_API void SeparatorTextAlignR(const char* label);
     IMGUI_API bool CenteredButton(const char* label, const ImVec2& size_arg, std::string test);
     IMGUI_API void CenteredText(const char* label, const ImVec2& size_arg);
-    IMGUI_API void InputTextWithHintExt(const char* label, const char* hint, HintInputField& field, std::function<bool()> validation_function, bool* feedback);
+    IMGUI_API void InputTextWithHintExt(const char* label, const char* hint, 
+                                        HintInputField& field, 
+                                        std::function<bool()> validation_function = nullptr, 
+                                        bool* feedback = nullptr);
     IMGUI_API void GetFontV(ImFont* font_t);
     IMGUI_API bool ButtonScaled(const char* label, float font_size, ImVec2 button_size);
 
-    IMGUI_API void InputTextWithPopup(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function, bool* selection, HintInputFieldsW_Popup* rel_field, bool* feedback);
+    IMGUI_API void InputTextWithPopup(const char* label, const char* hint, 
+                                      HintInputFieldsW_Popup& field, 
+                                      std::function<bool()> validation_function, 
+                                      bool* selection = nullptr, 
+                                      HintInputFieldsW_Popup* rel_field = nullptr, 
+                                      bool* feedback = nullptr);
         
 } // namespace ImGui
 

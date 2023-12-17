@@ -31,7 +31,7 @@ void Finances::Render() {
   Summary();
   PartialSummaries();
   static int state_tmp = 0;
-  if(repairs_to_table)
+  if(repairs_to_table) 
     RepairsView::RepairsToTable(fi_date_from, fi_relation.number, fi_date_to, state_tmp, *repairs_to_table, fi_table_select);
   RepairsView::RunModal();
 
@@ -86,7 +86,7 @@ void Finances::RefreshRepairs() {
       fi_all_repair_by_query = new_repairs;
     else
       repairs_per_state.emplace_back(new_repairs);
-    printf("CURRENTLY I IS: %d\n", i);
+    //printf("CURRENTLY I IS: %d\n", i);
   }
 }
 
