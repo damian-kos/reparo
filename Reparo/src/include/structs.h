@@ -29,7 +29,7 @@ struct HintInputField {
     char buffer[128] = "";
     bool is_on = true;
     ImGuiInputTextFlags imgui_flags = ImGuiInputTextFlags_None;
-    bool validated = false;
+    bool valid = false;
 };
 
 struct Attribute {

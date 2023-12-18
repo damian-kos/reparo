@@ -31,7 +31,9 @@ void Finances::Render() {
   Summary();
   PartialSummaries();
   static int state_tmp = 0;
-  if(repairs_to_table) 
+  //if(repairs_to_table && RO_Config::data["finances"]["tables"]["##repairs"])
+  if (repairs_to_table && (*fi_data)["tables"].contains("##repairs") ? (*fi_data)["tables"]["##repairs"].get<bool>() : false)
+
     RepairsView::RepairsToTable(fi_date_from, fi_relation.number, fi_date_to, state_tmp, *repairs_to_table, fi_table_select);
   RepairsView::RunModal();
 

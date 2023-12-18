@@ -7,17 +7,17 @@ InsertCustomer::InsertCustomer() {
 InsertCustomer::InsertCustomer(Customer& cust) :  customer(cust){ 
   CopyToBuffer(phone.input.buffer, 
                 customer.phone.c_str(), 
-                phone.input.validated, 
+                phone.input.valid, 
                 [&]() { return LenValidation(phone.input.buffer, 8); });
   CopyToBuffer(name.buffer, 
                customer.name.c_str(), 
-               name.validated, [&]() { return LenValidation(name.buffer, 3); });
+               name.valid, [&]() { return LenValidation(name.buffer, 3); });
   CopyToBuffer(surname.buffer, 
                customer.surname.c_str(), 
-               surname.validated, [&]() { return LenValidation(surname.buffer, 3); });
+               surname.valid, [&]() { return LenValidation(surname.buffer, 3); });
   CopyToBuffer(email.buffer,
                customer.email.c_str(),
-               email.validated, [&]() { return IsEmailValid(email.buffer); });
+               email.valid, [&]() { return IsEmailValid(email.buffer); });
 }
 
 
@@ -26,16 +26,16 @@ InsertCustomer::~InsertCustomer() {
 }
 
 void InsertCustomer::Render() {
-  if (ImGui::BeginMenuBar()) {
-    if (ImGui::BeginMenu("Options")) {
-      if (ImGui::MenuItem("Fields")) {
 
-      }
-      ImGui::EndMenu();
-    }
-    ImGui::EndMenuBar();
-  }
+  //if (ImGui::BeginMenuBar()) {
+  //  if (ImGui::BeginMenu("Options")) {
+  //    if (ImGui::MenuItem("Fields")) {
 
+  //    }
+  //    ImGui::EndMenu();
+  //  }
+  //  ImGui::EndMenuBar();
+  //}
   FieldsSection();
   ImGui::Text(validation_feedback.c_str());
   UpdateValidationMsg();
@@ -67,10 +67,10 @@ void InsertCustomer::FieldsSection() {
                               &feedback);
 
   //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
-  //ImGui::Text(phone.input.validated ? "true" : "false");
-  //ImGui::SameLine(); ImGui::Text(name.validated ? "true" : "false");
-  //ImGui::SameLine(); ImGui::Text(surname.validated ? "true" : "false");
-  //ImGui::SameLine(); ImGui::Text(email.validated ? "true" : "false");
+  //ImGui::Text(phone.input.valid ? "true" : "false");
+  //ImGui::SameLine(); ImGui::Text(name.valid ? "true" : "false");
+  //ImGui::SameLine(); ImGui::Text(surname.valid ? "true" : "false");
+  //ImGui::SameLine(); ImGui::Text(email.valid ? "true" : "false");
   //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 }
@@ -82,18 +82,18 @@ void InsertCustomer::PhoneFieldSection() {
 }
 
 void InsertCustomer::CustomerSelectedOnPopup() {
-  if (phone.input.validated) {
+  if (phone.input.valid) {
     if (selected) {
       temp_customer = Database::QueryCustomerByPhone(phone.input.buffer);
       if (temp_customer != nullptr) {
         CopyToBuffer(name.buffer, temp_customer->name.c_str(), 
-                      name.validated, 
+                      name.valid, 
                       [&]() { return LenValidation(name.buffer, 3); });
         CopyToBuffer(surname.buffer, 
-                      temp_customer->surname.c_str(), surname.validated, 
+                      temp_customer->surname.c_str(), surname.valid, 
                       [&]() { return LenValidation(surname.buffer, 3); });
         CopyToBuffer(email.buffer, temp_customer->email.c_str(), 
-                      email.validated, 
+                      email.valid, 
                       [&]() { return IsEmailValid(email.buffer); });
       }
       selected = false;
@@ -127,8 +127,8 @@ bool InsertCustomer::LenValidation(const char* buffer, int length) {
 }
 
 bool InsertCustomer::FieldsValidated() {
-  return (phone.input.validated && name.validated && surname.validated 
-          && email.validated);
+  return (phone.input.valid && name.valid && surname.valid 
+          && email.valid);
 }
 
 int InsertCustomer::SetValidaitonErr() {
@@ -136,7 +136,7 @@ int InsertCustomer::SetValidaitonErr() {
   if (FieldsValidated())
      return -1;
   for (int i = 0; i < validations.size();  i++) {
-    if (strlen(validations[i].buffer) > 0 && !validations[i].validated)
+    if (strlen(validations[i].buffer) > 0 && !validations[i].valid)
     {
         return i;
     }

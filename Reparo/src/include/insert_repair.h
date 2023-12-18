@@ -25,9 +25,8 @@ protected:
     HintInputField hidden_note;
     HintInputField sn_imei;
 
-
 protected:
-    void ResetOnEmptyMain() override;
+    // Sections to render
     void CustomerSection();
     void PhoneFieldSection() override;
     void DeviceSection();
@@ -35,14 +34,21 @@ protected:
     void PriceSection();
     void SerialNumSection();
     virtual void StateSection();
-    void InsertRepairButtonEnabler();
-    virtual void InsertRepairButton();
+
+    // Buffers validators
     bool DeviceFieldsValidated();
     virtual bool RepairValidated();
-    bool BufferQueryOnDatabase(const char* label, const char* buffer);
-    virtual Repair InitRepair();
+    bool ChkBufferInDb(const char* label, const char* buffer);
+
+    // Modals
     virtual void InitModal() override;
     virtual void RunModal(Repair& repair);
+
+    // Misc
+    virtual Repair InitRepair();
+    void ResetOnEmptyMain() override;
+    void InsertRepairButtonEnabler();
+    virtual void InsertRepairButton();
     void InsertCustButton() override;
     void ResetFields() override;
     virtual void TestButton();

@@ -157,7 +157,7 @@ void EditRepair::TestButton() {
 
     //ImGui::Text("Repair modified: %s", modified.c_str());
     //ImGui::Text("Customer modified: %s", modified_c.c_str());
-    //ImGui::Text("Repair validated: %s", validated_r.c_str());
+    //ImGui::Text("Repair valid: %s", validated_r.c_str());
 
 }
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ 

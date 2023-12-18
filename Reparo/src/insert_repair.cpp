@@ -9,16 +9,16 @@ InsertRepair::InsertRepair(Repair& repair_) : InsertCustomer(repair_.customer),
                                               repair(repair_) {
 InsertCustomer::CopyToBuffer(model.input.buffer,
                              repair_.device.name.c_str(),
-                             model.input.validated,
-                             [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); });
+                             model.input.valid,
+                             [&]() { return ChkBufferInDb("##Model", model.input.buffer); });
 InsertCustomer::CopyToBuffer(category.input.buffer,
                              repair_.category.c_str(),
-                             category.input.validated,
-                             [&]() { return BufferQueryOnDatabase("##Category", category.input.buffer); });
+                             category.input.valid,
+                             [&]() { return ChkBufferInDb("##Category", category.input.buffer); });
 InsertCustomer::CopyToBuffer(color.input.buffer,
                              repair_.device.color.c_str(),
-                             color.input.validated,
-                             [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); });
+                             color.input.valid,
+                             [&]() { return ChkBufferInDb("##Color", color.input.buffer); });
 strcpy(visible_note.buffer, repair_.visible_note.c_str());
 strcpy(hidden_note.buffer, repair_.hidden_note.c_str());
 price = repair_.price;
@@ -37,15 +37,6 @@ InsertRepairButtonEnabler();
 TestButton();
 }
 
-void InsertRepair::ResetOnEmptyMain(){
-  InsertCustomer::ResetOnEmptyMain();
-  if (strlen(model.input.buffer) == 0 && !model_field_empty) {
-    category = HintInputFieldsW_Popup();
-    color = HintInputFieldsW_Popup();
-  }
-  if (strlen(model.input.buffer) > 0) { model_field_empty = false; }
-}
-
 void InsertRepair::CustomerSection() {
   InsertCustomer::Render();
 }
@@ -60,19 +51,19 @@ void InsertRepair::PhoneFieldSection() {
 void InsertRepair::DeviceSection() {
   ImGui::SeparatorDecorator("DEVICE: ", DeviceFieldsValidated());
   ImGui::InputTextWithPopup("##Model", "Model of device...", model, 
-                            [&]() { return BufferQueryOnDatabase("##Model", model.input.buffer); });
+                            [&]() { return ChkBufferInDb("##Model", model.input.buffer); });
   ImGui::InputTextWithPopup("##Category", "Category...", category, 
-                            [&]() { return BufferQueryOnDatabase("##Category", 
+                            [&]() { return ChkBufferInDb("##Category", 
                             category.input.buffer); });
   ImGui::InputTextWithPopup("##Color", "Color...", color, 
-                            [&]() { return BufferQueryOnDatabase("##Color", color.input.buffer); }, 
+                            [&]() { return ChkBufferInDb("##Color", color.input.buffer); }, 
                             nullptr, &model);
     
   //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
   //                      
-  //ImGui::Text(model.input.validated ? "true" : "false");
-  //ImGui::SameLine(); ImGui::Text(category.input.validated ? "true" : "false");
-  //ImGui::SameLine(); ImGui::Text(color.input.validated ? "true" : "false");
+  //ImGui::Text(model.input.valid ? "true" : "false");
+  //ImGui::SameLine(); ImGui::Text(category.input.valid ? "true" : "false");
+  //ImGui::SameLine(); ImGui::Text(color.input.valid ? "true" : "false");
   // 
   //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 }
@@ -97,15 +88,24 @@ void InsertRepair::StateSection() {
 
 }
 
+void InsertRepair::ResetOnEmptyMain() {
+  InsertCustomer::ResetOnEmptyMain();
+  if (strlen(model.input.buffer) == 0 && !model_field_empty) {
+    category = HintInputFieldsW_Popup();
+    color = HintInputFieldsW_Popup();
+  }
+  if (strlen(model.input.buffer) > 0) { model_field_empty = false; }
+}
+
 bool InsertRepair::DeviceFieldsValidated() {
-  return (model.input.validated && category.input.validated && color.input.validated);
+  return (model.input.valid && category.input.valid && color.input.valid);
 }
 
 bool InsertRepair::RepairValidated() {
   return (DeviceFieldsValidated() && FieldsValidated() && price > 0);
 }
 
-bool InsertRepair::BufferQueryOnDatabase(const char* label, const char* buffer) {
+bool InsertRepair::ChkBufferInDb(const char* label, const char* buffer) {
   return Database::GetBoolForValue(label, buffer);
 }
 

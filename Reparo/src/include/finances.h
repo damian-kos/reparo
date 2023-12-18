@@ -10,6 +10,7 @@
 #include "imgui_internal.h"
 #include "imgui_viewer.h"
 #include "repairs.h"
+#include "config.h"
 
 
 class Finances : public RepairsView {
@@ -39,4 +40,5 @@ private:
   void Summary();
   void PartialSummaries();
   void RefreshRepairs() override;
+  json* fi_data = &RO_Config::data["finances"];
 };

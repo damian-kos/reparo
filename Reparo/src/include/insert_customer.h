@@ -28,8 +28,8 @@ protected:
     Customer customer;
     ConfirmResult result = ConfirmResult::CONIFRM_IDLE;
     bool selected = false;
-    bool feedback = false;
-    bool phone_field_empty = false;
+    bool feedback = false; // Probably can be replaced with Observer 
+    bool phone_field_empty = false; // Phone field buffer should be utilized instead of this flag
 
     Customer* temp_customer = nullptr;
 

@@ -18,8 +18,11 @@
 #include "edit_repair.h"
 #include "finances.h"
 #include "config.h"
+#include "settings.h"
 
-json loaded = RO_Config::GetConfig();
+//json loaded = RO_Config::GetConfig();
+json loaded = RO_Config::data;
+
 
 // Data
 static ID3D11Device *g_pd3dDevice = nullptr;
@@ -159,7 +162,13 @@ int main(int, char**)
 
   char test[128] = "";
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
+  switch (loaded["settings"].contains("theme") ?
+    loaded["settings"]["theme"].get<int>() : 0)
+  {
+  case 0: ImGui::StyleColorsDark(); break;
+  case 1: ImGui::StyleColorsLight(); break;
+  case 2: ImGui::StyleColorsClassic(); break;
+  }
   // Main loop
   bool done = false;
   while (!done)
@@ -201,6 +210,7 @@ int main(int, char**)
     style->PopupRounding = 12.0f;
     style->ScrollbarRounding = 12.0f;
     style->GrabRounding = 12.0f;
+
 
   //    1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     if (show_demo_window)
@@ -251,7 +261,9 @@ int main(int, char**)
           RO_Config::UpdateCreateConfig(data);
         }
           ImGui::SetItemTooltip("Adding new repair \nAdd new or chose existing customer details \n", ImGui::GetStyle().HoverDelayNormal);
+
         if (ImGui::MenuItem("Search")) { /*To add */ }
+
         if (ImGui::MenuItem("View")) { 
           show_repair_states_window = !show_repair_states_window;
           data["repairs"]["window_on"] = show_repair_states_window;
@@ -265,9 +277,9 @@ int main(int, char**)
           RO_Config::UpdateCreateConfig(data);
         }
           ImGui::SetItemTooltip("Adding new part \nSearching for parts to update \nEditing existings ones", ImGui::GetStyle().HoverDelayNormal);
-
         ImGui::EndMenu();
       }
+      RO_Settings::Menu();
       ImGui::EndMainMenuBar();
     }
 

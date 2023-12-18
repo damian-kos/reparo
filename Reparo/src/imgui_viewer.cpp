@@ -227,7 +227,7 @@ namespace ImGui {
 
     if (ImGui::IsItemEdited() && validation_function) {
       std::cout << "Item is edited " << std::endl;
-      field.validated = validation_function();
+      field.valid = validation_function();
     }
 
     if (ImGui::IsItemDeactivated() && feedback) {
@@ -256,12 +256,12 @@ namespace ImGui {
     if (field.input.is_on) {
       ImGui::InputTextWithHintExt(label, hint, field.input, validation_function, feedback);
       if (rel_field) {
-        if (rel_field->input.validated && !field.attribute.retreived) {
+        if (rel_field->input.valid && !field.attribute.retreived) {
           int id = Database::GetIDForValueS(label, rel_field->input.buffer);
           Database::ManageSearchState(label, field.attribute, id, field.input.buffer);
           field.attribute.retreived = true;
         }
-        if (!rel_field->input.validated && field.attribute.retreived) {
+        if (!rel_field->input.valid && field.attribute.retreived) {
           field.attribute.retreived = false;
         }
       }

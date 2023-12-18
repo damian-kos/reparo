@@ -1,5 +1,7 @@
 #include "config.h"
 
+ json RO_Config::data = RO_Config::GetConfig();
+
 RO_Config::RO_Config(){
   printf("RO_Config created\n");
 }

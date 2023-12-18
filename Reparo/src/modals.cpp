@@ -120,7 +120,7 @@ void ModalController::PopupOnInputField(HintInputFieldsW_Popup& field,
       {
         strcpy(field.input.buffer, SeperateData(field.attribute.data[i].c_str(),
                label).c_str());
-        field.input.validated = true;
+        field.input.valid = true;
         field.attribute.name = field.attribute.data[i];
         if (selected) {
             printf("PopupOnInputField run\n");

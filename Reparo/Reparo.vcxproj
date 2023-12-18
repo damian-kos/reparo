@@ -75,7 +75,7 @@
     <IncludePath>$(ProjectDir)src\include;$(ProjectDir)vendor\sqlite3;$(ProjectDir)vendor\nlohmann;$(ProjectDir)vendor\imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\$(TargetName)\src\vendor\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>vendor\imgui;vendor\sqlite3;vendor\nlohmann;src\include;src\vendor;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -126,14 +126,17 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -150,6 +153,7 @@
     <ClInclude Include="src\include\insert_repair.h" />
     <ClInclude Include="src\include\modals.h" />
     <ClInclude Include="src\include\repairs.h" />
+    <ClInclude Include="src\include\settings.h" />
     <ClInclude Include="src\include\structs.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
@@ -164,6 +168,7 @@
     <ClInclude Include="vendor\sqlite3\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\config.cpp" />
     <ClCompile Include="src\database.cpp" />
     <ClCompile Include="src\edit_repair.cpp" />

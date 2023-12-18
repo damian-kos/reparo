@@ -168,7 +168,7 @@ void RepairsView::CalendarsRender(const int& relation, r_tm& date_from, r_tm& da
 void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, const int state, RepairsSort& retreived, int& selected) {
 
   static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Sortable;
-  if (ImGui::BeginTable("##states", 12, flags)) {
+  if (ImGui::BeginTable("##repairs", 12, flags)) {
     std::vector<std::string> col_names = { "ID", "Model", "Category", "Color", 
                                            "Price", "Note", "Note hidden", 
                                            "Cust. Phone Number", "Cust. Name", 
@@ -179,20 +179,20 @@ void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, 
 
     ImGui::TableHeadersRow();
 
-    if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs())
-      if (sort_specs->SpecsDirty)
-      {
+    if (ImGuiTableSortSpecs* sort_specs = ImGui::TableGetSortSpecs()) {
+      if (sort_specs->SpecsDirty) {
         printf("Sorted\n");
         retreived.repairs.clear();
         retreived.repairs_order.clear();
-        retreived = Database::RetreiveRepairsByDate(date_from.str, 
-                                                    relation, date_to.str, 
-                                                    state, 
-                                                    sort_specs->Specs->SortDirection, 
-                                                    sort_specs->Specs->ColumnIndex);
- 
+        retreived = Database::RetreiveRepairsByDate(date_from.str,
+          relation, date_to.str,
+          state,
+          sort_specs->Specs->SortDirection,
+          sort_specs->Specs->ColumnIndex);
+
         sort_specs->SpecsDirty = false;
       }
+    }
     for (auto& pair : retreived.repairs_order) {
       const bool is_selected = (selected == pair);
       retreived.repairs[1];
@@ -239,9 +239,8 @@ void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, 
       ImGui::TableNextColumn();
       ImGui::Text(retreived.repairs[pair].sn_imei.c_str());
       }
-    }
     ImGui::EndTable();
-
+  }
 }
 
 void RepairsView::RunModal() {
