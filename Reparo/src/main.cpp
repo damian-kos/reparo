@@ -20,8 +20,8 @@
 #include "config.h"
 #include "settings.h"
 
-//json loaded = RO_Config::GetConfig();
-json loaded = RO_Config::data;
+//json loaded = RO_Cfg::GetConfig();
+json loaded = RO_Cfg::data;
 
 
 // Data
@@ -149,21 +149,17 @@ int main(int, char**)
 
   // Our state
   bool show_demo_window = true;
-  bool show_another_window = false;
-  bool show_insert_customer_win =  loaded["insert_customer"].contains("window_on") ? 
-                                   loaded["insert_customer"]["window_on"].get<bool>() : false;
-  bool show_insert_repair =        loaded["insert_repair"].contains("window_on") ? 
-                                   loaded["insert_repair"]["window_on"].get<bool>() : false;
-  bool show_repair_states_window = loaded["repairs"].contains("window_on") ? 
-                                   loaded["repairs"]["window_on"].get<bool>() : false;
-  bool show_finances =             loaded["finances"].contains("window_on") ? 
-                                   loaded["finances"]["window_on"].get<bool>() : false;
+  bool show_another_window = false; 
+  bool show_insert_customer_win  = RO_Cfg::getValue("insert_customer.window_on", false);
+  bool show_insert_repair        = RO_Cfg::getValue("insert_repair.window_on", false);
+  bool show_repair_states_window = RO_Cfg::getValue("repairs.window_on", false);
+  bool show_finances             = RO_Cfg::getValue("finances.window_on", false);
+
 
 
   char test[128] = "";
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-  switch (loaded["settings"].contains("theme") ?
-    loaded["settings"]["theme"].get<int>() : 0)
+  switch (RO_Cfg::getValue("settings.theme", 0))
   {
   case 0: ImGui::StyleColorsDark(); break;
   case 1: ImGui::StyleColorsLight(); break;
@@ -249,7 +245,7 @@ int main(int, char**)
         if (ImGui::MenuItem("New Customer")) {
           show_insert_customer_win = !show_insert_customer_win;
           data["insert_customer"]["window_on"] = show_insert_customer_win;
-          RO_Config::UpdateCreateConfig(data);
+          RO_Cfg::UpdateCreateConfig(data);
         }
           ImGui::SetItemTooltip("Adding new customer \nSearching for existing customers \nEditing existings ones \nAdd repair for found customer", ImGui::GetStyle().HoverDelayNormal);
         ImGui::EndMenu();
@@ -257,8 +253,8 @@ int main(int, char**)
       if (ImGui::BeginMenu("Repairs")) {
         if (ImGui::MenuItem("New Repair")) { 
           show_insert_repair = !show_insert_repair;
-          data["insert_repair"]["window_on"] = show_insert_repair;
-          RO_Config::UpdateCreateConfig(data);
+          //data["insert_repair"]["window_on"] = show_insert_repair;
+          RO_Cfg::UpdateCreateConfig("insert_repair.window_on", show_insert_repair);
         }
           ImGui::SetItemTooltip("Adding new repair \nAdd new or chose existing customer details \n", ImGui::GetStyle().HoverDelayNormal);
 
@@ -267,14 +263,14 @@ int main(int, char**)
         if (ImGui::MenuItem("View")) { 
           show_repair_states_window = !show_repair_states_window;
           data["repairs"]["window_on"] = show_repair_states_window;
-          RO_Config::UpdateCreateConfig(data);
+          RO_Cfg::UpdateCreateConfig(data);
         }
           ImGui::SetItemTooltip("Repairs \nHistory and current tickets \n", ImGui::GetStyle().HoverDelayNormal);
 
         if (ImGui::MenuItem("Finances & Accounting")) { 
           show_finances = !show_finances;
           data["finances"]["window_on"] = show_finances;
-          RO_Config::UpdateCreateConfig(data);
+          RO_Cfg::UpdateCreateConfig(data);
         }
           ImGui::SetItemTooltip("Adding new part \nSearching for parts to update \nEditing existings ones", ImGui::GetStyle().HoverDelayNormal);
         ImGui::EndMenu();

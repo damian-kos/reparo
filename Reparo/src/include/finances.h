@@ -40,5 +40,5 @@ private:
   void Summary();
   void PartialSummaries();
   void RefreshRepairs() override;
-  json* fi_data = &RO_Config::data["finances"];
+  json* fi_data = &RO_Cfg::data["finances"];
 };

@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "config.h"
 
-class RO_Settings : public RO_Config {
+class RO_Settings : public RO_Cfg {
 public:
   static void Menu();
 

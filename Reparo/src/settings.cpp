@@ -1,6 +1,6 @@
 #include "settings.h"
 
-json data = RO_Config::GetConfig();
+json data = RO_Cfg::GetConfig();
 
 void RO_Settings::Menu(){
   if (ImGui::BeginMenu("Options"))
@@ -19,7 +19,7 @@ void RO_Settings::Menu(){
       case 2: ImGui::StyleColorsClassic(); break;
       }
       data["settings"]["theme"] = style_idx;
-      RO_Config::UpdateCreateConfig(data);
+      RO_Cfg::UpdateCreateConfig(data);
     }
     RO_Settings::FinancesWin();
     ImGui::EndMenu();
@@ -31,7 +31,7 @@ void RO_Settings::FinancesWin() {
   static bool table_enabled = data["finances"]["tables"].contains("##repairs") ? data["finances"]["tables"]["##repairs"].get<bool>():true;
   if (ImGui::MenuItem("Enabled", "", &table_enabled)) {
     data["finances"]["tables"]["##repairs"] = table_enabled;
-    RO_Config::UpdateCreateConfig(data);
+    RO_Cfg::UpdateCreateConfig(data);
   }
    
   

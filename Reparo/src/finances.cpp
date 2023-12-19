@@ -14,7 +14,10 @@ void Finances::Render() {
   //  printf("Finances Focused\n");
   //}
   if (ImGui::Button("Test Button")) {
+    static bool test;
+    test = !test;
     printf("RelationChosen: %d | Current state: %d\n", fi_relation.number, selected_state);
+    RO_Cfg::UpdateCreateConfig("finances.window.button", test);
   }
   //printf("Total %.2f\n\n", fi_all_repair_by_query.total);
   DateDirection(fi_relation); ImGui::SameLine();
@@ -31,9 +34,8 @@ void Finances::Render() {
   Summary();
   PartialSummaries();
   static int state_tmp = 0;
-  //if(repairs_to_table && RO_Config::data["finances"]["tables"]["##repairs"])
-  if (repairs_to_table && (*fi_data)["tables"].contains("##repairs") ? (*fi_data)["tables"]["##repairs"].get<bool>() : false)
-
+  //if(repairs_to_table && RO_Cfg::data["finances"]["tables"]["##repairs"])
+  if (repairs_to_table && RO_Cfg::getValue("finances.tables.##repairs", false))
     RepairsView::RepairsToTable(fi_date_from, fi_relation.number, fi_date_to, state_tmp, *repairs_to_table, fi_table_select);
   RepairsView::RunModal();
 
