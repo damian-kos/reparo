@@ -22,6 +22,7 @@ void RO_Settings::Menu(){
       RO_Cfg::UpdateCreateConfig(data);
     }
     RO_Settings::FinancesWin();
+    RO_Settings::CheckUpdate();
     ImGui::EndMenu();
   }
 
@@ -33,6 +34,24 @@ void RO_Settings::FinancesWin() {
     data["finances"]["tables"]["##repairs"] = table_enabled;
     RO_Cfg::UpdateCreateConfig(data);
   }
-   
-  
+}
+
+void RO_Settings::CheckUpdate() {
+  //static bool table_enabled = data["finances"]["tables"].contains("##repairs") ? data["finances"]["tables"]["##repairs"].get<bool>() : true;
+  if (ImGui::MenuItem("Check for Update")) {
+    //std::string version_data = GetDetailsFromAPI(0);
+    //std::cout << "Data: " << version_data << std::endl;
+      //ModalController::RenderModal("Test");
+
+    //if (REPARO_VERSION == version_data) {
+    //  printf("Version is the same\n");
+    //}
+    //else if (version_data == "") {
+    //  std::cout << " Can't parse" << std::endl;
+    //}
+    //else {
+    //  std::cout << "Can be updated" << std::endl;
+
+    //}
+  }
 }

@@ -10,7 +10,7 @@ ModalController::~ModalController() {
 }
 
 void ModalController::RenderModal(const char* modal_title) {
-    ImGui::OpenPopup(modal_title);
+  ImGui::OpenPopup("Test");
 }
 
 void ModalController::CenterAlign() {
@@ -74,6 +74,13 @@ void ModalController::ModalConfirm(const char* modal_title, Repair& repair,
     {
       ImGui::CloseCurrentPopup(); result = ConfirmResult::CONFIRM_CANCEL;
     }
+    ImGui::EndPopup();
+  }
+}
+
+void ModalController::UpdateAvailable() {
+  if (ImGui::BeginPopupModal("Test", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text("There is update avaiable");
     ImGui::EndPopup();
   }
 }

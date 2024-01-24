@@ -21,6 +21,7 @@ public:
                               std::shared_ptr<Repair> temp_repair, 
                               std::shared_ptr<Customer> temp_customer,
                               ConfirmResult& result);
+    static void UpdateAvailable();
     static void PopupOnInputField(HintInputFieldsW_Popup& field, 
                                   bool* selected, const char* label);
 

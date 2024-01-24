@@ -19,6 +19,7 @@
 #include "finances.h"
 #include "config.h"
 #include "settings.h"
+#include "updates.h"
 
 //json loaded = RO_Cfg::GetConfig();
 json loaded = RO_Cfg::data;
@@ -47,6 +48,38 @@ int main(int, char**)
 //    LPSTR lpCmdLine,
 //    int nShowCmd)
 {
+
+  #ifndef _DEBUG
+  std::cout << "App version is: " << REPARO_VERSION << std::endl;
+  std::string version_data = GetDetailsFromAPI(0);
+  std::cout << "Data: " << version_data << std::endl;
+
+  if (REPARO_VERSION == version_data) {
+    printf("Version is the same\n");
+  }
+  else if (version_data == "") {
+    std::cout << " Can't parse" << std::endl;
+  }
+  else {
+    std::string link = GetDetailsFromAPI(1);
+    std::string outputFile = "tracked_changes.txt";
+    //std::cout << link << std::endl;
+    if (DwnChangesTxt(link, outputFile)) {
+      std::cout << "Downloaded tracked_changes.txt successfully." << std::endl;
+    }
+    else {
+      std::cerr << "Failed to download tracked_changes.txt." << std::endl;
+    }
+    std::cout << "Downloading " << version_data << std::endl;
+
+    DownloadZipball(version_data);
+    Unzipper(version_data);
+    DeleteDwnZip();
+    ApplyReadChanges("tracked_changes.txt", version_data);
+
+  }
+  #endif
+
   InsertCustomer insert_customer;
   InsertRepair insert_repair;
   RepairsView repairs_view;
@@ -276,10 +309,16 @@ int main(int, char**)
         ImGui::EndMenu();
       }
       RO_Settings::Menu();
+      if (ImGui::MenuItem("Test Modal")) {
+      }
       ImGui::EndMainMenuBar();
     }
+        ImGui::OpenPopup("popup");
 
- 
+    if (ImGui::BeginPopupModal("popup")) {
+      ImGui::Text("Lorem ipsum");
+      ImGui::EndPopup();
+    }
     if (show_insert_customer_win) {
       ImGui::Begin("Add customer", &show_insert_customer_win, ImGuiWindowFlags_MenuBar);
       ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
@@ -309,6 +348,7 @@ int main(int, char**)
       repairs_view.Render();
       ImGui::End(); 
     }
+
 
     if (*EditRepair::show_repair) {
       ImGui::Begin("Edit Repair", EditRepair::show_repair);

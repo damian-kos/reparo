@@ -15,7 +15,6 @@ EditRepair::EditRepair(Repair& repair, int passed_repair_id) : InsertRepair(repa
     list_observer.clear();
     observers_attached = false;
 
-
 }
 
 EditRepair::~EditRepair() { instance_count--;  std::cout << "EditRepair destroyed " << instance_count << std::endl;  }
