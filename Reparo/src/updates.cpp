@@ -4,13 +4,77 @@
 #include <direct.h>
 
 
-size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* data) {
+#include <windows.h>
+
+
+void Updater::ModalForUpdate() {
+
+  if (update_available) {
+    ImGui::OpenPopup("Update Available");
+    update_available = false;
+  }
+  if (ImGui::BeginPopupModal("Update Available", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::Text(initial_text.c_str());
+
+    if (!update_downloaded) {
+      if (ImGui::Button("Yes")) {
+        Updater::update_confirm = true;
+
+#ifdef _DEBUG
+        update_downloaded = !update_downloaded;
+#endif
+#ifndef _DEBUG
+        update_downloaded = ProcessUpdate();
+#endif
+      }
+      if (ImGui::Button("Cancel")) {
+        Updater::update_confirm = false;
+        ImGui::CloseCurrentPopup();
+      }
+    }
+    else {
+      initial_text = "Updated downloaded successfuly.";
+      if (ImGui::Button("Restart")) 
+        ImGui::CloseCurrentPopup();
+      
+    }
+    ImGui::EndPopup();
+  }
+}
+
+bool Updater::ProcessUpdate() {
+  if (update_confirm) {
+    std::string link = GetDetailsFromAPI(1);
+    std::string changes_file = "tracked_changes.txt";
+
+    if (DwnChangesTxt(link, changes_file)) {
+      std::cout << "Downloaded tracked_changes.txt successfully." << std::endl;
+    }
+    else {
+      std::cerr << "Failed to download tracked_changes.txt." << std::endl;
+      return false;
+    }
+    std::cout << "Processing update  " << available_version << std::endl;
+
+    DownloadZipball(available_version);
+    Unzipper(available_version);
+    DeleteDwnZip();
+    ApplyReadChanges("tracked_changes.txt", available_version);
+    update_confirm = false;
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+size_t Updater::WriteCallback(void* contents, size_t size, size_t nmemb, std::string* data) {
   size_t total_size = size * nmemb;
   data->append(static_cast<char*>(contents), total_size);
   return total_size;
 }
 
-std::string GetDetailsFromAPI(int case_call) {
+std::string Updater::GetDetailsFromAPI(int case_call) {
   using json = nlohmann::json;
 
   CURL* curl = curl_easy_init();
@@ -73,7 +137,7 @@ std::string GetDetailsFromAPI(int case_call) {
   return "";
 }
 
-bool DwnChangesTxt(const std::string& url, const std::string& outputFile) {
+bool Updater::DwnChangesTxt(const std::string& url, const std::string& outputFile) {
   CURL* curl = curl_easy_init();
   if (curl) {
     FILE* file = fopen(outputFile.c_str(), "wb");
@@ -106,7 +170,7 @@ bool DwnChangesTxt(const std::string& url, const std::string& outputFile) {
   return false;
 }
 
-void ApplyReadChanges(std::string file_name, std::string latest_ver) {
+void Updater::ApplyReadChanges(std::string file_name, std::string latest_ver) {
 
   std::ifstream file(file_name);
 
@@ -144,13 +208,13 @@ void ApplyReadChanges(std::string file_name, std::string latest_ver) {
   }
 }
 
-static size_t write_data(void* ptr, size_t size, size_t nmemb, void* stream)
+size_t Updater::write_data(void* ptr, size_t size, size_t nmemb, void* stream)
 {
   size_t written = fwrite(ptr, size, nmemb, (FILE*)stream);
   return written;
 }
 
-void DownloadZipball(std::string latest_ver) {
+void Updater::DownloadZipball(std::string latest_ver) {
   std::string url = "https://api.github.com/repos/damian-kos/reparo_updates/zipball/" + latest_ver;
   CURL* curl_handle;
   CURLcode res;
@@ -190,7 +254,8 @@ void DownloadZipball(std::string latest_ver) {
   std::cout << "Downloaded " << std::endl;
 }
 
-std::string ReplaceFirstPart(const std::string& original, const std::string& replacement) {
+
+std::string Updater::ReplaceFirstPart(const std::string& original, const std::string& replacement) {
   size_t end_pos = original.find('/');
 
   if (end_pos != std::string::npos) {
@@ -202,7 +267,7 @@ std::string ReplaceFirstPart(const std::string& original, const std::string& rep
   }
 }
 
-void Unzipper(std::string latest_ver) {
+void Updater::Unzipper(std::string latest_ver) {
   const char* zip_file_path = "bin/data.zip";
   const char* extract_path = "bin";
 
@@ -282,7 +347,7 @@ void Unzipper(std::string latest_ver) {
   std::cout << "Extraction complete." << std::endl;
 }
 
-void DeleteDwnZip() {
+void Updater::DeleteDwnZip() {
   const char* filename = "bin/data.zip";
   // Attempt to remove the file
   if (std::remove(filename) == 0) {
@@ -294,7 +359,7 @@ void DeleteDwnZip() {
 }
 
 
-void RenameAndMovePrevExe() {
+void Updater::RenameAndMovePrevExe() {
   std::cout << "Executable path (__FILE__): " << __FILE__ << std::endl;
 
   if (std::rename("Reparo.exe", "Old.exe") == 0) {
@@ -324,7 +389,7 @@ void RenameAndMovePrevExe() {
 
 }
 
-void MoveFiles(std::string source, std::string latest_ver) {
+void Updater::MoveFiles(std::string source, std::string latest_ver) {
   // Specify the version folder
   std::string version_dir = "bin";
 
@@ -353,7 +418,7 @@ void MoveFiles(std::string source, std::string latest_ver) {
   }
 }
 
-void MoveOldVerFile(const std::string& file) {
+void Updater::MoveOldVerFile(const std::string& file) {
   std::filesystem::path src_file = std::filesystem::current_path() / file;
   std::cout << "Source path of file to change name: "  << src_file << std::endl;
 

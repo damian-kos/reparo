@@ -39,19 +39,23 @@ void RO_Settings::FinancesWin() {
 void RO_Settings::CheckUpdate() {
   //static bool table_enabled = data["finances"]["tables"].contains("##repairs") ? data["finances"]["tables"]["##repairs"].get<bool>() : true;
   if (ImGui::MenuItem("Check for Update")) {
-    //std::string version_data = GetDetailsFromAPI(0);
-    //std::cout << "Data: " << version_data << std::endl;
-      //ModalController::RenderModal("Test");
+    Updater::available_version = Updater::GetDetailsFromAPI(0);
+    std::cout << "Available version: " << Updater::available_version << std::endl;
+    if (REPARO_VERSION == Updater::available_version) {
+      // Modal saying version is up to date.
+      std::cout << "Version is up to date" << std::endl;
+      Updater::update_available = false;
+      return;
+    }
+    else if (Updater::available_version == "") {
+      // Modal informing about an error.
+      Updater::update_available = false;
 
-    //if (REPARO_VERSION == version_data) {
-    //  printf("Version is the same\n");
-    //}
-    //else if (version_data == "") {
-    //  std::cout << " Can't parse" << std::endl;
-    //}
-    //else {
-    //  std::cout << "Can be updated" << std::endl;
+      return;
+    }
+    else {
+      Updater::update_available = true;
 
-    //}
+    }
   }
 }

@@ -49,37 +49,7 @@ int main(int, char**)
 //    int nShowCmd)
 {
 
-  #ifndef _DEBUG
-  std::cout << "App version is: " << REPARO_VERSION << std::endl;
-  std::string version_data = GetDetailsFromAPI(0);
-  std::cout << "Data: " << version_data << std::endl;
-
-  if (REPARO_VERSION == version_data) {
-    printf("Version is the same\n");
-  }
-  else if (version_data == "") {
-    std::cout << " Can't parse" << std::endl;
-  }
-  else {
-    std::string link = GetDetailsFromAPI(1);
-    std::string outputFile = "tracked_changes.txt";
-    //std::cout << link << std::endl;
-    if (DwnChangesTxt(link, outputFile)) {
-      std::cout << "Downloaded tracked_changes.txt successfully." << std::endl;
-    }
-    else {
-      std::cerr << "Failed to download tracked_changes.txt." << std::endl;
-    }
-    std::cout << "Downloading " << version_data << std::endl;
-
-    DownloadZipball(version_data);
-    Unzipper(version_data);
-    DeleteDwnZip();
-    ApplyReadChanges("tracked_changes.txt", version_data);
-
-  }
-  #endif
-
+  
   InsertCustomer insert_customer;
   InsertRepair insert_repair;
   RepairsView repairs_view;
@@ -98,7 +68,7 @@ int main(int, char**)
   int screenWidth = GetSystemMetrics(SM_CXSCREEN);
   int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-  HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 400, 50, screenWidth-500, screenHeight-100, nullptr, nullptr, wc.hInstance, nullptr);
+  HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 0, 0, screenWidth, screenHeight, nullptr, nullptr, wc.hInstance, nullptr);
 
 
 
@@ -111,7 +81,7 @@ int main(int, char**)
   }
 
   // Show the window
-  ::ShowWindow(hwnd, SW_SHOWDEFAULT);
+  ::ShowWindow(hwnd, SW_MAXIMIZE);
   ::UpdateWindow(hwnd);
 
   // Setup Dear ImGui context
@@ -309,16 +279,11 @@ int main(int, char**)
         ImGui::EndMenu();
       }
       RO_Settings::Menu();
-      if (ImGui::MenuItem("Test Modal")) {
-      }
       ImGui::EndMainMenuBar();
     }
-        ImGui::OpenPopup("popup");
 
-    if (ImGui::BeginPopupModal("popup")) {
-      ImGui::Text("Lorem ipsum");
-      ImGui::EndPopup();
-    }
+    Updater::ModalForUpdate();
+
     if (show_insert_customer_win) {
       ImGui::Begin("Add customer", &show_insert_customer_win, ImGuiWindowFlags_MenuBar);
       ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
@@ -365,7 +330,7 @@ int main(int, char**)
       }
       ImGui::End();
     }
-
+    
     // Rendering
     ImGui::Render();
     const float clear_color_with_alpha[4] = {clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w};

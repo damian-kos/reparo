@@ -155,6 +155,7 @@
     <ClInclude Include="src\include\repairs.h" />
     <ClInclude Include="src\include\settings.h" />
     <ClInclude Include="src\include\structs.h" />
+    <ClInclude Include="src\include\updates.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_dx11.h" />
@@ -181,6 +182,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\modals.cpp" />
     <ClCompile Include="src\repairs.cpp" />
+    <ClCompile Include="src\updates.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
@@ -189,22 +191,6 @@
     <ClCompile Include="vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
     <ClCompile Include="vendor\sqlite3\sqlite3.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="vendor\parts_stock.db" />
-    <None Include="vendor\sqlite3\README.md" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="vendor\sqlite3\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="vendor\imgui\msc\fonts\Assistant.ttf" />
-    <Font Include="vendor\imgui\msc\fonts\Cousine-Regular.ttf" />
-    <Font Include="vendor\imgui\msc\fonts\DroidSans.ttf" />
-    <Font Include="vendor\imgui\msc\fonts\Karla-Regular.ttf" />
-    <Font Include="vendor\imgui\msc\fonts\ProggyClean.ttf" />
-    <Font Include="vendor\imgui\msc\fonts\ProggyTiny.ttf" />
-    <Font Include="vendor\imgui\msc\fonts\Roboto-Medium.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
