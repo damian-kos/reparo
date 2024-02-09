@@ -15,6 +15,34 @@ void PutTextMultiline(cv::Mat& image, const std::string& text, const cv::Point& 
   }
 }
 
+void drawRoundedRectangle(cv::Mat& img, cv::Point topLeft, cv::Point bottomRight, int cornerRadius, const cv::Scalar& color, const cv::Scalar& color_fill, int thickness) {
+  // Ensure thickness is positive or filled
+  thickness = thickness > 0 ? thickness : -1;
+
+  // Calculate corner points
+  int x1 = topLeft.x;
+  int y1 = topLeft.y;
+  int x2 = bottomRight.x;
+  int y2 = bottomRight.y;
+
+  // Draw the four corners: top left, top right, bottom right, bottom left
+  cv::ellipse(img, cv::Point(x1 + cornerRadius, y1 + cornerRadius), cv::Size(cornerRadius, cornerRadius), 180.0, 0, 90, color, thickness);
+  cv::ellipse(img, cv::Point(x2 - cornerRadius, y1 + cornerRadius), cv::Size(cornerRadius, cornerRadius), 270.0, 0, 90, color, thickness);
+  cv::ellipse(img, cv::Point(x2 - cornerRadius, y2 - cornerRadius), cv::Size(cornerRadius, cornerRadius), 0.0, 0, 90, color, thickness);
+  cv::ellipse(img, cv::Point(x1 + cornerRadius, y2 - cornerRadius), cv::Size(cornerRadius, cornerRadius), 90.0, 0, 90, color, thickness);
+
+  // Draw the four sides: top, right, bottom, left
+  cv::line(img, cv::Point(x1 + cornerRadius, y1), cv::Point(x2 - cornerRadius, y1), color, thickness);
+  cv::line(img, cv::Point(x2, y1 + cornerRadius), cv::Point(x2, y2 - cornerRadius), color, thickness);
+  cv::line(img, cv::Point(x1 + cornerRadius, y2), cv::Point(x2 - cornerRadius, y2), color, thickness);
+  cv::line(img, cv::Point(x1, y1 + cornerRadius), cv::Point(x1, y2 - cornerRadius), color, thickness);
+  // choose arbitrary starting point for fill => Top left plus 10,10
+  cv::Point fillFrom(topLeft.x + 10, topLeft.y + 10);
+  // You may want to use `lineColor` instead of `fillColor`
+  cv::floodFill(img, fillFrom, color_fill);
+}
+
+
 void ImageEditor::CreateA4(std::vector<TextField>& text_fields_vector, Logo* logo) {
 
   // Convert A4 size from inches to pixels (corrected conversion using PPI)
@@ -35,32 +63,41 @@ void ImageEditor::CreateA4(std::vector<TextField>& text_fields_vector, Logo* log
 
   // Text settings for custom font
   for (const auto& field : text_fields_vector) {
-    // Draw the text on the A4 image using custom font, handling new lines
+  // Draw the rectangle on the image
+
+    cv::Scalar rectColor(0, 0, 0); // Black border
+    cv::Scalar rectColor2(255, 175, 0); // Black border
+
+    int thickness = 1; // Pixel
+    int cornerRadius = 5; // Radius of the rounded corners
+    cv::Scalar color_fill(255, 175, 0);
+
+    drawRoundedRectangle(a4Image, cv::Point(field.offset.x-field.font_size/3, field.offset.y-field.font_size/4),
+                         cv::Point(field.offset.x + field.size.x, field.offset.y + field.size.y),
+                         cornerRadius, rectColor, color_fill, thickness);
+    cv::Scalar color_fill1(255, 120, 0);
+
+    drawRoundedRectangle(a4Image, cv::Point(field.offset.x +field.size.x + 40 , field.offset.y - field.font_size / 4),
+                         cv::Point(field.offset.x + field.size.x * 2, field.offset.y  + field.size.y), 
+                         cornerRadius, rectColor, color_fill1, thickness);
+      // Draw the text on the A4 image using custom font, handling new lines
     PutTextMultiline(a4Image, field.text, cv::Point(field.offset.x, field.offset.y), field.font_size, cv::Scalar(0, 0, 0), ft2);
     std::cout << "Font size on image creation: " << field.font_size << std::endl;
+
   }
   cv::Mat extraImg = cv::imread("sloth.png"); // Load the extra image
   if (!extraImg.empty()) {
     // Resize the extra image to 60x60 pixels
     cv::Size newSize(logo->size.x, logo->size.y); // New size: 60x60 pixels
     cv::resize(extraImg, extraImg, newSize);
-
-    // Now that extraImg is resized, calculate the center position for extraImg
-    //int centerX = (width - extraImg.cols) / 2; // Calculate the X position to center extraImg
-    //int posY = logo->offset.y; // Y position is 100 pixels down from the top
-
-    // Define the region of interest on the main image for placing the extra image
     cv::Rect roi(cv::Point(logo->offset.x, logo->offset.y), extraImg.size());
-
-    // Create a new ROI on the main image for the extra image
     cv::Mat destinationROI = a4Image(roi);
-
-    // Copy extraImg to the specified region on a4Image
     extraImg.copyTo(destinationROI);
   }
   else {
     std::cerr << "Failed to load extra image." << std::endl;
   }
+
   // Save the image or display
   cv::imwrite("a4_hello_world.jpg", a4Image); // Save the image
   cv::imshow("A4 Image with Custom Font", a4Image); // Display the image

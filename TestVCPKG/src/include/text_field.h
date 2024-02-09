@@ -18,9 +18,15 @@ public:
 
 class TextField : public DrawElement {
 public:
+  TextField();
+  TextField(std::string label);
+
+public:
+  std::string label = "";
   char text[256] = "";
   void FieldProperties();
   float font_size = 18.0f;
+private:
 };
 
 // SECTION LoadLogo load

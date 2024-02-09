@@ -207,6 +207,7 @@ int main(int, char**)
 
     ImGui::Begin("DirectX11 Texture Test");
     images.ShowImage();
+
     //ImGui::Image((void*)my_texture, ImVec2(300, 300));
     ImGui::End();
 

@@ -2,9 +2,23 @@
 #include "image.h"
 #include "blank_o_cv.h"
 
+
+
 void Images::CreateImage() {
   if (ImGui::Button("A4 IMAGE")) {
     ImageEditor::CreateA4(text_fields_vector, &logo);
+  }
+}
+
+void Images::TextFieldsForTemplate() {
+  if (ImGui::Button("Load TFs")) {
+    for (auto& label : text_fields_labels) {
+      TextField text_field(label);
+      strcpy_s(text_field.text, label.c_str());
+      text_field.offset.x = 54;
+      text_fields_vector.push_back(text_field);
+      text_fields_count += 1;
+    }
   }
 }
 
@@ -15,12 +29,16 @@ void Images::ShowImage() {
     ImGui::TableSetupColumn("Column 1"); // Default settings
 
     ImGui::TableNextRow();
-
+    
     ImGui::TableNextColumn();
+    static bool use_spacer;  ImGui::Checkbox("Use spacer", &use_spacer);
+    static float vec4f[4] = { 0.10f, 0.20f, 0.30f, 150.0f};
+    ImGui::DragFloat4("Spacer", vec4f);
     CreateImage();
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
-
-    static int text_fields_count;
+    TextFieldsForTemplate();
+    SaveTemplate();
+    //static int text_fields_count;
     if (ImGui::Button("Add text field")) {
       text_fields_count += 1;
       TextField field;
@@ -56,9 +74,16 @@ void Images::ShowImage() {
     draw_list->AddRectFilled(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
     draw_list->AddRect(canvas_p0, canvas_p1, IM_COL32(255, 255, 255, 255));
 
-    InvisibleButtonEx("canvas2 %d", ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight, ImVec2(60,60), canvas_rect, (void*)logo.my_texture, logo.offset, &logo); 
+    InvisibleButtonEx("canvas2 %d", ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight, canvas_rect, logo.offset, &logo); 
 
     for (int i = 0; i < text_fields_count; i++) {
+      if (use_spacer) {
+        text_fields_vector[i].offset.y = vec4f[3] + (vec4f[0] * i);
+        text_fields_vector[i].size.x = 50 + (vec4f[1]);
+        text_fields_vector[i].size.y = 50 + (vec4f[2]);
+
+
+      }
       ImGui::PushID(i);
       InvisibleButtonEx("canvas1 %d", ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight, text_fields_vector[i], canvas_rect);
       ImGui::PopID();
@@ -104,16 +129,26 @@ bool Images::InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags, TextF
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
     text_field.offset.x += ImGui::GetIO().MouseDelta.x;
     text_field.offset.y += ImGui::GetIO().MouseDelta.y;
+    
+
   }
   if (ImGui::IsItemHovered()) {
+    ImU32 col = IM_COL32(128, 128, 255, 255);
+    draw_list->AddRect(bb.Min, bb.Max, col);
+
+    ImGui::SetItemUsingMouseWheel();
+    draw_list->AddText(NULL, 14, bb.Min - ImVec2(0, 13), IM_COL32(128, 128, 128, 255), text_field.label.c_str(), NULL);
     //std::cout << "Hovered " << std::endl;
     float wheel = ImGui::GetIO().MouseWheel;
     if (wheel) {
       font_size += wheel;
     }
   }
+  else {
+    ImU32 col = IM_COL32(128, 128, 128, 128);
+    draw_list->AddRect(bb.Min, bb.Max, col);
+  }
 
-  draw_list->AddRect(bb.Min, bb.Max, IM_COL32(128, 128, 255, 255));
   draw_list->AddText(font, font_size, bb.Min, IM_COL32(0, 0, 0, 255), text_field.text, NULL, size.x, &clip_rect);
 
   if (text_field.offset.x + size.x> canvas.Max.x  - canvas.Min.x)
@@ -128,7 +163,7 @@ bool Images::InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags, TextF
   return pressed;
 }
 
-bool Images::InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags, const ImVec2& size_arg, ImRect& canvas, ImTextureID texture_id, ImVec2& offset, Logo* logo) {
+bool Images::InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags, ImRect& canvas, ImVec2& offset, Logo* logo) {
  
   static ImVec2 bb_min = canvas.Min;
   
@@ -164,7 +199,7 @@ bool Images::InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags, const
   }
 
   draw_list->AddRect(bb.Min, bb.Min + logo->size, IM_COL32(128, 128, 255, 255));
-  draw_list->AddImage((void*)texture_id, bb.Min, bb.Min+ logo->size);
+  draw_list->AddImage((void*)logo->my_texture, bb.Min, bb.Min+ logo->size);
   if (logo->offset.x + size.x > canvas.Max.x - canvas.Min.x)
     logo->offset.x = (canvas.Max.x - canvas.Min.x - size.x) - 1;
   if (logo->offset.y + size.y > canvas.Max.y - canvas.Min.y)
@@ -186,5 +221,18 @@ void Images::SetFonts() {
   font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\arial.ttf", 12.0f, &font_config);
   font->Scale = 1.0f;
   
+}
+
+void Images::SaveTemplate() {
+  if (ImGui::Button("Save template")) {
+    for (auto& field : text_fields_vector) {
+      std::string path = "text_field." + field.label;
+      RO_Cfg::UpdateCreateConfig(path + ".offfset.x", field.offset.x);
+      RO_Cfg::UpdateCreateConfig(path + ".offfset.y", field.offset.y);
+      RO_Cfg::UpdateCreateConfig(path + ".font_size", field.font_size);
+
+    }
+      
+  }
 }
 

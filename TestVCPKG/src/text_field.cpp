@@ -2,8 +2,16 @@
 #include "stb_image.h"
 #include "text_field.h"
 
+TextField::TextField() {}
+
+TextField::TextField(std::string label) : label(label){
+
+}
+
 void TextField::FieldProperties() {
-  if (ImGui::CollapsingHeader("Text Field", &closable_group)) {
+  if (label.empty())
+    label = "Text Field";
+  if (ImGui::CollapsingHeader(label.c_str(), &closable_group)) {
     ImGui::DragFloat("Text pos x", &offset.x, 1.0f, 2.0f, 0.0f, "%.0f");
     ImGui::DragFloat("Text pos y", &offset.y, 1.0f, 2.0f, 0.0f, "%.0f");
     ImGui::InputTextMultiline("Text", text, IM_ARRAYSIZE(text));
