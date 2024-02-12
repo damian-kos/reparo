@@ -26,7 +26,6 @@ InsertCustomer::~InsertCustomer() {
 }
 
 void InsertCustomer::Render() {
-
   //if (ImGui::BeginMenuBar()) {
   //  if (ImGui::BeginMenu("Options")) {
   //    if (ImGui::MenuItem("Fields")) {

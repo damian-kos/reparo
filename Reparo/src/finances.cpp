@@ -1,25 +1,24 @@
 ﻿#pragma once
 #include "finances.h"
 
-
-Finances::Finances() {
-  printf("Finances Created\n");
+FinancesWin::FinancesWin() {
+  printf("FinancesWin Created\n");
+  //settings_data = RO_Settings::GetConfig("config.json");
   repairs_to_table = &fi_all_repair_by_query;
   RefreshRepairs();
+  RO_Settings::FinancesWinOpts::table_repairs = RO_Cfg::getValue("finances.tables.##repairs", false, "config.json");
 }
-Finances::~Finances() { printf("Finances Destroyed"); }
+FinancesWin::~FinancesWin() { printf("FinancesWin Destroyed"); }
 
-void Finances::Render() {
-  //if (ImGui::IsWindowFocused()) {
-  //  printf("Finances Focused\n");
-  //}
-  if (ImGui::Button("Test Button")) {
-    static bool test;
-    test = !test;
-    printf("RelationChosen: %d | Current state: %d\n", fi_relation.number, selected_state);
-    RO_Cfg::UpdateCreateConfig("finances.window.button", test);
+void FinancesWin::Render() {
+  if (ImGui::BeginMenuBar()) {
+    if (ImGui::BeginMenu("Options"))  {
+      RO_Settings::FinancesWinWin();
+      ImGui::EndMenu();
+    }
+    ImGui::EndMenuBar();
   }
-  //printf("Total %.2f\n\n", fi_all_repair_by_query.total);
+
   DateDirection(fi_relation); ImGui::SameLine();
   CalendarsRender(fi_relation.number, fi_date_from, fi_date_to);
   ImGui::SameLine();
@@ -34,15 +33,15 @@ void Finances::Render() {
   Summary();
   PartialSummaries();
   static int state_tmp = 0;
-  //if(repairs_to_table && RO_Cfg::data["finances"]["tables"]["##repairs"])
-  if (repairs_to_table && RO_Cfg::getValue("finances.tables.##repairs", false))
-    RepairsView::RepairsToTable(fi_date_from, fi_relation.number, fi_date_to, state_tmp, *repairs_to_table, fi_table_select);
+  if (ImGui::CollapsingHeader("Tables", &RO_Settings::FinancesWinOpts::table_repairs)) {
+    if (repairs_to_table)
+      RepairsView::RepairsToTable(fi_date_from, fi_relation.number, fi_date_to, state_tmp, *repairs_to_table, fi_table_select);
+  }
   RepairsView::RunModal();
-
 }
 
 
-void Finances::Summary() {
+void FinancesWin::Summary() {
   ImGui::BeginGroup();
   std::string total = std::format("Total £ \n{0:.2f}", fi_all_repair_by_query.total);
   if (ImGui::ButtonScaled(total.c_str(), 2.0f, ImVec2(200, 215))) {
@@ -52,7 +51,7 @@ void Finances::Summary() {
   ImGui::SameLine();
 }
 
-void Finances::PartialSummaries() {
+void FinancesWin::PartialSummaries() {
   int names_count = names.size() / 5 + ((names.size() % 5 != 0) ? 1 : 0);
   int j = 0; // Initialize j outside the loop
 
@@ -79,7 +78,7 @@ void Finances::PartialSummaries() {
   }
 }
 
-void Finances::RefreshRepairs() {
+void FinancesWin::RefreshRepairs() {
   repairs_per_state.clear();
   
   for (int i = 0; i <= names.size(); i++)
@@ -94,11 +93,11 @@ void Finances::RefreshRepairs() {
   }
 }
 
-void Finances::Update(const int& passed_int) {
+void FinancesWin::Update(const int& passed_int) {
   printf("Do cool stuff on finances tables");
   RefreshRepairs();
 }
-std::shared_ptr<EditRepair> Finances::GetEditRepair()
+std::shared_ptr<EditRepair> FinancesWin::GetEditRepair()
 {
   return RepairsView::GetEditRepair();
 }

@@ -10,16 +10,9 @@
 #include <imgui.h>
 #endif //IMGUI_API
 
-// USAGE
-/*
-#include "imguidatechooser.h"
-//#include <time.h>   // mandatory when implementing ImGui::TestDateChooser() yourself in your code
-
-// inside a ImGui::Window:
-ImGui::TestDateChooser();
-*/
-
-
+#include "repair_ticket.h"
+class TextField; // Missing or Circular Includes
+class Logo;      //Missing or Circular Includes
 struct Customer;  // defined in "structs.h"
 
 namespace ImGui {
@@ -40,14 +33,16 @@ namespace ImGui {
                                         bool* feedback = nullptr);
     IMGUI_API void GetFontV(ImFont* font_t);
     IMGUI_API bool ButtonScaled(const char* label, float font_size, ImVec2 button_size);
-
     IMGUI_API void InputTextWithPopup(const char* label, const char* hint, 
                                       HintInputFieldsW_Popup& field, 
                                       std::function<bool()> validation_function, 
                                       bool* selection = nullptr, 
                                       HintInputFieldsW_Popup* rel_field = nullptr, 
                                       bool* feedback = nullptr);
-        
+    IMGUI_API bool InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags,
+                                     TextField& text_field, const ImRect& canvas);
+    IMGUI_API bool InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags,
+                                     const ImRect& canvas, ImVec2& offset, Logo* logo);
 } // namespace ImGui
 
 

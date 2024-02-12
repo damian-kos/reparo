@@ -154,7 +154,9 @@
     <ClInclude Include="src\include\modals.h" />
     <ClInclude Include="src\include\repairs.h" />
     <ClInclude Include="src\include\settings.h" />
+    <ClInclude Include="src\include\stb_image.h" />
     <ClInclude Include="src\include\structs.h" />
+    <ClInclude Include="src\include\repair_ticket.h" />
     <ClInclude Include="src\include\updates.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
@@ -169,6 +171,7 @@
     <ClInclude Include="vendor\sqlite3\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\repair_ticket.cpp" />
     <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\config.cpp" />
     <ClCompile Include="src\database.cpp" />

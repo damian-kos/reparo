@@ -6,12 +6,31 @@ RO_Cfg::RO_Cfg(){
   printf("RO_Cfg created\n");
 }
 
-json RO_Cfg::GetConfig()
-{
+json RO_Cfg::GetConfig() {
   json data;
 
   // Try to read existing data from the file
   std::ifstream file_in("config.json");
+  if (file_in.is_open()) {
+    try {
+      file_in >> data;
+    }
+    catch (const json::parse_error& e) {
+      // Handle parse error (e.g., empty file)
+      std::cerr << "Error parsing JSON: " << e.what() << std::endl;
+      data = json::object();
+    }
+    file_in.close();
+  }
+
+  return data;
+}
+
+json RO_Cfg::GetConfig(const std::string& filename) {
+  json data;
+
+  // Try to read existing data from the file
+  std::ifstream file_in(filename);
   if (file_in.is_open()) {
     try {
       file_in >> data;
@@ -108,14 +127,78 @@ void RO_Cfg::UpdateCreateConfig(const std::string& keyPath, const T& value) {
   file_out.close();
 }
 
+// Test config ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ BEGIN
+template <typename T>
+T RO_Cfg::getValue(const std::string& keyPath, const T& defaultValue, const std::string& filename) {
+  std::cout << "Get value with filename is running." << std::endl;
+  json loaded_data = RO_Cfg::GetConfig(filename);
+  try {
+    std::cout << "Loaded from specific json data " << std::endl;
+    return getJsonValue<T>(loaded_data, keyPath);
+  }
+  catch (const std::exception& e) {
+    // Print out the error message to std::cerr
+    std::cerr << "Error retrieving value for key '" << keyPath << "': " << e.what() << "|" << std::endl;
+    // Return the default value as a fallback
+    return defaultValue;
+  }
+}
 
+template <typename T>
+void RO_Cfg::UpdateCreateConfig(const std::string& keyPath, const T& value, const std::string& filename) {
+  //json loaded_data = RO_Cfg::GetConfig(filename);
+  json existing_data;
+  std::ifstream file_in(filename);
+  if (file_in.is_open()) {
+    try {
+      file_in >> existing_data;
+    }
+    catch (const json::parse_error& e) {
+      std::cerr << "Error parsing JSON: " << e.what() << std::endl;
+      existing_data = json::object();
+    }
+  }
+  else {
+    std::cerr << "Error opening config file for reading." << std::endl;
+    return;
+  }
+
+  file_in.close();
+
+  // Split the key path into nested keys
+  std::istringstream iss(keyPath);
+  std::string item;
+  json* currentNode = &existing_data;
+
+  while (std::getline(iss, item, '.')) {
+    currentNode = &(*currentNode)[item];
+  }
+
+  *currentNode = value;
+
+  std::ofstream file_out(filename);
+  if (file_out.is_open()) {
+    file_out << std::setw(4) << existing_data << std::endl;
+  }
+  else {
+    std::cerr << "Error opening config file for writing." << std::endl;
+  }
+
+  file_out.close();
+}
+
+
+// Test config ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ END
 
 template <typename T>
 T RO_Cfg::getValue(const std::string& keyPath, const T& defaultValue) {
   try {
     return getJsonValue<T>(data, keyPath);
   }
-  catch (const std::exception&) {
+  catch (const std::exception& e) {
+    // Print out the error message to std::cerr
+    std::cerr << "Error retrieving value for key '" << keyPath << "': " << e.what()  << "|" << std::endl;
+    // Return the default value as a fallback
     return defaultValue;
   }
 }
@@ -144,4 +227,15 @@ template int RO_Cfg::getValue<int>(const std::string&, const int&);
 template int RO_Cfg::getJsonValue<int>(const json&, const std::string&);
 
 template void RO_Cfg::UpdateCreateConfig<bool>(const std::string&, const bool&);
+
+
+// // Explicit template instantiations with file_path
+template bool RO_Cfg::getValue<bool>(const std::string&, const bool&, const std::string&);
+template float RO_Cfg::getValue<float>(const std::string&, const float&, const std::string&);
+
+template void RO_Cfg::UpdateCreateConfig<bool>(const std::string&, const bool&, const std::string&);
+template void RO_Cfg::UpdateCreateConfig<float>(const std::string&, const float&, const std::string&);
+
+
+
 

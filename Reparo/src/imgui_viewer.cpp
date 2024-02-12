@@ -4,12 +4,13 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 
-  #include <imgui.h>
-  #include <imgui_internal.h>
-  #include "structs.h"
-  #include "imgui_viewer.h"
-  #include "database.h"
-  #include "modals.h"
+#include <imgui.h>
+#include <imgui_internal.h>
+#include "structs.h"
+#include "imgui_viewer.h"
+#include "database.h"
+#include "modals.h"
+
 
 namespace ImGui {
   //Database db;
@@ -34,6 +35,8 @@ namespace ImGui {
 
   ImFont* font;
 
+
+
   void SetFonts() {
     ImGuiIO& io = ImGui::GetIO();
     ImFontConfig font_config;
@@ -42,7 +45,6 @@ namespace ImGui {
     font_config.RasterizerDensity = 2.0f;
     font = io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/DroidSans.ttf", 24.0f, &font_config);
     font->Scale = 1.0f;
-
   }
 
   void ViewCustomer(const Customer& customer, std::shared_ptr<Customer> t_customer) {
@@ -119,7 +121,7 @@ namespace ImGui {
   }
 
 
-  void SeparatorTextAlignC(const char* label, int width) {
+  void SeparatorTextAlignC(const char* label, int width) { // Dont use 
     ImGuiStyle* style = &ImGui::GetStyle();
     PushID(label);
     ImVec2 label_size = CalcTextSize(label);
@@ -197,7 +199,6 @@ namespace ImGui {
     }
     return ret;
   }
- 
 
   void CenteredText(const char* label, const ImVec2& size_arg)
   {
@@ -250,8 +251,6 @@ namespace ImGui {
 
   }
 
-
-
   void InputTextWithPopup(const char* label, const char* hint, HintInputFieldsW_Popup& field, std::function<bool()> validation_function, bool* selection, HintInputFieldsW_Popup* rel_field, bool* feedback) {
     if (field.input.is_on) {
       ImGui::InputTextWithHintExt(label, hint, field.input, validation_function, feedback);
@@ -270,6 +269,123 @@ namespace ImGui {
       }
       ModalController::PopupOnInputField(field, selection, label);
     }
+  }
+
+  bool InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags, TextField& text_field, const ImRect& canvas) {
+    float& font_size = text_field.font_size;
+
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    if (window->SkipItems)
+      return false;
+
+    // Cannot use zero-size for InvisibleButton(). Unlike Button() there is not way to fallback using the label size.
+    IM_ASSERT(text_field.size.x != 0.0f && text_field.size.y != 0.0f);
+
+    const ImGuiID id = window->GetID(str_id);
+    ImVec2 size = ImGui::CalcItemSize(text_field.size, 0.0f, 0.0f);
+    if (size.x > canvas.Max.x - canvas.Min.x - text_field.offset.x) {
+      size.x = canvas.Max.x - canvas.Min.x - text_field.offset.x - 1;
+    }
+    if (size.y > canvas.Max.y - canvas.Min.y - text_field.offset.y) {
+      size.y = canvas.Max.y - canvas.Min.y - text_field.offset.y - 1;
+    }
+    const ImRect bb(canvas.Min + text_field.offset, canvas.Min + text_field.offset + size);
+
+    ImGui::ItemSize(size);
+    if (!ImGui::ItemAdd(bb, id))
+      return false;
+
+    bool hovered, held;
+    bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held, flags);
+
+    IMGUI_TEST_ENGINE_ITEM_INFO(id, str_id, g.LastItemData.StatusFlags);
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImVec4 clip_rect(bb.Min.x, bb.Min.y, bb.Max.x, bb.Max.y); // AddText() takes a ImVec4* here so let's convert.
+
+    if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+      text_field.offset.x += ImGui::GetIO().MouseDelta.x;
+      text_field.offset.y += ImGui::GetIO().MouseDelta.y;
+    }
+
+    if (ImGui::IsItemHovered()) {
+      ImU32 col = IM_COL32(128, 128, 255, 255);
+      draw_list->AddRect(bb.Min, bb.Max, col);
+
+      ImGui::SetItemUsingMouseWheel();
+      draw_list->AddText(NULL, 14, bb.Min - ImVec2(0, 13), IM_COL32(128, 128, 128, 255), text_field.label.c_str(), NULL);
+      //std::cout << "Hovered " << std::endl;
+      float wheel = ImGui::GetIO().MouseWheel;
+      if (wheel) {
+        font_size += wheel;
+      }
+    }
+    else {
+      ImU32 col = IM_COL32(128, 128, 128, 128);
+      draw_list->AddRect(bb.Min, bb.Max, col);
+    }
+
+    draw_list->AddText(font, font_size, bb.Min, IM_COL32(0, 0, 0, 255), text_field.text, NULL, size.x, &clip_rect);
+
+    if (text_field.offset.x + size.x > canvas.Max.x - canvas.Min.x)
+      text_field.offset.x = (canvas.Max.x - canvas.Min.x - size.x) - 1;
+    if (text_field.offset.y + size.y > canvas.Max.y - canvas.Min.y)
+      text_field.offset.y = (canvas.Max.y - canvas.Min.y - size.y) - 1;
+
+    if (text_field.offset.x < 0)
+      text_field.offset.x = 1;
+    if (text_field.offset.y < 0)
+      text_field.offset.y = 1;
+    return pressed;
+  }
+
+  bool InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags, const ImRect& canvas, ImVec2& offset, Logo* logo) {
+    static ImVec2 bb_min = canvas.Min;
+
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    if (window->SkipItems)
+      return false;
+
+    // Cannot use zero-size for InvisibleButton(). Unlike Button() there is not way to fallback using the label size.
+    IM_ASSERT(logo->size.x != 0.0f && logo->size.y != 0.0f);
+
+    const ImGuiID id = window->GetID(str_id);
+    ImVec2 size = ImGui::CalcItemSize(logo->size, 0.0f, 0.0f);
+
+    const ImRect bb(canvas.Min + logo->offset, canvas.Min + logo->offset + size);
+
+    ImGui::ItemSize(size);
+    if (!ImGui::ItemAdd(bb, id))
+      return false;
+
+    bool hovered, held;
+    bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held, flags);
+
+    IMGUI_TEST_ENGINE_ITEM_INFO(id, str_id, g.LastItemData.StatusFlags);
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+    ImVec4 clip_rect(bb.Min.x, bb.Min.y, bb.Max.x, bb.Max.y); // AddText() takes a ImVec4* here so let's convert.
+
+    if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+      logo->offset.x += ImGui::GetIO().MouseDelta.x;
+      logo->offset.y += ImGui::GetIO().MouseDelta.y;
+
+    }
+
+    draw_list->AddRect(bb.Min, bb.Min + logo->size, IM_COL32(128, 128, 255, 255));
+    draw_list->AddImage((void*)logo->texture, bb.Min, bb.Min + logo->size);
+    if (logo->offset.x + size.x > canvas.Max.x - canvas.Min.x)
+      logo->offset.x = (canvas.Max.x - canvas.Min.x - size.x) - 1;
+    if (logo->offset.y + size.y > canvas.Max.y - canvas.Min.y)
+      logo->offset.y = (canvas.Max.y - canvas.Min.y - size.y) - 1;
+
+    if (logo->offset.x < 0)
+      logo->offset.x = 1;
+    if (logo->offset.y < 0)
+      logo->offset.y = 1;
+    return pressed;
   }
 }
 

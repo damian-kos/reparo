@@ -11,12 +11,13 @@
 #include "imgui_viewer.h"
 #include "repairs.h"
 #include "config.h"
+#include "settings.h"
 
 
-class Finances : public RepairsView {
+class FinancesWin : public RepairsView {
 public:
-  Finances();
-  ~Finances();
+  FinancesWin();
+  ~FinancesWin();
 
 public:
   void Render() override;
@@ -40,5 +41,7 @@ private:
   void Summary();
   void PartialSummaries();
   void RefreshRepairs() override;
-  json* fi_data = &RO_Cfg::data["finances"];
+
+private:
+  //json settings_data;
 };

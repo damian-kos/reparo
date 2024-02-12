@@ -20,6 +20,7 @@
 #include "config.h"
 #include "settings.h"
 #include "updates.h"
+#include "repair_ticket.h"
 
 //json loaded = RO_Cfg::GetConfig();
 json loaded = RO_Cfg::data;
@@ -53,7 +54,8 @@ int main(int, char**)
   InsertCustomer insert_customer;
   InsertRepair insert_repair;
   RepairsView repairs_view;
-  Finances finances;
+  FinancesWin finances;
+  RepairTicket repair_ticket;
   json data;
 
   insert_repair.Attach(&repairs_view);
@@ -118,7 +120,7 @@ int main(int, char**)
   // Setup Platform/Renderer backends
   ImGui_ImplWin32_Init(hwnd);
   ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
-    
+  LoadLogo::g_pd3dDeviceImages = g_pd3dDevice;
   // setup
   ImFontConfig font_config;
   font_config.OversampleH = 1; // FreeType does not support those, reset so stb_truetype will produce similar results
@@ -151,8 +153,8 @@ int main(int, char**)
   // IM_ASSERT(font != nullptr);
 
   // Our state
-  bool show_demo_window = true;
-  bool show_another_window = false; 
+  bool show_demo_window          = true;
+  bool show_another_window       = false; 
   bool show_insert_customer_win  = RO_Cfg::getValue("insert_customer.window_on", false);
   bool show_insert_repair        = RO_Cfg::getValue("insert_repair.window_on", false);
   bool show_repair_states_window = RO_Cfg::getValue("repairs.window_on", false);
@@ -164,9 +166,9 @@ int main(int, char**)
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
   switch (RO_Cfg::getValue("settings.theme", 0))
   {
-  case 0: ImGui::StyleColorsDark(); break;
-  case 1: ImGui::StyleColorsLight(); break;
-  case 2: ImGui::StyleColorsClassic(); break;
+  case 0: ImGui::StyleColorsDark();     break;
+  case 1: ImGui::StyleColorsLight();    break;
+  case 2: ImGui::StyleColorsClassic();  break;
   }
   // Main loop
   bool done = false;
@@ -293,7 +295,7 @@ int main(int, char**)
        
 
     if (show_finances) {
-      ImGui::Begin("Finances", &show_finances);
+      ImGui::Begin("Finances & Accounting", &show_finances, ImGuiWindowFlags_MenuBar);
       finances.Render();
       ImGui::End();
     }
@@ -314,14 +316,13 @@ int main(int, char**)
       ImGui::End(); 
     }
 
-
     if (*EditRepair::show_repair) {
       ImGui::Begin("Edit Repair", EditRepair::show_repair);
       ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.95f);
       std::shared_ptr<EditRepair> edit_repair = EditRepair::Get();
-          
+
       if (edit_repair) {
-        if(!edit_repair->observers_attached) {
+        if (!edit_repair->observers_attached) {
           edit_repair->Attach(&repairs_view);
           edit_repair->Attach(&finances);
           edit_repair->observers_attached = true;
@@ -329,6 +330,10 @@ int main(int, char**)
         edit_repair->Render();
       }
       ImGui::End();
+    }
+
+    if (RepairTicket::show_window) {
+      repair_ticket.RepairTicketWin();
     }
     
     // Rendering

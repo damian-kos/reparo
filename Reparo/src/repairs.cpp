@@ -12,12 +12,6 @@ RepairsView::RepairsView() {
 RepairsView::~RepairsView() { std::cout << "RepairsView Destroyed " << std::endl; }
 
 void RepairsView::Render() {
-  //if (ImGui::IsWindowFocused()) {
-  //  printf("Repairs Focused\n");
-  //}
-  if (ImGui::Button("Test Button")) {
-    printf("RelationChosen: %d\n", rv_relation.number);
-  }
   DateDirection(rv_relation); ImGui::SameLine();  
   CalendarsRender(rv_relation.number, rv_date_from, rv_date_to);
   OnDatesChanged(rv_date_from, rv_relation.number, rv_date_to,
@@ -206,7 +200,6 @@ void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, 
       if (ImGui::BeginPopupContextItem()) {
         if (ImGui::Button("Update repair")) {
           EditRepair::Set(std::make_shared<EditRepair>(retreived.repairs[pair], pair));
-          //std::shared_ptr<EditRepair> edit_repair = std::make_shared<EditRepair>(retreived.repairs[pair], pair);
           *EditRepair::show_repair = true;
         }
         if (ImGui::Button("Delete")) {

@@ -21,18 +21,24 @@ void RO_Settings::Menu(){
       data["settings"]["theme"] = style_idx;
       RO_Cfg::UpdateCreateConfig(data);
     }
-    RO_Settings::FinancesWin();
+    RO_Settings::FinancesWinWin();
     RO_Settings::CheckUpdate();
+    RO_Settings::TicketPrintableTemplate();
     ImGui::EndMenu();
   }
 
 }
 
-void RO_Settings::FinancesWin() {
-  static bool table_enabled = data["finances"]["tables"].contains("##repairs") ? data["finances"]["tables"]["##repairs"].get<bool>():true;
-  if (ImGui::MenuItem("Enabled", "", &table_enabled)) {
-    data["finances"]["tables"]["##repairs"] = table_enabled;
-    RO_Cfg::UpdateCreateConfig(data);
+void RO_Settings::FinancesWinWin() {
+  //static bool table_enabled = data["finances"]["tables"].contains("##repairs") ? data["finances"]["tables"]["##repairs"].get<bool>() : true;
+  //FinancesWinOpts::table_repairs = RO_Cfg::getValue("finances.tables.##repairs", true);
+  if (ImGui::BeginMenu("Finances & Accounting"))
+  {
+    if (ImGui::MenuItem("View table with repairs", "", &FinancesWinOpts::table_repairs)) {
+        data["finances"]["tables"]["##repairs"] = FinancesWinOpts::table_repairs;
+        RO_Cfg::UpdateCreateConfig(data);
+      }
+  ImGui::EndMenu();
   }
 }
 
@@ -57,5 +63,11 @@ void RO_Settings::CheckUpdate() {
       Updater::update_available = true;
 
     }
+  }
+}
+
+void RO_Settings::TicketPrintableTemplate() {
+  if (ImGui::MenuItem("Printable Template")) {
+    RepairTicket::show_window = !RepairTicket::show_window;
   }
 }
