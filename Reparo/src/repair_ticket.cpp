@@ -103,18 +103,18 @@ bool LoadLogo::LoadTextureFromFile(const char* filename, ID3D11ShaderResourceVie
 void CreateImage::CreateA4(std::vector<TextField>& text_fields_vector, Logo* logo, float right_margin) {
   // Convert A4 size from inches to pixels (corrected conversion using PPI)
 
-  cv::Mat image(height, width, CV_8UC4, cv::Scalar(255, 255, 255));
+  cv::Mat image(height, width, CV_8UC3, cv::Scalar(255, 255, 255));
 
   // Create a FreeType2 instance and load font we will be using
   //ft2 = cv::freetype::createFreeType2();
   std::string fontPath = "vendor/imgui/msc/fonts/assistant.ttf";
   ft2->loadFontData(fontPath, 0);
   DrawTextFields(text_fields_vector, image, right_margin);
-  DrawLogo(image, logo);
 
   ft2->putText(image, "Reference text", cv::Point(30, 30), 32, cv::Scalar (0, 0, 0), -1, cv::LINE_AA, true);
   cv::putText(image, "Reference text", cv::Point(30,120), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 0), 1, cv::LINE_4);
   
+  DrawLogo(image, logo);
 
   cv::imwrite("a4_hello_world.jpg", image); // Save the image
   cv::imshow("A4 Image with Custom Font", image); // Display the image
@@ -218,6 +218,7 @@ void CreateImage::DrawRoundedRect(cv::Mat& image, cv::Point top_left, cv::Point 
   // choose arbitrary starting point for fill => Top left plus 10,10
   cv::Point fill_from(top_left.x + 10, top_left.y + 10);
   // You may want to use `lineColor` instead of `fillColor`
+  std::cout << "Channels: " << image.channels() << std::endl;
   cv::floodFill(image, fill_from, color_fill);
 }
 
