@@ -58,7 +58,39 @@ When adding a new repair, you will see a window with Customer details and Device
   - `Upcoming Feature` **Print Repair Ticket** A feature to print the Repair Ticket, which can be handed to your customer for their reference.
   - `Upcoming Feature` **Print Barcode** An option to print a Barcode for the repair, facilitating easier tracking and management of repair jobs.
 
-### Adding a Repair
+### Edit Repair
+The Edit Repair feature allows you to modify the details of an existing repair, including its status, price, or associated customer information. Here's how updates to customer details are handled:
+- If you modify the details of the current customer and the new details do not match the phone number of any other customer in our database, the current customer's record will be updated with the new information.
+- If the new details entered match the phone number of another customer in our database, the repair will then be associated with this other customer.
+
+![image](https://github.com/damian-kos/reparo/assets/106775028/bc1018c1-786c-497b-846a-1577cc319abf)
+
+All changes made to a repair order are documented in the Updates section. This ensures a clear history of modifications for each repair, providing transparency and accountability for both the repair shop and its customers.
+
+ ![image](https://github.com/damian-kos/reparo/assets/106775028/dd3c680e-4f1a-413d-8f2f-19286bf14451)
+
+
+### Repairs View
+In the Repairs View, you have the ability to browse through all the repairs recorded in your system. Repairs are organized by their current status, but you can also filter them based on specific dates:
+
+![image](https://github.com/damian-kos/reparo/assets/106775028/b59e7ea0-b5fe-44fe-9412-88d4ec9c139b)
+
+- Before a specified *date*
+- After a specified *date*
+- Between two specified *dates*
+
+![image](https://github.com/damian-kos/reparo/assets/106775028/160bd43f-e2f9-4d4c-994e-d1474d6fa007)
+
+The table displaying the repairs can be sorted by the following criteria:
+`ID` `Model` `Category` `Price` `Date` 
+You have the flexibility to hide certain columns or rearrange their order according to your preferences.
+
+![image](https://github.com/damian-kos/reparo/assets/106775028/bc187dae-a17a-4c8b-94fc-eaaa9f41f9ec)
+
+
+Right-clicking on a repair entry will bring up a popup menu that provides options to **Delete** or **Edit** the selected repair. This feature enables quick and easy management of repair orders directly from the Repairs View.
+
+![image](https://github.com/damian-kos/reparo/assets/106775028/8d20581d-9365-4c19-9bfa-f129319971db)
 
 
 #### Upcoming Features
