@@ -169,11 +169,11 @@ Customer InsertCustomer::InitCustomer() {
 }
 
 void InsertCustomer::InitModal() {
-  ModalController::RenderModal("ModalConfirm Customer Details");
+  ModalController::RenderModal("Confirm Customer Details");
 }
 
 void InsertCustomer::RunModal(Customer& customer) {
-  ModalController::ModalConfirm("ModalConfirm Customer Details", customer, result);
+  ModalController::ModalConfirm("Confirm Customer Details", customer, result);
   if (result == ConfirmResult::CONIFRM_SUBMIT) {
     int customerID = Database::QueryCustomerIDByPhone(phone.input.buffer);
     if (customerID == 0) {

@@ -34,9 +34,11 @@ private:
   RepairsSort* repairs_to_table;
   int selected_state = 0;
   std::vector<RepairsSort> repairs_per_state;
+
 // IObserver / ISubject
 private:
-  void Update(const int& passed_int) override;
+  void Update(const int& passed_int, Repair* repair = nullptr) override;
+
 private:
   void Summary();
   void PartialSummaries();

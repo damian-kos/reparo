@@ -60,6 +60,7 @@ int main(int, char**)
 
   insert_repair.Attach(&repairs_view);
   insert_repair.Attach(&finances);
+  insert_repair.Attach(&repair_ticket);
 
   repairs_view.Attach(&finances);
 
@@ -120,7 +121,7 @@ int main(int, char**)
   // Setup Platform/Renderer backends
   ImGui_ImplWin32_Init(hwnd);
   ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
-  LoadLogo::g_pd3dDeviceImages = g_pd3dDevice;
+  LoadImg::g_pd3dDeviceImages = g_pd3dDevice;
   // setup
   ImFontConfig font_config;
   font_config.OversampleH = 1; // FreeType does not support those, reset so stb_truetype will produce similar results
@@ -332,6 +333,11 @@ int main(int, char**)
       ImGui::End();
     }
 
+    if (RepairTicket::run_modal) {
+      ModalController::RenderModal("Print confirmation?");
+      RepairTicket::run_modal = false;
+    }
+    ModalController::ModalConfirm("Print confirmation?", RepairTicket::print, TicketImage::texture);
     if (RepairTicket::show_window) {
       repair_ticket.RepairTicketWin();
     }

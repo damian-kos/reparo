@@ -11,6 +11,7 @@ ModalController::~ModalController() {
 }
 
 void ModalController::RenderModal(const char* modal_title) {
+  std::cout << "RENDER MODAL: " << modal_title << std::endl;
   ImGui::OpenPopup(modal_title);
 }
 
@@ -50,6 +51,30 @@ void ModalController::ModalConfirm(const char* modal_title, Repair& repair, Conf
     ImGui::SameLine();
     if (ImGui::Button("Cancel", ImVec2(120, 0))) 
       { ImGui::CloseCurrentPopup(); result = ConfirmResult::CONFIRM_CANCEL; }
+    ImGui::EndPopup();
+  }
+}
+
+void ModalController::ModalConfirm(const char* modal_title, ConfirmResult& result, ID3D11ShaderResourceView* ticket) {
+  CenterAlign();
+
+  
+  if (ImGui::BeginPopupModal(modal_title, NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Image((void*)ticket, ImVec2(210*3, 297*3));
+    ImGui::Text("Do you want to print repair ticket?");
+    ImGui::Separator();
+
+    if (ImGui::Button("OK", ImVec2(120, 0)))
+    {
+      ImGui::CloseCurrentPopup();  result = ConfirmResult::CONIFRM_SUBMIT;
+    }
+    ImGui::SetItemDefaultFocus();
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0)))
+    {
+      ImGui::CloseCurrentPopup(); result = ConfirmResult::CONFIRM_CANCEL;
+    }
     ImGui::EndPopup();
   }
 }

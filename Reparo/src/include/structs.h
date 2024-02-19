@@ -87,4 +87,5 @@ struct Repair {
     str state;
     str date;
     str sn_imei;
+    int id;
 };

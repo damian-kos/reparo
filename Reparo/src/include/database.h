@@ -33,11 +33,11 @@ public:
     static void ManageSearchState(const char* label, Attribute& attribute, int rel_id, const char* buffer);
     static int GetIDForValueS(const char* value, const char* label);
     static bool GetBoolForValue(const char* label, const char* buffer);
-    static void InsertRepair(Repair repair);
+    static void InsertRepair(Repair& repair);
     static std::unordered_map<int, std::string> GetRepairStates();
     static void UpdateCustomer(Customer& customer, int id);
     static void UpdateRepair(Repair& repair, int id);
-    static int GetIDForID(int id, std::string table);
+    static int GetIDForID(int id, std::string table); 
     static void InsertRepairUpdateDesc(int& repair_id, std::string& desc);
     static std::vector<RepairUpdates> RetreiveRepairUdpdates(int& repair_id);
     static std::vector<std::string> GetRepairStatesNames();

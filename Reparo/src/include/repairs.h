@@ -72,6 +72,6 @@ public:
 
 protected: 
   void Notify() override;
-  void Update(const int& passed_int) override;
+  void Update(const int& passed_int, Repair* repair) override;
   std::vector<IObserver*> list_observer;
 };

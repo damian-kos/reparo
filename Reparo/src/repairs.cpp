@@ -270,9 +270,9 @@ void RepairsView::Detach(IObserver* observer) {
 
 void RepairsView::Notify() {
   for (IObserver* observer : list_observer) {
-    observer->Update(1);
+    observer->Update(1, nullptr);
   }
 }
-void RepairsView::Update(const int& passed_int) {
+void RepairsView::Update(const int& passed_int, Repair* repair) {
   RefreshRepairs();
 }

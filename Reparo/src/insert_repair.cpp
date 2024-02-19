@@ -1,7 +1,7 @@
 #include "insert_repair.h"
 
 InsertRepair::InsertRepair() : InsertCustomer() { 
-modal_message = "ModalConfirm Repair Details"; 
+modal_message = "Confirm Repair Details"; 
 std::cout << "InsertRepair created " << std::endl; 
 }
 
@@ -148,8 +148,8 @@ void InsertRepair::RunModal(Repair& repair) {
       }
       Database::InsertRepair(repair);
       ResetFields();
-      Notify();
       result = ConfirmResult::CONIFRM_IDLE;
+      Notify();
   }
 }
 
@@ -186,7 +186,7 @@ void InsertRepair::Detach(IObserver* observer) {
 
 void InsertRepair::Notify() {
   for (IObserver* observer : list_observer) {
-    observer->Update(1);
+    observer->Update(1, &repair);
   }
 }
 

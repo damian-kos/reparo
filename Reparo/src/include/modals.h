@@ -6,7 +6,9 @@
 #include "structs.h"
 #include "imgui_viewer.h"
 #include "enums.h"
+//#include "repair_ticket.h"
 //#include "updates.h"
+class Logo;
 
 class ModalController {
 public:
@@ -19,6 +21,7 @@ public:
                               ConfirmResult& result);
     static void ModalConfirm(const char* modal_title, Repair& repair, 
                               ConfirmResult& result);
+    static void ModalConfirm(const char* modal_title, ConfirmResult& result, ID3D11ShaderResourceView* ticket);
     static void ModalConfirm(const char* modal_title, Repair& repair, 
                               std::shared_ptr<Repair> temp_repair, 
                               std::shared_ptr<Customer> temp_customer,

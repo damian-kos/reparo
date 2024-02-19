@@ -93,10 +93,11 @@ void FinancesWin::RefreshRepairs() {
   }
 }
 
-void FinancesWin::Update(const int& passed_int) {
+void FinancesWin::Update(const int& passed_int, Repair* repair) {
   printf("Do cool stuff on finances tables");
   RefreshRepairs();
 }
+
 std::shared_ptr<EditRepair> FinancesWin::GetEditRepair()
 {
   return RepairsView::GetEditRepair();

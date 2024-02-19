@@ -7,7 +7,7 @@
 class IObserver {
 public:
   virtual ~IObserver() {};
-  virtual void Update(const int& passed_int = 0) = 0;
+  virtual void Update(const int& passed_int = 0, Repair* repair = nullptr) = 0;
 };
 
 class ISubject  {

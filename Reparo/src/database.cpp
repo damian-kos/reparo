@@ -91,7 +91,7 @@ Customer* Database::QueryCustomerByPhone(std::string phone) {
     return customer;
 }
 
-void Database::InsertCustomer(Customer& customer, int* lastRowId) {
+void Database::InsertCustomer(Customer& customer, int* last_row_id) {
     std::cout << "InsertCustomer is running  " << std::endl;
     sqlite3* db_ptr = PtrDB();
     const char* query = "INSERT INTO customers (name, surname, email, phone) VALUES (?, ?, ?, ?)";
@@ -104,8 +104,8 @@ void Database::InsertCustomer(Customer& customer, int* lastRowId) {
     }
 
     if (sqlite3_step(stmt) == SQLITE_DONE) {
-        if (lastRowId != nullptr) {
-            *lastRowId = sqlite3_last_insert_rowid(db_ptr);
+        if (last_row_id != nullptr) {
+            *last_row_id = sqlite3_last_insert_rowid(db_ptr);
         }
         std::cout << "Customer added: " << customer.phone << " " << customer.name << std::endl;
     }
@@ -260,7 +260,7 @@ bool Database::GetBoolForValue(const char* label, const char* buffer) {
     return is_found;
 }
 
-void Database::InsertRepair(Repair repair) {
+void Database::InsertRepair(Repair& repair) {
     std::cout << "InsertRepair is running  " << std::endl;
     static int customer_id = GetIDForValueS("##Customer", repair.customer.phone.c_str());
     static int model_id = GetIDForValueS("##Model", repair.device.name.c_str());
@@ -287,6 +287,9 @@ void Database::InsertRepair(Repair repair) {
 
     if (sqlite3_step(stmt) == SQLITE_DONE) {
         std::cout << "Repair added: " << repair.device.name << " " << repair.customer.phone << std::endl;
+        //if (last_row_id != nullptr) {
+          repair.id = sqlite3_last_insert_rowid(db_ptr);
+        //}
     }
     else {
         std::cout << "Error during adding a repair: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;

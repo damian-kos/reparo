@@ -8,7 +8,7 @@ bool* EditRepair::show_repair = new bool(false);
 
 EditRepair::EditRepair(Repair& repair, int passed_repair_id) : InsertRepair(repair), repair_id(passed_repair_id) {
     instance_count++;
-    modal_message = "ModalConfirm Update Repair";
+    modal_message = "Confirm Update Repair";
     selected_state = repair.state;
     updates = Database::RetreiveRepairUdpdates(passed_repair_id);
     std::cout << "EditRepair created " << instance_count << std::endl;    
@@ -147,9 +147,9 @@ bool EditRepair::RepairValidated()
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
 void EditRepair::TestButton() {
-  if (ImGui::Button("Test button")) {
-    std::cout << "Repair ID:" << repair_id << std::endl;
-  }
+  //if (ImGui::Button("Test button")) {
+    //std::cout << "Repair ID:" << repair_id << std::endl;
+  //}
     //std::string modified = RepairModified() ? "true" : "false";
     //std::string modified_c = CustomerModified() ? "true" : "false";
     //std::string validated_r = InsertRepair::RepairValidated() ? "true" : "false";
