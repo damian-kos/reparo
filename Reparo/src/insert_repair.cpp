@@ -119,6 +119,10 @@ void InsertRepair::InsertRepairButtonEnabler() {
       ImGui::EndDisabled();
   }
   RunModal(repair); // This is where insertion of Repair to db is called
+  if (ImGui::Button("Test Repair")) {
+    repair = InitRepair();
+    Notify();
+  }
 }
 
 void InsertRepair::InsertRepairButton() {
@@ -151,6 +155,7 @@ void InsertRepair::RunModal(Repair& repair) {
       result = ConfirmResult::CONIFRM_IDLE;
       Notify();
   }
+
 }
 
 void InsertRepair::InsertCustButton() {

@@ -89,3 +89,11 @@ struct Repair {
     str sn_imei;
     int id;
 };
+
+struct TicketScales {
+  static inline float print_dpi = 5;
+  static inline float scale = print_dpi / 4;
+  static inline float temp_scale = 2.5;
+  static inline float dpi_scale = print_dpi / temp_scale;
+  static inline float margin = 50 * dpi_scale;
+};

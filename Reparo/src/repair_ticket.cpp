@@ -11,7 +11,10 @@ ElementProperty::ElementProperty(const ImVec2& size, const ImVec2& offset) : siz
 // SECTION TextField
 TextField::TextField() {}
 
-TextField::TextField(std::string label) : label(label) {}
+TextField::TextField(std::string label) : label(label) {
+  std::cout << "Created TextField: " << label <<  std::endl;
+
+}
 
 TextField::TextField(const std::string& label, const ImVec2& size, const ImVec2& offset, const float& font_size)
   : ElementProperty(size, offset), // Call the base class constructor
@@ -148,63 +151,91 @@ void CreateImage::CreateA4(std::vector<TextField>& text_fields_vector, Logo* log
   
   DrawLogo(image, logo);
   cv::imwrite("temp.jpg", image); // Save the image
-  //cv::imshow("A4 Image with Custom Font", image); // Display the image
-  //cv::waitKey(0); // Wait for a key press to close the image window
+  cv::imshow("A4 Image with Custom Font", image); // Display the image
+  cv::waitKey(0); // Wait for a key press to close the image window
 }
 
 void CreateImage::DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vector, cv::Mat& image, float& right_margin, Repair* repair) {
-  static bool toggle = false;
+  int y = 0;
+  int ext_box = 0;
   for (auto& field : text_fields_vector) {
-
-    float offset_x = field.offset.x * dpi_s;
-    float offset_y = field.offset.y * dpi_s;
-
+    float offset_x = field.offset.x * TicketScales::dpi_scale;
+    float offset_y = field.offset.y * TicketScales::dpi_scale;
+    float size_x = field.size.x * TicketScales::scale;
+    float size_y = field.size.y * TicketScales::scale;
+    float font_size = field.font_size * TicketScales::scale;
+    float text_pos_x = offset_x + 10;
+    float text_pos_y = offset_y + ((size_y / font_size) * scale );
+    //std::cout << "Offset Y: " << offset_y << " Text Pos Y: " << text_pos_y <<  " | " << scale << " | " << size_y << " | " << font_size << std::endl;
     cv::Scalar rect_color(0, 0, 0); // Black border
     int thickness = 1; // Pixel
     int corner_radius = 5; // Radius of the rounded corners
-    cv::Scalar color_fill = toggle ? cv::Scalar(255, 255, 255, 128) : cv::Scalar(255, 255, 255, 128);
+    cv::Scalar color_fill =  cv::Scalar(255, 255, 255, 128);
 
-    cv::Point left_cell;
+    
+
+    // Draw labels on left side 
+    DrawWrappedText(image, field.label, cv::Point(text_pos_x,  offset_y + y), size_x, font_size, cv::Scalar(0, 0, 0), 1, font_size);
+    cv::Point left_cell_bot_right;
     if (field.label == "Terms & Conditions") {
-      left_cell = cv::Point(width - right_margin, (offset_y)+(field.size.y));
+      left_cell_bot_right = cv::Point(width - right_margin, offset_y + size_y + y);
     }
     else {
-      left_cell = cv::Point((offset_x)+(field.size.x * dpi_s), (offset_y)+(field.size.y));
+      left_cell_bot_right = cv::Point(offset_x + size_x, offset_y + size_y+y);
     }
-    DrawRoundedRect(image, cv::Point((offset_x), (offset_y)-(field.font_size)),
-      left_cell,
+    DrawRoundedRect(image, cv::Point(offset_x, offset_y + y),
+      left_cell_bot_right,
       corner_radius, rect_color, color_fill, 2);
-    cv::Scalar color_fill1(255, 255, 255, 128);
-
-    cv::Point right_cell;
-    if (field.label != "Terms & Conditions") {
-      if (field.label == "Repair number")
-        right_cell = cv::Point((offset_x)+(field.size.x * dpi_s) * 2, offset_y+field.size.y);
-      else {
-        right_cell = cv::Point(width - right_margin, (offset_y)+(field.size.y));
-      }
-      DrawRoundedRect(image, cv::Point((offset_x), (offset_y)-(field.font_size)),
-        right_cell,
-        corner_radius, rect_color, color_fill1, thickness);
-    }
 
     // Draw the text on the A4 image using custom font, handling new lines
-    DrawWrappedText(image, field.label, cv::Point(offset_x + field.font_size , offset_y + field.font_size / 1.5), field.size.x * dpi_s, field.font_size * dpi_s, cv::Scalar(0, 0, 0), 1);
     static std::unordered_map<std::string, std::string> right_cells;
     if (repair) {
       right_cells = AssignRepairToLabels(repair);
     }
-     DrawWrappedText(image, right_cells[field.label], cv::Point((offset_x + field.size.x * dpi_s) + field.font_size, offset_y + field.font_size / 1.5), field.size.x * dpi_s, field.font_size * dpi_s, cv::Scalar(0, 0, 0), -1);
-      
-   
-    toggle = !toggle;
+    int temp_y = DrawWrappedText(image, right_cells[field.label], cv::Point(text_pos_x + size_x, text_pos_y + y), width - right_margin - offset_x - size_x, font_size, cv::Scalar(0, 0, 0), -1, font_size);
+
+
+    // Draw fields on right side
+    cv::Scalar color_fill1(255, 255, 255, 128);
+
+    cv::Point right_cell_top_left;
+    if (field.label == "Terms & Conditions") {
+      right_cell_top_left = cv::Point((offset_x + size_x), offset_y);
+    }
+    if (field.label == "Repair number") {
+      right_cell_top_left = cv::Point((offset_x + size_x), offset_y);
+    }
+    else {
+      right_cell_top_left = cv::Point((offset_x + size_x), offset_y + y);
+    }
+    y = 0;
+    if (temp_y - offset_y > 5) {
+      y +=  temp_y -offset_y;
+    }
+
+    cv::Point right_cell_bot_right;
+    if (field.label != "Terms & Conditions") {
+      if (field.label == "Repair number")
+        right_cell_bot_right = cv::Point(offset_x + size_x * 2, offset_y + size_y + y);
+      else {
+        right_cell_bot_right = cv::Point(width - right_margin, offset_y + size_y + y);
+      }
+    }
+
+      //DrawRoundedRect(image, cv::Point((offset_x+size_x), offset_y),
+    if (field.label != "Terms & Conditions") {
+      DrawRoundedRect(image, right_cell_top_left,
+        right_cell_bot_right,
+        corner_radius, rect_color, color_fill1, thickness);
+    }
   }
 }
 
-void CreateImage::DrawWrappedText(cv::Mat& image, const std::string& text, cv::Point origin, int max_width, float font_scale, cv::Scalar color, int thickness) {
+int CreateImage::DrawWrappedText(cv::Mat& image, const std::string& text, cv::Point origin, int max_width, float font_scale, cv::Scalar color, int thickness, float padding) {
   int base_line = 0;
   // Estimate height of a single line of text
   cv::Size text_size = ft2->getTextSize("W", static_cast<int>(font_scale), thickness, &base_line);
+  //std::cout << "Text size: "  << text_size << " | " << font_scale << " | "  << origin.y << std::endl;
   int y = origin.y;
 
   std::istringstream words(text);
@@ -216,7 +247,7 @@ void CreateImage::DrawWrappedText(cv::Mat& image, const std::string& text, cv::P
     cv::Size lineWidth = ft2->getTextSize(mew_line, static_cast<int>(font_scale), thickness, &base_line);
 
     if (lineWidth.width > max_width && !line.empty()) {
-      ft2->putText(image, line, cv::Point(origin.x, y), static_cast<int>(font_scale), color, thickness, cv::LINE_AA, true);
+      ft2->putText(image, line, cv::Point(origin.x, y), static_cast<int>(font_scale), color, thickness, cv::LINE_AA, false);
       line = word + " ";
       y += text_size.height + base_line;
     }
@@ -225,8 +256,9 @@ void CreateImage::DrawWrappedText(cv::Mat& image, const std::string& text, cv::P
     }
   }
   if (!line.empty()) {
-    ft2->putText(image, line, cv::Point(origin.x, y), static_cast<int>(font_scale), color, thickness, cv::LINE_AA, true);
+    ft2->putText(image, line, cv::Point(origin.x, y), static_cast<int>(font_scale), color, thickness, cv::LINE_AA, false);
   }
+  return  y;
 }
 
 void CreateImage::DrawRoundedRect(cv::Mat& image, cv::Point top_left, cv::Point bot_right, int corner_radius, const cv::Scalar& color, const cv::Scalar& color_fill, int thickness) {
@@ -253,19 +285,18 @@ void CreateImage::DrawRoundedRect(cv::Mat& image, cv::Point top_left, cv::Point 
   // choose arbitrary starting point for fill => Top left plus 10,10
   cv::Point fill_from(top_left.x + 10, top_left.y + 10);
   // You may want to use `lineColor` instead of `fillColor`
-  std::cout << "Channels: " << image.channels() << std::endl;
-  cv::floodFill(image, fill_from, color_fill);
+  //cv::floodFill(image, fill_from, color_fill);
 }
 
 void CreateImage::DrawLogo(cv::Mat& image, Logo* logo) {
   cv::Mat logo_img = cv::imread("logo.png", cv::IMREAD_UNCHANGED); // Load the extra image with alpha channel
   if (!logo_img.empty()) {
     // Resize the extra image to match logo size
-    cv::Size new_size(logo->size.x * dpi_s, logo->size.y * dpi_s); // Assuming logo->size is defined and contains the target size
+    cv::Size new_size(logo->size.x * scale, logo->size.y * scale); // Assuming logo->size is defined and contains the target size
     cv::resize(logo_img, logo_img, new_size);
 
     // Define the region of interest (ROI) on the image
-    cv::Point offset(logo->offset.x * dpi_s, logo->offset.y * dpi_s); // Assuming logo->offset is defined and contains the target position
+    cv::Point offset(logo->offset.x * TicketScales::dpi_scale, logo->offset.y * TicketScales::dpi_scale); // Divided by whatever scale we have on blank image in imgui - currently 2.5
     if (offset.x + new_size.width <= image.cols && offset.y + new_size.height <= image.rows) {
       cv::Rect roi(offset, new_size);
       cv::Mat destination_roi = image(roi);
@@ -308,7 +339,7 @@ std::unordered_map<std::string, std::string> CreateImage::AssignRepairToLabels(R
     {"Color", repair->device.color},
     {"Note for customer", repair->visible_note},
     {"Price", std::to_string(repair->price)},
-    {"Terms & Conditions", "Lorem ipsum...."}
+    {"Terms & Conditions", "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."}
   };
   return repair_to_map;
 }
@@ -316,7 +347,6 @@ std::unordered_map<std::string, std::string> CreateImage::AssignRepairToLabels(R
 // SECTION RepairTicket
 void RepairTicket::Update(const int& passed_int, Repair* repair) {
   if (repair) {
-    // *********************************************************************************** Template tests ******** BEGIN
     std::vector<TextField> text_fields_v;
     json data = RO_Cfg::GetConfig("template.json");
     auto textFields = data["text_field"];
@@ -330,18 +360,23 @@ void RepairTicket::Update(const int& passed_int, Repair* repair) {
 
       text_fields_v.push_back(text_field);
     }
+
+    // Sort the vector by offset.y in ascending order
+    std::sort(text_fields_v.begin(), text_fields_v.end(), [](const TextField& a, const TextField& b) {
+      return a.offset.y < b.offset.y;
+      });
+
     auto json_logo = data["logo"];
     ImVec2 size(json_logo["size"]["x"], json_logo["size"]["y"]);
     ImVec2 offset(json_logo["offset"]["x"], json_logo["offset"]["y"]);
     Logo logo(size, offset);
-    CreateImage::CreateA4(text_fields_v, &logo, 50, repair);
+    CreateImage::CreateA4(text_fields_v, &logo, TicketScales::margin, repair);
 
     std::cout << "Update" << std::endl;
     ShowTemplate();
 
     run_modal = true;
   }
-  // ***********************************************************************************   Template tests ******** END
 }
 
 void RepairTicket::RepairTicketWin() {
@@ -363,7 +398,7 @@ void RepairTicket::RepairTicketWin() {
       // CreateImage() - opencv
       ImDrawList* draw_list = ImGui::GetWindowDrawList();
       ImVec2 canvas_p0 = ImGui::GetCursorScreenPos();
-      ImVec2 canvas_p1 = ImVec2(canvas_p0.x + (210 * 2.5), canvas_p0.y + (297 * 2.5));
+      ImVec2 canvas_p1 = ImVec2(canvas_p0.x + (210 * TicketScales::temp_scale), canvas_p0.y + (297 * TicketScales::temp_scale));
       ImRect canvas_rect = ImRect(canvas_p0, canvas_p1);
       DrawBlankPage(draw_list, canvas_rect);
       TextFieldsOnCanvas(canvas_rect);
@@ -391,7 +426,7 @@ void RepairTicket::CreateTextFields() {
       text_field.size.x = RO_Cfg::getValue("text_field." + label + ".size.x", 50.0f, "template.json");
       text_field.size.y = RO_Cfg::getValue("text_field." + label + ".size.y", 50.0f, "template.json");
       text_field.font_size = RO_Cfg::getValue("text_field." + label + ".font_size", 14.0f, "template.json");
-
+      std::cout << "TextField label of: " << label << std::endl;
       text_fields_vector.push_back(text_field);
       text_fields_count += 1;
     }
@@ -464,7 +499,7 @@ void RepairTicket::SaveTemplateProperties() {
 
 void RepairTicket::CreateTemplate() {
   if (ImGui::Button("A4 IMAGE")) {
-    CreateImage::CreateA4(text_fields_vector,  &logo, 25);
+    CreateImage::CreateA4(text_fields_vector,  &logo, TicketScales::margin);
   }
 }
 
