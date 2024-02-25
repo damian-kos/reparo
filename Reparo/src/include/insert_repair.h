@@ -1,6 +1,7 @@
 #pragma once
 
 #include <time.h>
+#include <windows.h>
 
 #include "insert_customer.h"
 #include "imguidatechooser.h"

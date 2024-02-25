@@ -333,11 +333,12 @@ int main(int, char**)
       ImGui::End();
     }
 
-    if (RepairTicket::run_modal) {
-      ModalController::RenderModal("Print confirmation?");
-      RepairTicket::run_modal = false;
-    }
-    ModalController::ModalConfirm("Print confirmation?", RepairTicket::print, TicketImage::texture);
+    //if (RepairTicket::run_modal) {
+    //  ModalController::RenderModal("Print confirmation?");
+    //  RepairTicket::run_modal = false;
+    //}
+    //ModalController::ModalConfirm("Print confirmation?", RepairTicket::print, TicketImage::texture);
+    RepairTicket::Modals();
     if (RepairTicket::show_window) {
       repair_ticket.RepairTicketWin();
     }

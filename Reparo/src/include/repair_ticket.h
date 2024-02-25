@@ -47,7 +47,6 @@ public:
   static inline ID3D11ShaderResourceView* texture = nullptr;
 };
 
-
 // SECTION LoadImg load
 class Logo : public ElementProperty {
 public:
@@ -74,8 +73,6 @@ public:
   static inline int my_image_height = static_cast<int>(297);
 };
 
-
-
 // SECTION CreateImage
 class CreateImage  {
 public:
@@ -83,7 +80,7 @@ public:
   //static void CreateA4(std::vector<TextField>& text_fields_vector, Logo* logo, float right_margin, Repair& repair);
 
   static void DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vector, cv::Mat& image, float& right_margin, Repair* repair = nullptr);
-  static int DrawWrappedText(cv::Mat& image, const std::string& text, cv::Point origin, int max_width, float font_scale, cv::Scalar color, int thickness, float padding);
+  static int DrawWrappedText(cv::Mat& image, const std::string& text, cv::Point origin, int max_width, float font_scale, cv::Scalar color, int thickness);
   static void DrawRoundedRect(cv::Mat& image, cv::Point top_left, cv::Point bot_right, int corner_radius, const cv::Scalar& color, const cv::Scalar& color_fill, int thickness);
   static void DrawLogo(cv::Mat& image, Logo* logo);
 
@@ -107,6 +104,18 @@ public:
   void RepairTicketWin();
 public:
   static inline bool show_window = false;
+  static inline Logo logo;
+  static inline TicketImage ticket_img;
+  static inline ConfirmResult print = ConfirmResult::CONIFRM_IDLE;
+  static inline bool run_modal = false;
+private:
+  static inline bool use_spacer;
+  static inline float vec4f[4] = { 0.10f, 0.20f, 0.30f, 150.0f };
+  std::vector<std::string> text_fields_labels{ "Repair number", "Date", "Phone", "Name", "Surname", "Email", "Model",
+                                            "Category", "SN / IMEI", "Color", "Note for customer", "Price", "Terms & Conditions" };
+  std::vector<TextField> text_fields_vector;
+  static inline int text_fields_count = 0;
+
 private:
   void DrawBlankPage(ImDrawList* draw_list, const ImRect& canvas_rect);
   void CreateTextFields();
@@ -117,24 +126,10 @@ private:
   void SaveTemplateProperties();
   void CreateTemplate();
   void ShowTemplate();
-
-private:
-  std::vector<std::string> text_fields_labels{ "Repair number", "Date", "Phone", "Name", "Surname", "Email", "Model", 
-                                              "Category", "SN / IMEI", "Color", "Note for customer", "Price", "Terms & Conditions" };
-  std::vector<TextField> text_fields_vector;
-  static inline int text_fields_count = 0;
-public:
-  static inline Logo logo;
-  static inline TicketImage ticket_img;
-private:
-  static inline bool use_spacer;
-  static inline float vec4f[4] = { 0.10f, 0.20f, 0.30f, 150.0f };
-private:
+  static void PrintTicket();
 
 public:
-  static inline ConfirmResult print = ConfirmResult::CONIFRM_IDLE;
-  static inline bool run_modal = false;
   void Update(const int& passed_int, Repair* repair) override;
-
+  static void Modals();
 };
 

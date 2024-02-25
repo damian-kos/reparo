@@ -174,8 +174,25 @@ void InsertRepair::ResetFields() {
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
 void InsertRepair::TestButton() {
-//  if (ImGui::Button("Test button")) {
-//  }
+
+  if (ImGui::Button("Print")) {
+    // Use ShellExecute to open the print dialog
+    HINSTANCE result = ShellExecute(
+      NULL,       // Handle to the parent window
+      L"print",   // Operation to perform
+      L"temp.jpg", // File to print
+      NULL,       // Parameters
+      NULL,       // Default directory
+      SW_SHOWNORMAL // Show command
+    );
+    // Check if the operation was successful
+    if ((int)result <= 32) {
+      std::cerr << "Failed to print the file." << std::endl;
+    }
+    else {
+      std::cout << "Print command issued successfully." << std::endl;
+    }
+  }
 }
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
 

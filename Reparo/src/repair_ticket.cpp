@@ -151,8 +151,9 @@ void CreateImage::CreateA4(std::vector<TextField>& text_fields_vector, Logo* log
   
   DrawLogo(image, logo);
   cv::imwrite("temp.jpg", image); // Save the image
-  cv::imshow("A4 Image with Custom Font", image); // Display the image
-  cv::waitKey(0); // Wait for a key press to close the image window
+
+  //cv::imshow("A4 Image with Custom Font", image); // Display the image
+  //cv::waitKey(0); // Wait for a key press to close the image window
 }
 
 void CreateImage::DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vector, cv::Mat& image, float& right_margin, Repair* repair) {
@@ -164,25 +165,19 @@ void CreateImage::DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vect
     float size_x = field.size.x * TicketScales::scale;
     float size_y = field.size.y * TicketScales::scale;
     float font_size = field.font_size * TicketScales::scale;
-    float text_pos_x = offset_x + 10;
+    float font_padding = 10;
+    float text_pos_x = offset_x + font_padding;
     float text_pos_y = offset_y + ((size_y / font_size) * scale );
-    //std::cout << "Offset Y: " << offset_y << " Text Pos Y: " << text_pos_y <<  " | " << scale << " | " << size_y << " | " << font_size << std::endl;
     cv::Scalar rect_color(0, 0, 0); // Black border
     int thickness = 1; // Pixel
     int corner_radius = 5; // Radius of the rounded corners
     cv::Scalar color_fill =  cv::Scalar(255, 255, 255, 128);
 
-    
-
     // Draw labels on left side 
-    DrawWrappedText(image, field.label, cv::Point(text_pos_x,  offset_y + y), size_x, font_size, cv::Scalar(0, 0, 0), 1, font_size);
+    DrawWrappedText(image, field.label, cv::Point(text_pos_x,  offset_y + y), size_x, font_size, cv::Scalar(0, 0, 0), 0.5);
+
     cv::Point left_cell_bot_right;
-    if (field.label == "Terms & Conditions") {
-      left_cell_bot_right = cv::Point(width - right_margin, offset_y + size_y + y);
-    }
-    else {
-      left_cell_bot_right = cv::Point(offset_x + size_x, offset_y + size_y+y);
-    }
+    left_cell_bot_right = cv::Point(offset_x + size_x, offset_y + size_y+y);
     DrawRoundedRect(image, cv::Point(offset_x, offset_y + y),
       left_cell_bot_right,
       corner_radius, rect_color, color_fill, 2);
@@ -192,16 +187,15 @@ void CreateImage::DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vect
     if (repair) {
       right_cells = AssignRepairToLabels(repair);
     }
-    int temp_y = DrawWrappedText(image, right_cells[field.label], cv::Point(text_pos_x + size_x, text_pos_y + y), width - right_margin - offset_x - size_x, font_size, cv::Scalar(0, 0, 0), -1, font_size);
+    if (field.label == "Terms & Conditions")
+      font_size = font_size / TicketScales::scale;
+    int temp_y = DrawWrappedText(image, right_cells[field.label], cv::Point(text_pos_x + size_x, text_pos_y + y), width - right_margin - offset_x - size_x - font_padding, font_size, cv::Scalar(0, 0, 0), -1);
 
 
     // Draw fields on right side
     cv::Scalar color_fill1(255, 255, 255, 128);
 
     cv::Point right_cell_top_left;
-    if (field.label == "Terms & Conditions") {
-      right_cell_top_left = cv::Point((offset_x + size_x), offset_y);
-    }
     if (field.label == "Repair number") {
       right_cell_top_left = cv::Point((offset_x + size_x), offset_y);
     }
@@ -214,25 +208,20 @@ void CreateImage::DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vect
     }
 
     cv::Point right_cell_bot_right;
-    if (field.label != "Terms & Conditions") {
-      if (field.label == "Repair number")
-        right_cell_bot_right = cv::Point(offset_x + size_x * 2, offset_y + size_y + y);
-      else {
-        right_cell_bot_right = cv::Point(width - right_margin, offset_y + size_y + y);
-      }
+    if (field.label == "Repair number")
+      right_cell_bot_right = cv::Point(offset_x + size_x * 2, offset_y + size_y + y);
+    else {
+      right_cell_bot_right = cv::Point(width - right_margin, offset_y + size_y + y);
     }
 
-      //DrawRoundedRect(image, cv::Point((offset_x+size_x), offset_y),
-    if (field.label != "Terms & Conditions") {
-      DrawRoundedRect(image, right_cell_top_left,
-        right_cell_bot_right,
-        corner_radius, rect_color, color_fill1, thickness);
-    }
+    DrawRoundedRect(image, right_cell_top_left,
+      right_cell_bot_right,
+      corner_radius, rect_color, color_fill1, thickness);
   }
 }
 
-int CreateImage::DrawWrappedText(cv::Mat& image, const std::string& text, cv::Point origin, int max_width, float font_scale, cv::Scalar color, int thickness, float padding) {
-  int base_line = 0;
+int CreateImage::DrawWrappedText(cv::Mat& image, const std::string& text, cv::Point origin, int max_width, float font_scale, cv::Scalar color, int thickness) {
+  int base_line = 15;
   // Estimate height of a single line of text
   cv::Size text_size = ft2->getTextSize("W", static_cast<int>(font_scale), thickness, &base_line);
   //std::cout << "Text size: "  << text_size << " | " << font_scale << " | "  << origin.y << std::endl;
@@ -339,7 +328,7 @@ std::unordered_map<std::string, std::string> CreateImage::AssignRepairToLabels(R
     {"Color", repair->device.color},
     {"Note for customer", repair->visible_note},
     {"Price", std::to_string(repair->price)},
-    {"Terms & Conditions", "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."}
+    {"Terms & Conditions", lorem_ipsum}
   };
   return repair_to_map;
 }
@@ -378,6 +367,7 @@ void RepairTicket::Update(const int& passed_int, Repair* repair) {
     run_modal = true;
   }
 }
+
 
 void RepairTicket::RepairTicketWin() {
   ImGui::Begin("Template Editor");
@@ -509,3 +499,36 @@ void RepairTicket::ShowTemplate() {
   }
 }
 
+void RepairTicket::Modals() {
+  const char* message = "Print a ticket?";
+  if (run_modal) {
+    ModalController::RenderModal(message);
+    run_modal = false;
+  }
+  ModalController::ModalConfirm(message, print, TicketImage::texture);
+  PrintTicket();
+}
+
+void RepairTicket::PrintTicket() {
+  if (print == ConfirmResult::CONIFRM_SUBMIT) {
+    // Use ShellExecute to open the print dialog
+    HINSTANCE result = ShellExecute(
+      NULL,       // Handle to the parent window
+      L"print",   // Operation to perform
+      L"temp.jpg", // File to print
+      NULL,       // Parameters
+      NULL,       // Default directory
+      SW_SHOWNORMAL // Show command
+    );
+    // Check if the operation was successful
+    if ((int)result <= 32) {
+      std::cerr << "Failed to print the file." << std::endl;
+    // Offer to try to print again.
+    }
+    else {
+      std::cout << "Print command issued successfully." << std::endl;
+      print = ConfirmResult::CONIFRM_IDLE;
+    }
+    print = ConfirmResult::CONIFRM_IDLE;
+  }
+}
