@@ -51,21 +51,44 @@ void InsertRepair::PhoneFieldSection() {
 void InsertRepair::DeviceSection() {
   ImGui::SeparatorDecorator("DEVICE: ", DeviceFieldsValidated());
   ImGui::InputTextWithPopup("##Model", "Model of device...", model, 
-                            [&]() { return ChkBufferInDb("##Model", model.input.buffer); });
+                            [&]() { return ChkBufferInDb("##Model", model.input.buffer); }, NULL, NULL, &feedback);
   ImGui::InputTextWithPopup("##Category", "Category...", category, 
                             [&]() { return ChkBufferInDb("##Category", 
                             category.input.buffer); });
   ImGui::InputTextWithPopup("##Color", "Color...", color, 
                             [&]() { return ChkBufferInDb("##Color", color.input.buffer); }, 
                             nullptr, &model);
-    
+  CustomDeviceFeedback();
+  
+  //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom DEVICE Start
+
+  //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Custom DEVICE End
+
   //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
-  //                      
-  //ImGui::Text(model.input.valid ? "true" : "false");
+  //
   //ImGui::SameLine(); ImGui::Text(category.input.valid ? "true" : "false");
   //ImGui::SameLine(); ImGui::Text(color.input.valid ? "true" : "false");
   // 
   //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+}
+
+void InsertRepair::CustomDeviceFeedback() {
+  static std::string msg;
+  if (feedback) {
+    if (!model.input.valid && strlen(model.input.buffer) >= 3) {
+      msg = ("New custom device will be added.");
+      custom_device = true;
+    }
+    else {
+      msg = "";
+      custom_device = false;
+    }
+  }
+  ImGui::Text(msg.c_str());
+  if (msg != "") {
+    ImGui::SameLine();
+    ImGui::HelpMarker("If a model of a device which does not exist in database, you can add a custom device to database. These devices will not appear on usual popup of Model field.");
+  }
 }
 
 void InsertRepair::NotesSection() {
@@ -98,6 +121,9 @@ void InsertRepair::ResetOnEmptyMain() {
 }
 
 bool InsertRepair::DeviceFieldsValidated() {
+  if (custom_device && category.input.valid) {
+    return custom_device;
+  }
   return (model.input.valid && category.input.valid && color.input.valid);
 }
 
@@ -121,6 +147,7 @@ void InsertRepair::InsertRepairButtonEnabler() {
   RunModal(repair); // This is where insertion of Repair to db is called
   if (ImGui::Button("Test Repair")) {
     repair = InitRepair();
+    std::cout << "Repair: " << repair.customer.phone << " | " << repair.device.name << std::endl;
     Notify();
   }
 }
@@ -142,7 +169,7 @@ void InsertRepair::InitModal() {
   ModalController::RenderModal(modal_message);
 }
 
-// Opens modal window and waits for users' click.
+// Opens modal window and waits for users' click. Inserts repair to DB.
 void InsertRepair::RunModal(Repair& repair) {
   ModalController::ModalConfirm(modal_message, repair, result);
   if (result == ConfirmResult::CONIFRM_SUBMIT) {
@@ -151,11 +178,10 @@ void InsertRepair::RunModal(Repair& repair) {
           Database::InsertCustomer(repair.customer, nullptr); // Insert Customer if doesnt exist
       }
       Database::InsertRepair(repair);
+      Notify();
       ResetFields();
       result = ConfirmResult::CONIFRM_IDLE;
-      Notify();
   }
-
 }
 
 void InsertRepair::InsertCustButton() {
@@ -170,33 +196,16 @@ void InsertRepair::ResetFields() {
   visible_note = HintInputField();
   hidden_note = HintInputField();
   price = 0;
+  //repair = Repair();
 }
 
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
 void InsertRepair::TestButton() {
 
-  if (ImGui::Button("Print")) {
-    // Use ShellExecute to open the print dialog
-    HINSTANCE result = ShellExecute(
-      NULL,       // Handle to the parent window
-      L"print",   // Operation to perform
-      L"temp.jpg", // File to print
-      NULL,       // Parameters
-      NULL,       // Default directory
-      SW_SHOWNORMAL // Show command
-    );
-    // Check if the operation was successful
-    if ((int)result <= 32) {
-      std::cerr << "Failed to print the file." << std::endl;
-    }
-    else {
-      std::cout << "Print command issued successfully." << std::endl;
-    }
-  }
+  //if (ImGui::Button("Print")) {
+  //}
 }
 //-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ Debugging
-
-
 
 void InsertRepair::Attach(IObserver* observer) {
   list_observer.push_back(observer);
@@ -208,6 +217,7 @@ void InsertRepair::Detach(IObserver* observer) {
 
 void InsertRepair::Notify() {
   for (IObserver* observer : list_observer) {
+    std::cout << "Repair PTR: " << &repair << std::endl;
     observer->Update(1, &repair);
   }
 }

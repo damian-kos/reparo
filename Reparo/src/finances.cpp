@@ -52,7 +52,7 @@ void FinancesWin::Summary() {
 }
 
 void FinancesWin::PartialSummaries() {
-  int names_count = names.size() / 5 + ((names.size() % 5 != 0) ? 1 : 0);
+  int names_count = static_cast<int>(names.size() / 5 + ((names.size() % 5 != 0) ? 1 : 0));
   int j = 0; // Initialize j outside the loop
 
   for (int i = 0; i < names.size(); i++) {

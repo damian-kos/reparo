@@ -31,6 +31,7 @@ protected:
     void CustomerSection();
     void PhoneFieldSection() override;
     void DeviceSection();
+    void CustomDeviceFeedback();
     void NotesSection();
     void PriceSection();
     void SerialNumSection();
@@ -56,6 +57,7 @@ protected:
 
 private:
   bool model_field_empty = false;
+  bool custom_device = false;
 
 // ISubject
 public:

@@ -144,12 +144,12 @@ namespace ImGui {
     int pos;
     std::string delimiter = "\n";
 
-    pos = line.find(delimiter);
+    pos = static_cast<int>(line.find(delimiter));
     while (pos != -1) {
       v->push_back(line.substr(0, pos));
       line.erase(0, pos + 1);
 
-      pos = line.find(delimiter);
+      pos = static_cast<int>(line.find(delimiter));
     }
     v->push_back(line);
   }
@@ -185,12 +185,12 @@ namespace ImGui {
     for (int i = 0; i < str_vector.size(); i++)
     {
       line_size = CalcTextSize(str_vector[i].c_str(), NULL, true);
-      offset_x = (size.x - line_size.x) / 2;
+      offset_x = static_cast<int>((size.x - line_size.x) / 2);
       if (line_size.y != 0) {
-        offset_y = (size.y / str_vector.size()) * i + padding_for_resize.y;
+        offset_y = static_cast<int>((size.y / str_vector.size()) * i + padding_for_resize.y);
       }
       else {
-        offset_y = font_height * i + padding_for_resize.y;
+        offset_y = static_cast<int>(font_height * i + padding_for_resize.y);
       }
       text_start.x = bb.Min.x + offset_x;
       text_start.y = bb.Min.y + offset_y;
@@ -386,6 +386,19 @@ namespace ImGui {
     if (logo->offset.y < 0)
       logo->offset.y = 1;
     return pressed;
+  }
+
+  void HelpMarker(const char* desc) {
+    {
+      ImGui::TextDisabled("(?)");
+      if (ImGui::BeginItemTooltip())
+      {
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+      }
+    }
   }
 }
 

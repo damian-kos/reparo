@@ -24,7 +24,7 @@ sqlite3* Database::PtrDB() {
         std::cout << "DATABASE CAN'T BE OPEN" << std::endl;
         return db_ptr;
     }
-    std::cout << "DB IS OPEN" << std::endl;
+    //std::cout << "DB IS OPEN" << std::endl;
     return db_ptr;
 }
 
@@ -36,7 +36,8 @@ int Database::QueryCustomerIDByPhone(std::string phone) {
     const char* query = "SELECT customer_id FROM customers WHERE phone = ?";
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
-        sqlite3_bind_text(stmt, 1, phone.c_str(), phone.size(), NULL);
+        sqlite3_bind_text(stmt, 1, phone.c_str(), static_cast<int>(phone.size()), NULL); // static cast to avoid getting arg conversion warning
+        
         int customerID = 0;
         
         while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -62,7 +63,7 @@ Customer* Database::QueryCustomerByPhone(std::string phone) {
     const char* query = "SELECT * FROM customers WHERE phone = ?";
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
-        sqlite3_bind_text(stmt, 1, phone.c_str(), phone.size(), NULL);
+      sqlite3_bind_text(stmt, 1, phone.c_str(), static_cast<int>(phone.size()), NULL); // static cast to avoid getting arg conversion warning
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             std::cout << "Statement step " << std::endl;
             name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
@@ -105,7 +106,7 @@ void Database::InsertCustomer(Customer& customer, int* last_row_id) {
 
     if (sqlite3_step(stmt) == SQLITE_DONE) {
         if (last_row_id != nullptr) {
-            *last_row_id = sqlite3_last_insert_rowid(db_ptr);
+          *last_row_id = static_cast<int>(sqlite3_last_insert_rowid(db_ptr));
         }
         std::cout << "Customer added: " << customer.phone << " " << customer.name << std::endl;
     }
@@ -154,7 +155,7 @@ void Database::ManageSearchState(const char* label, Attribute& attribute, const 
 
             // Get the concatenated string without the trailing space
             std::string value = concatenatedValue.str();
-            std::cout << "concatenatedValue: " << value << std::endl;
+            //std::cout << "concatenatedValue: " << value << std::endl;
             if (!value.empty()) {
                 value.pop_back();
             }
@@ -261,16 +262,21 @@ bool Database::GetBoolForValue(const char* label, const char* buffer) {
 }
 
 void Database::InsertRepair(Repair& repair) {
-    std::cout << "InsertRepair is running  " << std::endl;
-    static int customer_id = GetIDForValueS("##Customer", repair.customer.phone.c_str());
-    static int model_id = GetIDForValueS("##Model", repair.device.name.c_str());
-    static int category_id = GetIDForValueS("##Category", repair.category.c_str());
-    static int color_id = GetIDForValueS("##Color2", repair.device.color.c_str());
+    std::cout << "InsertRepair is running: " <<  &repair <<std::endl;
+    int customer_id = GetIDForValueS("##Customer", repair.customer.phone.c_str());
+    int model_id = GetIDForValueS("##Model", repair.device.name.c_str());
+    int cust_device_id = -1;
+    if (model_id < 0) {
+      cust_device_id = InsertCustomDevice(repair);
+    }
+    int category_id = GetIDForValueS("##Category", repair.category.c_str());
+    int color_id = GetIDForValueS("##Color2", repair.device.color.c_str());
+    std::cout << "INSERT REPAIR: " << customer_id << " | " << model_id << " | " << category_id << " | " << color_id << std::endl;
     sqlite3* db_ptr = PtrDB();
     sqlite3_stmt* stmt; 
     const char* query = "INSERT INTO repairs"
-        "(customer_id, model_id, category_id, color_id, repair_desc, repair_desc_hidden, price, repair_state_id, date, sn_imei) "
-        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), ?)";
+        "(customer_id, model_id, category_id, color_id, repair_desc, repair_desc_hidden, price, repair_state_id, date, sn_imei, cust_device_id) "
+        "VALUES(?, ?, ?, ?, ?, ?, ?, ?, datetime('now', 'localtime'), ?, ?)";
     if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
 
         sqlite3_bind_int(stmt, 1, customer_id);
@@ -282,23 +288,53 @@ void Database::InsertRepair(Repair& repair) {
         sqlite3_bind_double(stmt, 7, repair.price);
         sqlite3_bind_int(stmt, 8, static_cast<int>(RepairState::TO_DO)); // repair_state_id
         sqlite3_bind_text(stmt, 9, repair.sn_imei.c_str(), -1, SQLITE_STATIC); // sn_imei
+        if (cust_device_id > 0) {
+          sqlite3_bind_int(stmt, 10, cust_device_id);
+        }
 
     }
-
     if (sqlite3_step(stmt) == SQLITE_DONE) {
         std::cout << "Repair added: " << repair.device.name << " " << repair.customer.phone << std::endl;
         //if (last_row_id != nullptr) {
-          repair.id = sqlite3_last_insert_rowid(db_ptr);
+        repair.id = static_cast<int>(sqlite3_last_insert_rowid(db_ptr));
         //}
     }
     else {
         std::cout << "Error during adding a repair: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
     }
-
     sqlite3_finalize(stmt);
     sqlite3_close(db_ptr);
 }
 
+int Database::InsertCustomDevice(Repair& repair) {
+  std::cout << "InsertCustomDevice is running  " << std::endl;
+  int customer_id = GetIDForValueS("##Customer", repair.customer.phone.c_str());
+  int category_id = GetIDForValueS("##Category", repair.category.c_str());
+  const char* query = "INSERT INTO custom_device"
+    "(brand, model, color) VALUES(?, ?, ?)";
+
+  static int last_row_id;
+
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
+  if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
+    sqlite3_bind_text(stmt, 1, "" , -1, SQLITE_STATIC); // brand
+    sqlite3_bind_text(stmt, 2, repair.device.name.c_str(), -1, SQLITE_STATIC); // model
+    sqlite3_bind_text(stmt, 3, repair.device.color.c_str(), -1, SQLITE_STATIC); // color
+
+  }
+  if (sqlite3_step(stmt) == SQLITE_DONE) {
+    std::cout << "Customdevice added: " << repair.device.name << " " << repair.customer.phone << std::endl;
+    last_row_id = static_cast<int>(sqlite3_last_insert_rowid(db_ptr));
+  }
+  else {
+    std::cout << "Error during adding a repair: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    last_row_id = -1;
+  }
+  sqlite3_finalize(stmt);
+  sqlite3_close(db_ptr);
+  return last_row_id;
+}
 
 std::unordered_map<int, std::string> Database::GetRepairStates() {
     std::cout << "GetRepairsStates is running " << std::endl;
@@ -490,18 +526,22 @@ void Database::DeleteRepair(int& repair_id) {
   sqlite3_close(db_ptr);
 }
 
-
+std::string GetStringFromColumn(sqlite3_stmt* stmt, int columnIndex, const std::string& defaultValue = "") {
+  const char* text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, columnIndex));
+  return text ? std::string(text) : defaultValue;
+}
 RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direction, std::string* date_2, int state, int asc_desc, int order) {
-  printf("RetreiveRepairsByDate is running with VARIANT: %d STATE: %d DIRECTION: %d ORDER: %d\n", date_direction, state, asc_desc, order);
+  //printf("RetreiveRepairsByDate is running with VARIANT: %d STATE: %d DIRECTION: %d ORDER: %d\n", date_direction, state, asc_desc, order);
   sqlite3* db_ptr = PtrDB();
   sqlite3_stmt* stmt;
 
-  std::string query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date FROM repairs r "
+  std::string query = "SELECT r.*, c.category, m.model, co.color, rs.repair_state, cu.*, r.date, cd.* FROM repairs r "
     "LEFT JOIN categories c ON r.category_id = c.category_id "
     "LEFT JOIN models m ON r.model_id = m.model_id "
     "LEFT JOIN colors co ON r.color_id = co.color_id "
     "LEFT JOIN repair_states rs ON r.repair_state_id = rs.repair_state_id "
-    "LEFT JOIN customers cu ON r.customer_id = cu.customer_id ";
+    "LEFT JOIN customers cu ON r.customer_id = cu.customer_id "
+    "LEFT JOIN custom_device cd ON r.cust_device_id = cd.cust_device_id";
 
   std::unordered_map<int, std::string> queries = {
     {0, " WHERE DATE(r.date) <= datetime('now', 'localtime')"},
@@ -567,9 +607,7 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
         sum_query += "STATE-BIND-1 ";
       }
     }
-    printf("%s\n", sum_query.c_str());
-    //printf("Query is: %s\n", query.c_str());
-    //printf("SQL Query is: %s\n", queries[variant].c_str());
+    //printf("%s\n", sum_query.c_str());
     while (sqlite3_step(stmt) == SQLITE_ROW) {
       int repair_id = sqlite3_column_int(stmt, 0);
       int customer_id = sqlite3_column_int(stmt, 1);
@@ -579,23 +617,19 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
       std::string visible_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
       std::string hidden_note = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
       double price = sqlite3_column_double(stmt, 7);
-      std::string date_str = sqlite3_column_text(stmt, 9) ? reinterpret_cast<const char*>(sqlite3_column_text(stmt, 9)) : "";
 
-      std::string sn_imei = sqlite3_column_text(stmt, 10) ? reinterpret_cast<const char*>(sqlite3_column_text(stmt, 10)) : "";
+      std::string date_str = GetStringFromColumn(stmt, 9);
+      std::string sn_imei = GetStringFromColumn(stmt, 10);
+      std::string device_name = GetStringFromColumn(stmt, repair_model_id > 0 ? 13 : 24);
+      std::string color = GetStringFromColumn(stmt, repair_color_id > 0 ? 14 : 25);
+      Device device(device_name, color); 
+      std::string category = GetStringFromColumn(stmt, repair_category_id > 0 ? 12 : -1, "N/A");
+      std::string state = GetStringFromColumn(stmt, 15);
 
-      std::string device_name = (repair_model_id > 0) ?
-        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 12)) : "N/A";
-      std::string color = (repair_color_id > 0) ?
-        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 13)) : "N/A";
-      Device device(device_name, color);
-      std::string category = (repair_category_id > 0) ?
-        reinterpret_cast<const char*>(sqlite3_column_text(stmt, 11)) : "N/A";
-      std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 14));
-
-      std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 16));
-      std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
-      std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 18));
-      std::string customer_phone = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 19));
+      std::string customer_name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 17));
+      std::string customer_surname = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 18));
+      std::string customer_email = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 19));
+      std::string customer_phone = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 20));
       Customer customer(customer_phone, customer_name, customer_surname, customer_email);
 
       Repair repair(customer, device, category, price, visible_note, hidden_note, sn_imei, state, date_str);

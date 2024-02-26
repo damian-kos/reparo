@@ -76,21 +76,23 @@ public:
 // SECTION CreateImage
 class CreateImage  {
 public:
-  static void CreateA4(std::vector<TextField>& text_fields_vector, Logo* logo, float right_margin, Repair* repair = nullptr);
+  static void CreateA4(std::vector<TextField>& text_fields_vector, Logo* logo, int right_margin, Repair* repair = nullptr);
   //static void CreateA4(std::vector<TextField>& text_fields_vector, Logo* logo, float right_margin, Repair& repair);
 
-  static void DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vector, cv::Mat& image, float& right_margin, Repair* repair = nullptr);
+  static void DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vector, cv::Mat& image, int& right_margin, Repair* repair = nullptr);
   static int DrawWrappedText(cv::Mat& image, const std::string& text, cv::Point origin, int max_width, float font_scale, cv::Scalar color, int thickness);
   static void DrawRoundedRect(cv::Mat& image, cv::Point top_left, cv::Point bot_right, int corner_radius, const cv::Scalar& color, const cv::Scalar& color_fill, int thickness);
   static void DrawLogo(cv::Mat& image, Logo* logo);
 
 private:
-  static inline float dpi = 5;
-  static inline float scale = dpi/4;
+  static inline float print_dpi = TicketScales::print_dpi;
+  static inline float scale =TicketScales::scale;
+  static inline float dpi_scale = TicketScales::dpi_scale;
+
 
   //static inline float dpi_s = 1.5f;
-  static inline int width = static_cast<int>(210 * dpi);
-  static inline int height = static_cast<int>(297 * dpi);
+  static inline int width = static_cast<int>(210 * print_dpi);
+  static inline int height = static_cast<int>(297 * print_dpi);
   static inline cv::Ptr<cv::freetype::FreeType2> ft2 = cv::freetype::createFreeType2();
   static std::unordered_map<std::string, std::string> AssignRepairToLabels(Repair* repair);
 

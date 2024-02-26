@@ -12,14 +12,14 @@ ElementProperty::ElementProperty(const ImVec2& size, const ImVec2& offset) : siz
 TextField::TextField() {}
 
 TextField::TextField(std::string label) : label(label) {
-  std::cout << "Created TextField: " << label <<  std::endl;
+  //std::cout << "Created TextField: " << label <<  std::endl;
 
 }
 
 TextField::TextField(const std::string& label, const ImVec2& size, const ImVec2& offset, const float& font_size)
   : ElementProperty(size, offset), // Call the base class constructor
   label(label), font_size(font_size) {
-  std::cout << "Created TextField: " << label << " " << offset.x << " | " << offset.y << std::endl;
+  //std::cout << "Created TextField: " << label << " " << offset.x << " | " << offset.y << std::endl;
 }
 
 void TextField::SetProperties() {
@@ -52,13 +52,6 @@ void Logo::SetProperties() {
   }
 }
 
-//ID3D11ShaderResourceView* LoadImg::ShowLoadImg(const char* filename) {
-//  if (ImGui::Button("Show logo")) {
-//    ReturnTexture(filename);
-//    return texture;
-//  }
-//  return nullptr;
-//}
 
 void LoadImg::ShowLoadImg(const char* filename, ID3D11ShaderResourceView** texture) {
   if (ImGui::Button("Show logo")) {
@@ -66,20 +59,11 @@ void LoadImg::ShowLoadImg(const char* filename, ID3D11ShaderResourceView** textu
   }
 }
 
-//ID3D11ShaderResourceView* LoadImg::ReturnTexture(const char* filename) {
-//  if (texture != nullptr) {
-//    texture->Release(); // Release the previous texture
-//    texture = nullptr;
-//  }
-//  bool ret = LoadTextureFromFile(filename, &texture, &my_image_width, &my_image_height);
-//  IM_ASSERT(ret);
-//  return texture;
-//}
-
 void LoadImg::ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture) {
   if (*texture != nullptr) {
     (*texture)->Release(); // Release the previous texture
     *texture = nullptr;
+    std::cout << "Texture released on Return Texutre" << std::endl;
   }
   bool ret = LoadTextureFromFile(filename, texture, &my_image_width, &my_image_height);
   IM_ASSERT(ret);
@@ -133,7 +117,7 @@ bool LoadImg::LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView
 
 // SECTION CreateImage
 
-void CreateImage::CreateA4(std::vector<TextField>& text_fields_vector, Logo* logo, float right_margin, Repair* repair) {
+void CreateImage::CreateA4(std::vector<TextField>& text_fields_vector, Logo* logo, int right_margin, Repair* repair) {
   // Convert A4 size from inches to pixels (corrected conversion using PPI)
 
   cv::Mat image(height, width, CV_8UC3, cv::Scalar(255, 255, 255));
@@ -156,25 +140,24 @@ void CreateImage::CreateA4(std::vector<TextField>& text_fields_vector, Logo* log
   //cv::waitKey(0); // Wait for a key press to close the image window
 }
 
-void CreateImage::DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vector, cv::Mat& image, float& right_margin, Repair* repair) {
+void CreateImage::DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vector, cv::Mat& image, int& right_margin, Repair* repair) {
   int y = 0;
-  int ext_box = 0;
   for (auto& field : text_fields_vector) {
-    float offset_x = field.offset.x * TicketScales::dpi_scale;
-    float offset_y = field.offset.y * TicketScales::dpi_scale;
-    float size_x = field.size.x * TicketScales::scale;
-    float size_y = field.size.y * TicketScales::scale;
-    float font_size = field.font_size * TicketScales::scale;
-    float font_padding = 10;
-    float text_pos_x = offset_x + font_padding;
-    float text_pos_y = offset_y + ((size_y / font_size) * scale );
+    int offset_x = static_cast<int>(field.offset.x * dpi_scale);
+    int offset_y = static_cast<int>(field.offset.y * dpi_scale);
+    int size_x = static_cast<int>(field.size.x * scale);
+    int size_y = static_cast<int>(field.size.y * scale);
+    float font_size = field.font_size * scale;
+    int font_padding = 10;
+    int text_pos_x = offset_x + font_padding;
+    int text_pos_y = static_cast<int>(offset_y + ((size_y / font_size) * scale));
     cv::Scalar rect_color(0, 0, 0); // Black border
     int thickness = 1; // Pixel
     int corner_radius = 5; // Radius of the rounded corners
     cv::Scalar color_fill =  cv::Scalar(255, 255, 255, 128);
 
     // Draw labels on left side 
-    DrawWrappedText(image, field.label, cv::Point(text_pos_x,  offset_y + y), size_x, font_size, cv::Scalar(0, 0, 0), 0.5);
+    DrawWrappedText(image, field.label, cv::Point(text_pos_x,  offset_y + y), size_x, font_size, cv::Scalar(0, 0, 0), 1);
 
     cv::Point left_cell_bot_right;
     left_cell_bot_right = cv::Point(offset_x + size_x, offset_y + size_y+y);
@@ -281,11 +264,15 @@ void CreateImage::DrawLogo(cv::Mat& image, Logo* logo) {
   cv::Mat logo_img = cv::imread("logo.png", cv::IMREAD_UNCHANGED); // Load the extra image with alpha channel
   if (!logo_img.empty()) {
     // Resize the extra image to match logo size
-    cv::Size new_size(logo->size.x * scale, logo->size.y * scale); // Assuming logo->size is defined and contains the target size
+    static const int size_x = static_cast<int>(logo->size.x * scale);
+    static const int size_y = static_cast<int>(logo->size.y * scale);
+    cv::Size new_size(size_x, size_y); // Assuming logo->size is defined and contains the target size
     cv::resize(logo_img, logo_img, new_size);
 
     // Define the region of interest (ROI) on the image
-    cv::Point offset(logo->offset.x * TicketScales::dpi_scale, logo->offset.y * TicketScales::dpi_scale); // Divided by whatever scale we have on blank image in imgui - currently 2.5
+    static const int offset_x = static_cast<int>(logo->offset.x * dpi_scale);
+    static const int offset_y = static_cast<int>(logo->offset.y * dpi_scale);
+    cv::Point offset(offset_x, offset_y); // Divided by whatever scale we have on blank image in imgui - currently 2.5
     if (offset.x + new_size.width <= image.cols && offset.y + new_size.height <= image.rows) {
       cv::Rect roi(offset, new_size);
       cv::Mat destination_roi = image(roi);
@@ -317,7 +304,7 @@ void CreateImage::DrawLogo(cv::Mat& image, Logo* logo) {
 std::unordered_map<std::string, std::string> CreateImage::AssignRepairToLabels(Repair* repair) {
   std::unordered_map<std::string, std::string> repair_to_map = {
     {"Repair number", std::to_string(repair->id)},
-    {"Date", "16/02/2024"},
+    {"Date", repair->date},
     {"Phone", repair->customer.phone},
     {"Name", repair->customer.name},
     {"Surname",repair->customer.surname},
@@ -494,9 +481,7 @@ void RepairTicket::CreateTemplate() {
 }
 
 void RepairTicket::ShowTemplate() {
-  if (TicketImage::texture == nullptr) {
-    LoadImg::ReturnTexture("temp.jpg", &ticket_img.texture);
-  }
+    LoadImg::ReturnTexture("temp.jpg", &TicketImage::texture);
 }
 
 void RepairTicket::Modals() {
@@ -521,7 +506,7 @@ void RepairTicket::PrintTicket() {
       SW_SHOWNORMAL // Show command
     );
     // Check if the operation was successful
-    if ((int)result <= 32) {
+    if (reinterpret_cast<INT_PTR>(result) <= 32) {
       std::cerr << "Failed to print the file." << std::endl;
     // Offer to try to print again.
     }

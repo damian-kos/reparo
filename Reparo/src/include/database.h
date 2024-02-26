@@ -34,6 +34,7 @@ public:
     static int GetIDForValueS(const char* value, const char* label);
     static bool GetBoolForValue(const char* label, const char* buffer);
     static void InsertRepair(Repair& repair);
+    static int InsertCustomDevice(Repair& repair);
     static std::unordered_map<int, std::string> GetRepairStates();
     static void UpdateCustomer(Customer& customer, int id);
     static void UpdateRepair(Repair& repair, int id);

@@ -32,7 +32,8 @@ struct HintInputField {
     bool valid = false;
 };
 
-struct Attribute {
+// Attributes for fields which have relations to other fields. Like Colors may be dependable on Model.
+struct Attribute { 
     std::vector<std::string> data;
     std::string name = "";
     bool retreived = false;
@@ -54,7 +55,7 @@ struct Device {
     }
     Device(std::string name, std::string color)
         : name(name), color(color) {
-        /*std::cout << "Device created with values " << std::endl;*/
+        //std::cout << "\n" << "Device created with values " << name << " | " << color << std::endl;
     }
     ~Device() { /*std::cout << "Device destroyed " << std::endl;*/ }
     std::string name;

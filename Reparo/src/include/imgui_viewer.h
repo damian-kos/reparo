@@ -43,6 +43,9 @@ namespace ImGui {
                                      TextField& text_field, const ImRect& canvas);
     IMGUI_API bool InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags,
                                      const ImRect& canvas, ImVec2& offset, Logo* logo);
+
+    IMGUI_API void HelpMarker(const char* desc);
+   
 } // namespace ImGui
 
 
