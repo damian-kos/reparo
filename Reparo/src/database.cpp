@@ -526,9 +526,9 @@ void Database::DeleteRepair(int& repair_id) {
   sqlite3_close(db_ptr);
 }
 
-std::string GetStringFromColumn(sqlite3_stmt* stmt, int columnIndex, const std::string& defaultValue = "") {
-  const char* text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, columnIndex));
-  return text ? std::string(text) : defaultValue;
+std::string GetStringFromColumn(sqlite3_stmt* stmt, int column_index, const std::string& default_value = "") {
+  const char* text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, column_index));
+  return text ? std::string(text) : default_value;
 }
 RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direction, std::string* date_2, int state, int asc_desc, int order) {
   //printf("RetreiveRepairsByDate is running with VARIANT: %d STATE: %d DIRECTION: %d ORDER: %d\n", date_direction, state, asc_desc, order);
@@ -554,20 +554,23 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
   else {
     query += queries[0];
   }
-  if (state != 0) {
+  if (state == 8) {
+    query += "";
+  }
+  if (state != 8) {
     query += " AND r.repair_state_id = ?";
   }
 
-  std::unordered_map<int, std::string> sort_order = {
-  {1, "DESC"},
-  {2, "ASC"},
-  };
   std::unordered_map<int, std::string> order_by = {
   {0, "repair_id"},
-  {1, "m.model"},
+  {1, "COALESCE(m.model, cd.model)"},
   {2, "c.category"},
   {4, "r.price"},
   {10, "r.date"}
+  };
+  std::unordered_map<int, std::string> sort_order = {
+  {1, "DESC"},
+  {2, "ASC"},
   };
 
   query += " ORDER BY " + order_by[order] + " " + sort_order[asc_desc];
@@ -608,6 +611,8 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
       }
     }
     //printf("%s\n", sum_query.c_str());
+    printf("%s\n", query.c_str());
+
     while (sqlite3_step(stmt) == SQLITE_ROW) {
       int repair_id = sqlite3_column_int(stmt, 0);
       int customer_id = sqlite3_column_int(stmt, 1);

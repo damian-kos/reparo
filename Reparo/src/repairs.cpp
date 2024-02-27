@@ -1,8 +1,6 @@
 #include "repairs.h"
 
 
-
-
 RepairsView::RepairsView() { 
     std::cout << "RepairsView Created empty" << std::endl;
     names = Database::GetRepairStatesNames();
@@ -20,7 +18,6 @@ void RepairsView::Render() {
                          rv_all_repairs_by_query);
   StatesTabBar();
   RunModal();
-
 }
 
 void RepairsView::StatesTabBar()
@@ -158,6 +155,7 @@ void RepairsView::CalendarsRender(const int& relation, r_tm& date_from, r_tm& da
   Calendar(2, date_to);
   ImGui::EndDisabled();
 }
+
 
 void RepairsView::RepairsToTable(r_tm& date_from, int& relation, r_tm& date_to, const int state, RepairsSort& retreived, int& selected) {
 
