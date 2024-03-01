@@ -1,4 +1,4 @@
-// Dear ImGui: standalone example application for DirectX 11
+﻿// Dear ImGui: standalone example application for DirectX 11
 // If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
 // Read online: https://github.com/ocornut/imgui/tree/master/docs
 
@@ -11,6 +11,7 @@
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
+#include "imgui_freetype.h"
 
 #include "helpmarker.h"
 #include "insert_repair.h"
@@ -123,9 +124,6 @@ int main(int, char**)
   ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
   LoadImg::g_pd3dDeviceImages = g_pd3dDevice;
   // setup
-  ImFontConfig font_config;
-  font_config.OversampleH = 1; // FreeType does not support those, reset so stb_truetype will produce similar results
-  font_config.OversampleV = 1;
 
 
   // Load Fonts
@@ -136,10 +134,27 @@ int main(int, char**)
   // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
   // - Read 'docs/FONTS.md' for more instructions and details.
   // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-  font_config.RasterizerDensity = 4.0f;
-  auto font_d = io.Fonts->AddFontDefault(&font_config);
-  font_d->Scale = 1.0f;
+  //font_d->Scale = 1.0f;
+  //auto font_d = io.Fonts->AddFontDefault(&cfg);
+  
   //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+  //io.Fonts->AddFontFromFileTTF("vendor/imgui/misc/fonts/Roboto-Medium.ttf", 16.0f);
+
+  ImFontConfig cfg;
+  cfg.OversampleV = 1;
+  cfg.OversampleH = 1;
+  cfg.RasterizerDensity = 1.0f;
+  auto font_default = io.Fonts->AddFontFromFileTTF("vendor/imgui/misc/fonts/NotoSans-Regular.ttf", 15.0f, &cfg);
+  font_default->Scale = 1.0f;
+  {
+    static ImWchar ranges[] = { 0x1, 0x1FFFF, 0 };
+    //static ImFontConfig cfg;
+    cfg.OversampleH = cfg.OversampleV = 1;
+    cfg.MergeMode = true;
+    cfg.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_LoadColor;
+    io.Fonts->AddFontFromFileTTF("vendor/imgui/misc/fonts/seguiemj.ttf", 16.0f, &cfg, ranges);
+  }
+
   ImGui::SetFonts();
   //font_config.RasterizerDensity = 2.0f;
   //auto font_a = io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/DroidSans.ttf", 24.0f, &font_config);
@@ -266,14 +281,14 @@ int main(int, char**)
 
         if (ImGui::MenuItem("Search")) { /*To add */ }
 
-        if (ImGui::MenuItem("View")) { 
+        if (ImGui::MenuItem("View", "\xF0\x9F\x92\xB5")) {
           show_repair_states_window = !show_repair_states_window;
           data["repairs"]["window_on"] = show_repair_states_window;
           RO_Cfg::UpdateCreateConfig(data);
         }
           ImGui::SetItemTooltip("Repairs \nHistory and current tickets \n", ImGui::GetStyle().HoverDelayNormal);
 
-        if (ImGui::MenuItem("Finances & Accounting")) { 
+        if (ImGui::MenuItem("Finances & Accounting", "\xF0\x9F\x92\xB5")) {
           show_finances = !show_finances;
           data["finances"]["window_on"] = show_finances;
           RO_Cfg::UpdateCreateConfig(data);
@@ -286,6 +301,7 @@ int main(int, char**)
     }
 
     Updater::ModalForUpdate();
+    RO_Settings::DisplayLogoUploader();
 
     if (show_insert_customer_win) {
       ImGui::Begin("Add customer", &show_insert_customer_win, ImGuiWindowFlags_MenuBar);
@@ -338,7 +354,9 @@ int main(int, char**)
     if (RepairTicket::show_window) {
       repair_ticket.RepairTicketWin();
     }
-    
+
+   
+
     // Rendering
     ImGui::Render();
     const float clear_color_with_alpha[4] = {clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w};

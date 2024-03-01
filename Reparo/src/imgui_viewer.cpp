@@ -43,7 +43,7 @@ namespace ImGui {
     font_config.OversampleH = 1; // FreeType does not support those, reset so stb_truetype will produce similar results
     font_config.OversampleV = 1;
     font_config.RasterizerDensity = 2.0f;
-    font = io.Fonts->AddFontFromFileTTF("vendor/imgui/msc/fonts/DroidSans.ttf", 24.0f, &font_config);
+    font = io.Fonts->AddFontFromFileTTF("vendor/imgui/misc/fonts/NotoSans-Regular.ttf", 24.0f, &font_config);
     font->Scale = 1.0f;
   }
 

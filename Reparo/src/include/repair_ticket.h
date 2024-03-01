@@ -54,8 +54,11 @@ public:
   Logo(const ImVec2& size, const ImVec2& offset);
 public:
   void SetProperties();
+  void ChooseLogoDialog();
+  static bool MoveLogo(std::string source);
 public:
   static inline ID3D11ShaderResourceView* texture = nullptr;
+
 };
 
 class LoadImg {

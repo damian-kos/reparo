@@ -24,6 +24,7 @@ void RO_Settings::Menu(){
     RO_Settings::FinancesWinWin();
     RO_Settings::CheckUpdate();
     RO_Settings::TicketPrintableTemplate();
+    RO_Settings::UploadCompanyLogo();
     ImGui::EndMenu();
   }
 
@@ -70,4 +71,35 @@ void RO_Settings::TicketPrintableTemplate() {
   if (ImGui::MenuItem("Printable Template")) {
     RepairTicket::show_window = !RepairTicket::show_window;
   }
+}
+
+void RO_Settings::UploadCompanyLogo() {
+  if (ImGui::MenuItem("Load Company Logo")) {
+    IGFD::FileManager file_manager;
+    file_manager.GetDrives();
+    IGFD::FileDialogConfig config;
+    config.path = ".";
+    ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByTypeDir, "", ImVec4(0.5f, 1.0f, 0.9f, 0.9f), "\xF0\x9F\x93\x81");
+    ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".jpg", ImVec4(0.5f, 1.0f, 0.9f, 0.9f), "\xF0\x9F\x8C\x84");
+    ImGuiFileDialog::Instance()->SetFileStyle(IGFD_FileStyleByExtention, ".png", ImVec4(0.5f, 1.0f, 0.9f, 0.9f), "\xF0\x9F\x8C\x84");
+    ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".png",config);
+  }
+}
+
+void RO_Settings::DisplayLogoUploader() {
+  // display
+  if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+    if (ImGuiFileDialog::Instance()->IsOk()) { // action if OK
+      std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+      std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+      std::cout << "File path name: " << filePathName << std::endl;
+
+      std::cout << "File path: " << filePath << std::endl;
+      Logo::MoveLogo(filePathName);
+    }
+
+    // close
+    ImGuiFileDialog::Instance()->Close();
+  }
+
 }

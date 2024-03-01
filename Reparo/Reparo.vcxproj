@@ -145,6 +145,8 @@
     <ClInclude Include="src\include\enums.h" />
     <ClInclude Include="src\include\finances.h" />
     <ClInclude Include="src\include\imguidatechooser.h" />
+    <ClInclude Include="src\include\ImGuiFileDialog.h" />
+    <ClInclude Include="src\include\ImGuiFileDialogConfig.h" />
     <ClInclude Include="src\include\imgui_viewer.h" />
     <ClInclude Include="src\include\config.h" />
     <ClInclude Include="src\include\IObserver.h" />
@@ -155,11 +157,13 @@
     <ClInclude Include="src\include\repairs.h" />
     <ClInclude Include="src\include\settings.h" />
     <ClInclude Include="src\include\stb_image.h" />
+    <ClInclude Include="src\include\stb_image_resize.h" />
     <ClInclude Include="src\include\structs.h" />
     <ClInclude Include="src\include\repair_ticket.h" />
     <ClInclude Include="src\include\updates.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
+    <ClInclude Include="vendor\imgui\imgui_freetype.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_win32.h" />
     <ClInclude Include="vendor\imgui\imgui_internal.h" />
@@ -171,6 +175,7 @@
     <ClInclude Include="vendor\sqlite3\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ImGuiFileDialog.cpp" />
     <ClCompile Include="src\repair_ticket.cpp" />
     <ClCompile Include="src\settings.cpp" />
     <ClCompile Include="src\config.cpp" />
@@ -189,6 +194,7 @@
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_freetype.cpp" />
     <ClCompile Include="vendor\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="vendor\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="vendor\imgui\imgui_tables.cpp" />

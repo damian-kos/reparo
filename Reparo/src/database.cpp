@@ -568,6 +568,7 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
   {4, "r.price"},
   {10, "r.date"}
   };
+
   std::unordered_map<int, std::string> sort_order = {
   {1, "DESC"},
   {2, "ASC"},
@@ -575,10 +576,8 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
 
   query += " ORDER BY " + order_by[order] + " " + sort_order[asc_desc];
 
-
   RepairsSort retreived;
   std::string date_1_str, date_2_str;
-
 
   if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
     std::string sum_query = "RUN WITH: ";
@@ -611,7 +610,7 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
       }
     }
     //printf("%s\n", sum_query.c_str());
-    printf("%s\n", query.c_str());
+    //printf("%s\n", query.c_str());
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
       int repair_id = sqlite3_column_int(stmt, 0);

@@ -52,6 +52,31 @@ void Logo::SetProperties() {
   }
 }
 
+void Logo::ChooseLogoDialog() {
+
+}
+
+bool Logo::MoveLogo(std::string source) {
+  std::filesystem::path src_file_path = std::filesystem::path(source);
+  std::filesystem::path dest_dir_path = std::filesystem::current_path();
+  try {
+    // Create the destination path by appending the filename to the destination folder path
+    std::filesystem::path dest_file_path = dest_dir_path / "logo.png";
+
+    // Create the destination folder if it doesn't exist
+    std::filesystem::create_directories(dest_dir_path);
+
+    // Perform the move operation
+    std::filesystem::rename(src_file_path, dest_file_path);
+
+    std::cout << "File moved successfully! \n" << src_file_path << dest_file_path << std::endl;
+    return true;
+  }
+  catch (const std::exception& e) {
+    std::cerr << "Error: " << e.what() << "\n" << std::endl;
+    return false;
+  }
+}
 
 void LoadImg::ShowLoadImg(const char* filename, ID3D11ShaderResourceView** texture) {
   if (ImGui::Button("Show logo")) {
@@ -124,7 +149,7 @@ void CreateImage::CreateA4(std::vector<TextField>& text_fields_vector, Logo* log
 
   // Create a FreeType2 instance and load font we will be using
   //ft2 = cv::freetype::createFreeType2();
-  std::string fontPath = "vendor/imgui/msc/fonts/assistant.ttf";
+  std::string fontPath = "vendor/imgui/misc/fonts/assistant.ttf";
   ft2->loadFontData(fontPath, 0);
   if (repair == nullptr) {
     DrawTextFieldsOnImage(text_fields_vector, image, right_margin);
