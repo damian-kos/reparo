@@ -54,8 +54,9 @@ public:
   Logo(const ImVec2& size, const ImVec2& offset);
 public:
   void SetProperties();
-  void ChooseLogoDialog();
   static bool MoveLogo(std::string source);
+  static void RecalcSize(float& img_width, float& img_height);
+
 public:
   static inline ID3D11ShaderResourceView* texture = nullptr;
 
@@ -63,9 +64,9 @@ public:
 
 class LoadImg {
 public: 
-  static void ShowLoadImg(const char* filename, ID3D11ShaderResourceView** texture);
+  static void ShowLoadImg(const char* filename, ID3D11ShaderResourceView** texture, Logo& logo);
 public:
-  static void ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture);
+  static void ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture, Logo& logo);
   static bool LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height);
   static inline ID3D11ShaderResourceView* i_texture = nullptr;
 

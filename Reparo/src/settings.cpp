@@ -97,7 +97,6 @@ void RO_Settings::DisplayLogoUploader() {
       std::cout << "File path: " << filePath << std::endl;
       Logo::MoveLogo(filePathName);
     }
-
     // close
     ImGuiFileDialog::Instance()->Close();
   }

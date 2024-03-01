@@ -52,10 +52,6 @@ void Logo::SetProperties() {
   }
 }
 
-void Logo::ChooseLogoDialog() {
-
-}
-
 bool Logo::MoveLogo(std::string source) {
   std::filesystem::path src_file_path = std::filesystem::path(source);
   std::filesystem::path dest_dir_path = std::filesystem::current_path();
@@ -70,27 +66,63 @@ bool Logo::MoveLogo(std::string source) {
     std::filesystem::rename(src_file_path, dest_file_path);
 
     std::cout << "File moved successfully! \n" << src_file_path << dest_file_path << std::endl;
-    return true;
   }
   catch (const std::exception& e) {
     std::cerr << "Error: " << e.what() << "\n" << std::endl;
     return false;
   }
-}
-
-void LoadImg::ShowLoadImg(const char* filename, ID3D11ShaderResourceView** texture) {
-  if (ImGui::Button("Show logo")) {
-    ReturnTexture(filename, texture);
+  cv::Mat logo_img = cv::imread("logo.png");
+  if (!logo_img.empty()) {
+    float width = logo_img.cols;
+    float height = logo_img.rows;
+    RecalcSize(width, height);
+    return true;
   }
 }
 
-void LoadImg::ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture) {
+void Logo::RecalcSize(float& img_width, float& img_height) {
+  // Define the maximum dimensions
+  const int max_width = 300;
+  const int max_height = 130;
+
+  // Calculate the aspect ratio of the image
+  float aspect = static_cast<float>(img_width) / img_height;
+
+  // Calculate the maximum aspect ratio
+  float max_aspect = static_cast<float>(max_width) / max_height;
+
+  // Compare aspect ratios to decide how to scale
+  if (aspect > max_aspect) {
+    // Image is wider than the bounding box, scale based on width
+    img_height = static_cast<int>(max_width / aspect);
+    img_width = max_width;
+  }
+  else {
+    // Image is taller than the bounding box, scale based on height
+    img_width = static_cast<int>(max_height * aspect);
+    img_height = max_height;
+  }
+  std::cout << img_width << " | " << img_height << std::endl;
+  RO_Cfg::UpdateCreateConfig("logo.size.x", img_width, "template.json");
+  RO_Cfg::UpdateCreateConfig("logo.size.y", img_height, "template.json");
+}
+
+void LoadImg::ShowLoadImg(const char* filename, ID3D11ShaderResourceView** texture, Logo& logo) {
+  if (ImGui::Button("Show logo")) {
+    ReturnTexture(filename, &logo.texture, logo);
+  }
+}
+
+
+void LoadImg::ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture, Logo& logo) {
   if (*texture != nullptr) {
     (*texture)->Release(); // Release the previous texture
     *texture = nullptr;
     std::cout << "Texture released on Return Texutre" << std::endl;
   }
   bool ret = LoadTextureFromFile(filename, texture, &my_image_width, &my_image_height);
+  logo.size.x = my_image_width;
+  logo.size.y = my_image_height;
   IM_ASSERT(ret);
 }
 
@@ -133,8 +165,8 @@ bool LoadImg::LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView
   g_pd3dDeviceImages->CreateShaderResourceView(p_texture, &srv_desc, out_srv);
   p_texture->Release();
 
-  *out_width = 150;
-  *out_height = 150;
+  *out_width = image_width;
+  *out_height = image_height;
   stbi_image_free(image_data);
 
   return true;
@@ -291,11 +323,12 @@ void CreateImage::DrawLogo(cv::Mat& image, Logo* logo) {
     // Resize the extra image to match logo size
     static const int size_x = static_cast<int>(logo->size.x * scale);
     static const int size_y = static_cast<int>(logo->size.y * scale);
+    std::cout << size_x << " x " << size_y << std::endl;
     cv::Size new_size(size_x, size_y); // Assuming logo->size is defined and contains the target size
     cv::resize(logo_img, logo_img, new_size);
 
     // Define the region of interest (ROI) on the image
-    static const int offset_x = static_cast<int>(logo->offset.x * dpi_scale);
+    static const int offset_x = static_cast<int>((width - logo->size.x )/2);
     static const int offset_y = static_cast<int>(logo->offset.y * dpi_scale);
     cv::Point offset(offset_x, offset_y); // Divided by whatever scale we have on blank image in imgui - currently 2.5
     if (offset.x + new_size.width <= image.cols && offset.y + new_size.height <= image.rows) {
@@ -380,7 +413,6 @@ void RepairTicket::Update(const int& passed_int, Repair* repair) {
   }
 }
 
-
 void RepairTicket::RepairTicketWin() {
   ImGui::Begin("Template Editor");
 
@@ -463,8 +495,14 @@ void RepairTicket::TextFieldsOnCanvas(const ImRect& canvas_rect) {
   }
 }
 
+
 void RepairTicket::LoadImgAndProperties() {
-  LoadImg::ShowLoadImg("logo.png", &logo.texture);
+  LoadImg::ShowLoadImg("logo.png", &logo.texture, logo);
+  if(logo.texture)
+    logo.SetProperties();
+}
+
+void RepairTicket::ShowLogoOnCanvas(const ImRect& canvas_rect) {
   if (logo.texture != nullptr){
     static bool logo_init = false;
     if (!logo_init) {
@@ -474,11 +512,7 @@ void RepairTicket::LoadImgAndProperties() {
       logo.size.y = RO_Cfg::getValue("logo.size.y", 100.0f, "template.json");
       logo_init = true;
     }
-    logo.SetProperties();
   }
-}
-
-void RepairTicket::ShowLogoOnCanvas(const ImRect& canvas_rect) {
   ImGui::InvisibleButtonEx("canvas2 %d", ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight, canvas_rect, logo.offset, &logo);
 }
 
@@ -506,7 +540,7 @@ void RepairTicket::CreateTemplate() {
 }
 
 void RepairTicket::ShowTemplate() {
-    LoadImg::ReturnTexture("temp.jpg", &TicketImage::texture);
+    LoadImg::ReturnTexture("temp.jpg", &TicketImage::texture, logo);
 }
 
 void RepairTicket::Modals() {
