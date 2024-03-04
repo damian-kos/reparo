@@ -113,11 +113,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>C:\src\crashpad\crashpad;C:\src\crashpad\crashpad\third_party\mini_chromium\mini_chromium;C:\src\crashpad\crashpad\out\Debug\gen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;MSVCRTD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;MSVCRTD.lib;client.lib;util.lib;base.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\src\crashpad\crashpad\out\Debug\obj\util;C:\src\crashpad\crashpad\out\Debug\obj\client;C:\src\crashpad\crashpad\out\Debug\obj\third_party\mini_chromium\mini_chromium\base;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,6 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\include\crash_reporter.h" />
     <ClInclude Include="src\include\database.h" />
     <ClInclude Include="src\include\edit_repair.h" />
     <ClInclude Include="src\include\enums.h" />
@@ -167,14 +170,17 @@
     <ClInclude Include="vendor\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="vendor\imgui\imgui_impl_win32.h" />
     <ClInclude Include="vendor\imgui\imgui_internal.h" />
+    <ClInclude Include="vendor\imgui\imgui_stdlib.h" />
     <ClInclude Include="vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="vendor\imgui\misc\freetype\imgui_freetype.h" />
     <ClInclude Include="vendor\nlohmann\json.hpp" />
     <ClInclude Include="vendor\nlohmann\json_fwd.hpp" />
     <ClInclude Include="vendor\sqlite3\sqlite3.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\crash_reporter.cpp" />
     <ClCompile Include="src\ImGuiFileDialog.cpp" />
     <ClCompile Include="src\repair_ticket.cpp" />
     <ClCompile Include="src\settings.cpp" />
@@ -197,6 +203,7 @@
     <ClCompile Include="vendor\imgui\imgui_freetype.cpp" />
     <ClCompile Include="vendor\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="vendor\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="vendor\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
     <ClCompile Include="vendor\sqlite3\sqlite3.c" />

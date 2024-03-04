@@ -227,14 +227,20 @@ template int RO_Cfg::getValue<int>(const std::string&, const int&);
 template int RO_Cfg::getJsonValue<int>(const json&, const std::string&);
 
 template void RO_Cfg::UpdateCreateConfig<bool>(const std::string&, const bool&);
+template void RO_Cfg::UpdateCreateConfig<std::string>(const std::string&, const std::string&);
+
 
 
 // // Explicit template instantiations with file_path
 template bool RO_Cfg::getValue<bool>(const std::string&, const bool&, const std::string&);
 template float RO_Cfg::getValue<float>(const std::string&, const float&, const std::string&);
+template std::string RO_Cfg::getValue<std::string>(const std::string&, const std::string&, const std::string&);
+
 
 template void RO_Cfg::UpdateCreateConfig<bool>(const std::string&, const bool&, const std::string&);
 template void RO_Cfg::UpdateCreateConfig<float>(const std::string&, const float&, const std::string&);
+template void RO_Cfg::UpdateCreateConfig<std::string>(const std::string&, const std::string&, const std::string&);
+
 
 
 

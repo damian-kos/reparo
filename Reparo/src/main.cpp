@@ -13,6 +13,7 @@
 #include "imgui_impl_dx11.h"
 #include "imgui_freetype.h"
 
+#include "crash_reporter.h"
 #include "helpmarker.h"
 #include "insert_repair.h"
 #include "repairs.h"
@@ -64,6 +65,8 @@ int main(int, char**)
   insert_repair.Attach(&repair_ticket);
 
   repairs_view.Attach(&finances);
+
+  CrashReporter::InitializeCrashpad();
 
   // Create application window
   // ImGui_ImplWin32_EnableDpiAwareness();
@@ -281,9 +284,10 @@ int main(int, char**)
       RO_Settings::Menu();
       ImGui::EndMainMenuBar();
     }
-
+    CrashReporter::CrashOnVec();
     Updater::ModalForUpdate();
     RO_Settings::DisplayLogoUploader();
+    RO_Settings::TCsSttgsWin();
 
     if (show_insert_customer_win) {
       ImGui::Begin("Add customer", &show_insert_customer_win, ImGuiWindowFlags_MenuBar);

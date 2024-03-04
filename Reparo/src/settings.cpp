@@ -25,6 +25,7 @@ void RO_Settings::Menu(){
     RO_Settings::CheckUpdate();
     RO_Settings::TicketPrintableTemplate();
     RO_Settings::UploadCompanyLogo();
+    RO_Settings::TermsAndConditionsMenu();
     ImGui::EndMenu();
   }
 
@@ -101,4 +102,32 @@ void RO_Settings::DisplayLogoUploader() {
     ImGuiFileDialog::Instance()->Close();
   }
 
+}
+
+void RO_Settings::TermsAndConditionsMenu() {
+  if (ImGui::MenuItem("Terms & Conditions")) {
+    TCsWinOpts::tcs_win_on = true;
+    TCsWinOpts::str = RO_Cfg::getValue("text_field.Terms & Conditions.text", TCsWinOpts::str, "template.json");
+    TCsWinOpts::size_left = TCsWinOpts::max_size - TCsWinOpts::str.size();
+  }
+}
+
+void RO_Settings::TCsSttgsWin() {
+  if (TCsWinOpts::tcs_win_on) {
+    ImGui::Begin("Terms & Conditions", &TCsWinOpts::tcs_win_on);
+   
+    ImGui::InputTextMultiline("Terms & Conditions", &TCsWinOpts::str);
+    if (ImGui::IsItemEdited()) {
+      TCsWinOpts::size_left = TCsWinOpts::max_size - TCsWinOpts::str.size();
+    }
+    ImGui::Text("(%d)", TCsWinOpts::size_left);
+    ImGui::BeginDisabled(TCsWinOpts::size_left < 0);
+    if (ImGui::Button("Save T&C")) {
+      UpdateCreateConfig("text_field.Terms & Conditions.text", TCsWinOpts::str, "template.json");
+      std::cout << TCsWinOpts::str << std::endl;
+    }
+    ImGui::EndDisabled();
+
+    ImGui::End();
+  }
 }

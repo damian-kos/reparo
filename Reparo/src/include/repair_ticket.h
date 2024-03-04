@@ -12,6 +12,7 @@
 #include "settings.h"
 #include "imgui_viewer.h"
 #include "IObserver.h"
+#include "config.h"
 
 class Logo;
 
@@ -64,9 +65,9 @@ public:
 
 class LoadImg {
 public: 
-  static void ShowLoadImg(const char* filename, ID3D11ShaderResourceView** texture, Logo& logo);
+  static void LoadLogo(const char* filename, Logo& logo);
 public:
-  static void ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture, Logo& logo);
+  static void ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture);
   static bool LoadTextureFromFile(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height);
   static inline ID3D11ShaderResourceView* i_texture = nullptr;
 
@@ -131,7 +132,7 @@ private:
   void ShowLogoOnCanvas(const ImRect& canvas_rect);
   void SaveTemplateProperties();
   void CreateTemplate();
-  void ShowTemplate();
+  void ShowTicket();
   static void PrintTicket();
 
 public:

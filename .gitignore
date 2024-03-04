@@ -13,6 +13,9 @@ ehthumbs_vista.db
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+*.dmp
+*.jpg
+*.png
 
 # Windows Installer files
 *.cab
@@ -77,6 +80,7 @@ Temporary Items
 *.class
 
 # Generated files
+database/
 bin/
 gen/
 out/

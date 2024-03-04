@@ -107,22 +107,19 @@ void Logo::RecalcSize(float& img_width, float& img_height) {
   RO_Cfg::UpdateCreateConfig("logo.size.y", img_height, "template.json");
 }
 
-void LoadImg::ShowLoadImg(const char* filename, ID3D11ShaderResourceView** texture, Logo& logo) {
+void LoadImg::LoadLogo(const char* filename, Logo& logo) {
   if (ImGui::Button("Show logo")) {
-    ReturnTexture(filename, &logo.texture, logo);
+    ReturnTexture(filename, &logo.texture);
   }
 }
 
-
-void LoadImg::ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture, Logo& logo) {
+void LoadImg::ReturnTexture(const char* filename, ID3D11ShaderResourceView** texture) {
   if (*texture != nullptr) {
     (*texture)->Release(); // Release the previous texture
     *texture = nullptr;
     std::cout << "Texture released on Return Texutre" << std::endl;
   }
   bool ret = LoadTextureFromFile(filename, texture, &my_image_width, &my_image_height);
-  logo.size.x = my_image_width;
-  logo.size.y = my_image_height;
   IM_ASSERT(ret);
 }
 
@@ -262,32 +259,54 @@ void CreateImage::DrawTextFieldsOnImage(std::vector<TextField>& text_fields_vect
 
 int CreateImage::DrawWrappedText(cv::Mat& image, const std::string& text, cv::Point origin, int max_width, float font_scale, cv::Scalar color, int thickness) {
   int base_line = 15;
+  int line_spacing = 5; // Additional spacing between lines. Adjust this value as needed.
+
   // Estimate height of a single line of text
   cv::Size text_size = ft2->getTextSize("W", static_cast<int>(font_scale), thickness, &base_line);
-  //std::cout << "Text size: "  << text_size << " | " << font_scale << " | "  << origin.y << std::endl;
   int y = origin.y;
 
-  std::istringstream words(text);
-  std::string line;
-  std::string word;
+  std::istringstream stream(text);
+  std::string segment;
+  bool firstSegment = true;
 
-  while (words >> word) {
-    std::string mew_line = line + word + " ";
-    cv::Size lineWidth = ft2->getTextSize(mew_line, static_cast<int>(font_scale), thickness, &base_line);
+  while (std::getline(stream, segment)) {
+    if (!firstSegment) {
+      // Move to the next line only if this isn't the first segment
+      // Add line_spacing to increase space between lines
+      y += text_size.height + base_line + line_spacing;
+    }
+    firstSegment = false;
 
-    if (lineWidth.width > max_width && !line.empty()) {
+    std::istringstream words(segment);
+    std::string line;
+    std::string word;
+    bool first_word = true;
+
+    while (words >> word) {
+      std::string new_line = line + word + " ";
+      cv::Size line_width = ft2->getTextSize(new_line, static_cast<int>(font_scale), thickness, &base_line);
+
+      if (line_width.width > max_width && !line.empty()) {
+        // Draw the current line before it exceeds max_width
+        ft2->putText(image, line, cv::Point(origin.x, y), static_cast<int>(font_scale), color, thickness, cv::LINE_AA, false);
+        line = word + " ";
+        if (!first_word) {
+          // Only add to y if this isn't the first word (which means we're actually wrapping text)
+          // Add line_spacing to increase space between lines
+          y += text_size.height + base_line + line_spacing;
+        }
+      }
+      else {
+        line = new_line;
+      }
+      first_word = false;
+    }
+    // Draw the last line of the current segment or if it's a single word
+    if (!line.empty()) {
       ft2->putText(image, line, cv::Point(origin.x, y), static_cast<int>(font_scale), color, thickness, cv::LINE_AA, false);
-      line = word + " ";
-      y += text_size.height + base_line;
-    }
-    else {
-      line = mew_line;
     }
   }
-  if (!line.empty()) {
-    ft2->putText(image, line, cv::Point(origin.x, y), static_cast<int>(font_scale), color, thickness, cv::LINE_AA, false);
-  }
-  return  y;
+  return y;
 }
 
 void CreateImage::DrawRoundedRect(cv::Mat& image, cv::Point top_left, cv::Point bot_right, int corner_radius, const cv::Scalar& color, const cv::Scalar& color_fill, int thickness) {
@@ -323,12 +342,11 @@ void CreateImage::DrawLogo(cv::Mat& image, Logo* logo) {
     // Resize the extra image to match logo size
     static const int size_x = static_cast<int>(logo->size.x * scale);
     static const int size_y = static_cast<int>(logo->size.y * scale);
-    std::cout << size_x << " x " << size_y << std::endl;
     cv::Size new_size(size_x, size_y); // Assuming logo->size is defined and contains the target size
     cv::resize(logo_img, logo_img, new_size);
 
     // Define the region of interest (ROI) on the image
-    static const int offset_x = static_cast<int>((width - logo->size.x )/2);
+    static const int offset_x = static_cast<int>((width - (logo->size.x * scale)) / 2);  // Overrides logo->offset.x, so logo is always centered
     static const int offset_y = static_cast<int>(logo->offset.y * dpi_scale);
     cv::Point offset(offset_x, offset_y); // Divided by whatever scale we have on blank image in imgui - currently 2.5
     if (offset.x + new_size.width <= image.cols && offset.y + new_size.height <= image.rows) {
@@ -373,7 +391,7 @@ std::unordered_map<std::string, std::string> CreateImage::AssignRepairToLabels(R
     {"Color", repair->device.color},
     {"Note for customer", repair->visible_note},
     {"Price", std::to_string(repair->price)},
-    {"Terms & Conditions", lorem_ipsum}
+    {"Terms & Conditions", RO_Cfg::getValue("text_field.Terms & Conditions.text", std::string("Default value"), "template.json").c_str()}
   };
   return repair_to_map;
 }
@@ -403,11 +421,11 @@ void RepairTicket::Update(const int& passed_int, Repair* repair) {
     auto json_logo = data["logo"];
     ImVec2 size(json_logo["size"]["x"], json_logo["size"]["y"]);
     ImVec2 offset(json_logo["offset"]["x"], json_logo["offset"]["y"]);
-    Logo logo(size, offset);
+    Logo logo(size, offset); // only offset.y is used. Offset.x is hardcoded so the logo will be always centered.
     CreateImage::CreateA4(text_fields_v, &logo, TicketScales::margin, repair);
 
     std::cout << "Update" << std::endl;
-    ShowTemplate();
+    ShowTicket();
 
     run_modal = true;
   }
@@ -495,9 +513,8 @@ void RepairTicket::TextFieldsOnCanvas(const ImRect& canvas_rect) {
   }
 }
 
-
 void RepairTicket::LoadImgAndProperties() {
-  LoadImg::ShowLoadImg("logo.png", &logo.texture, logo);
+  LoadImg::LoadLogo("logo.png", logo);
   if(logo.texture)
     logo.SetProperties();
 }
@@ -539,8 +556,8 @@ void RepairTicket::CreateTemplate() {
   }
 }
 
-void RepairTicket::ShowTemplate() {
-    LoadImg::ReturnTexture("temp.jpg", &TicketImage::texture, logo);
+void RepairTicket::ShowTicket() {
+    LoadImg::ReturnTexture("temp.jpg", &TicketImage::texture);
 }
 
 void RepairTicket::Modals() {
@@ -576,3 +593,4 @@ void RepairTicket::PrintTicket() {
     print = ConfirmResult::CONIFRM_IDLE;
   }
 }
+
