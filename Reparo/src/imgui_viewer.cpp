@@ -236,6 +236,17 @@ namespace ImGui {
     }
   }
 
+  void InputTextWithHintExt(const char* label, const char* hint, HintInputFieldStr& field, std::function<bool()> validation_function, bool* feedback) {
+  ImGui::InputTextWithHint(label, hint, &field.buffer, field.imgui_flags);
+  if (ImGui::IsItemEdited() && validation_function) {
+    std::cout << "Item is edited " << std::endl;
+    field.valid = validation_function();
+  }
+  if (ImGui::IsItemDeactivated() && feedback) {
+    *feedback = true;
+  }
+}
+
   void GetFontV(ImFont* font_t) {
     font = font_t;
   }
@@ -270,6 +281,26 @@ namespace ImGui {
       ModalController::PopupOnInputField(field, selection, label);
     }
   }
+
+  void InputTextWithPopup(const char* label, const char* hint, HintInputFieldsW_PopupStr& field, std::function<bool()> validation_function, bool* selection, HintInputFieldsW_PopupStr* rel_field, bool* feedback) {
+  if (field.input.is_on) {
+    ImGui::InputTextWithHintExt(label, hint, field.input, validation_function, feedback);
+    if (rel_field) {
+      if (rel_field->input.valid && !field.attribute.retreived) {
+        int id = Database::GetIDForValueS(label, rel_field->input.buffer.c_str());
+        Database::ManageSearchState(label, field.attribute, id, field.input.buffer.c_str());
+        field.attribute.retreived = true;
+      }
+      if (!rel_field->input.valid && field.attribute.retreived) {
+        field.attribute.retreived = false;
+      }
+    }
+    else if (ImGui::IsItemEdited() || ImGui::IsItemActivated()) {
+      Database::ManageSearchState(label, field.attribute, field.input.buffer.c_str());
+    }
+    ModalController::PopupOnInputField(field, selection, label);
+  }
+}
 
   bool InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags, TextField& text_field, const ImRect& canvas) {
     float& font_size = text_field.font_size;

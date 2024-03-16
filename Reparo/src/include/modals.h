@@ -30,6 +30,8 @@ public:
     static void PopupOnInputField(HintInputFieldsW_Popup& field, 
                                   bool* selected, const char* label);
 
+    static void PopupOnInputField(HintInputFieldsW_PopupStr& field, bool* selected, const char* label);
+
 private:
     static void CenterAlign();
 };

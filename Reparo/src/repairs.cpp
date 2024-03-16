@@ -3,7 +3,7 @@
 
 RepairsView::RepairsView() { 
     std::cout << "RepairsView Created empty" << std::endl;
-    names = Database::GetRepairStatesNames();
+    names = Database::GetSimpleTableNames();
     opened = new bool[names.size()];
 }
 

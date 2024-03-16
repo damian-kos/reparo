@@ -19,7 +19,7 @@ Database::~Database() {
 
 sqlite3* Database::PtrDB() {
     sqlite3* db_ptr = nullptr;
-    int rc = sqlite3_open("vendor/parts_stock.db", &db_ptr);
+    int rc = sqlite3_open("resource/parts_stock.db", &db_ptr);
     if (rc != SQLITE_OK) {
         std::cout << "DATABASE CAN'T BE OPEN" << std::endl;
         return db_ptr;
@@ -126,6 +126,7 @@ void Database::ManageSearchState(const char* label, Attribute& attribute, const 
     //OpenDB();
     static std::map<const char*, const char*> queries = {
     {"##Model", "SELECT model FROM models WHERE model LIKE ?"},
+    {"##Color3", "SELECT color FROM colors WHERE color LIKE ?"},
     {"##Category", "SELECT category FROM categories WHERE category LIKE ?"},
     {"##Phone", "SELECT phone, name, surname FROM customers WHERE phone = ?"},
     {"##PartialPhone", "SELECT phone, name, surname FROM customers WHERE phone LIKE ?"},
@@ -336,13 +337,13 @@ int Database::InsertCustomDevice(Repair& repair) {
   return last_row_id;
 }
 
-std::unordered_map<int, std::string> Database::GetRepairStates() {
-    std::cout << "GetRepairsStates is running " << std::endl;
+std::unordered_map<int, std::string> Database::GetSimpleTable(const std::string& table) {
+    std::cout << "GetRepairsStates is running " << table << std::endl;
     sqlite3* db_ptr = PtrDB();
-    static std::unordered_map<int, std::string> states;
+    std::unordered_map<int, std::string> states;
     sqlite3_stmt* stmt;
-    const char* query = "SELECT * FROM repair_states";
-    if (sqlite3_prepare_v2(db_ptr, query, -1, &stmt, NULL) == SQLITE_OK) {
+    std::string query = "SELECT * FROM " + table;
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
             int state_id = sqlite3_column_int(stmt, 0);
             std::string state = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
@@ -488,7 +489,7 @@ std::vector<RepairUpdates> Database::RetreiveRepairUdpdates(int& repair_id) {
   return updates;
 }
 
-std::vector<std::string> Database::GetRepairStatesNames() {
+std::vector<std::string> Database::GetSimpleTableNames() {  // Extremely similar to GetSimpleTable
   sqlite3* db_ptr = PtrDB();
   sqlite3_stmt* stmt;
   std::vector<std::string> states;
@@ -652,4 +653,241 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
   return retreived;
 }
 
+DevicesSort Database::RetreiveDevices(const int type, const int brand, const std::string search_query, int* asc_desc) {
+  DevicesSort sort;
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
 
+  std::string query =
+    "SELECT m.model_id, m.model, b.brand, dt.device_type "
+    "FROM models m "
+    "JOIN brands b ON m.brand_id = b.brand_id "
+    "JOIN device_type dt ON m.device_type_id = dt.device_type_id";
+
+  if (type!=0)
+    query += " WHERE dt.device_type_id = " + std::to_string(type);
+  if (brand!=0) {
+    query += std::string(type ? " AND " : " WHERE ") + "b.brand_id = " + std::to_string(brand);
+   
+  }
+  if (search_query!= "") {
+    query += std::string(type||brand ? " AND " : " WHERE ") + "m.model LIKE '%" + search_query + "%'";
+  }
+
+  std::cout << query << std::endl;
+
+  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      int device_id = sqlite3_column_int(stmt, 0);
+      std::string model = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+      std::string brand = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+      std::string type = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+
+      DeviceDetailed device(device_id, model, brand, type);
+      sort.devices.emplace(device_id, device);
+      sort.devices_order.emplace_back(device_id);
+    }
+  }
+  else {
+    std::cout << "Error during retreiving a repair: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+
+  for (auto& device : sort.devices) {
+    query = "SELECT c.color "
+      "FROM model_color mc "
+      "JOIN colors c ON mc.color_id = c.color_id";
+    query += " WHERE mc.model_id = " + std::to_string(device.first);
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      while (sqlite3_step(stmt) == SQLITE_ROW) {
+        std::string color = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        device.second.colors.emplace_back(color);
+      }
+      sqlite3_finalize(stmt); // Finalize after finishing with colors for a device
+    }
+    else {
+      std::cout << "Error during retreiving a color: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    }
+
+    query = "SELECT a.alias "
+      "FROM aliases a ";
+    query += " WHERE a.model_id = " + std::to_string(device.first);
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      while (sqlite3_step(stmt) == SQLITE_ROW) {
+        std::string alias = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        device.second.aliases.emplace_back(alias);
+      }
+      sqlite3_finalize(stmt); // Finalize after finishing with colors for a device
+    }
+    else {
+      std::cout << "Error during retreiving a alias: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    }
+  }
+
+  for (auto& device : sort.devices) {
+    for (auto& alias : device.second.aliases) {
+      std::cout << device.second.model << " | " << alias << std::endl;
+    }
+  }
+  sqlite3_close(db_ptr);
+  return sort;
+}
+
+DeviceDetailed Database::RetreiveDevice(const int& id) {
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
+  std::string query =
+    "SELECT m.model_id, m.model, b.brand, dt.device_type "
+    "FROM models m "
+    "JOIN brands b ON m.brand_id = b.brand_id "
+    "JOIN device_type dt ON m.device_type_id = dt.device_type_id "
+    "WHERE m.model_id = ?";
+  DeviceDetailed device;
+  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+    sqlite3_bind_int(stmt, 1, id);
+    if (sqlite3_step(stmt) == SQLITE_ROW) { // SQLITE_ROW indicates that a row of data is available.
+      device.id = id; // Assuming device.id is the correct place to store the ID.
+
+      // Retrieve column data. It's important to do this after calling sqlite3_step.
+      const char* model = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+      const char* brand = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+      const char* device_type = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+
+      if (model != nullptr) device.model = std::string(model);
+      if (brand != nullptr) device.brand = std::string(brand);
+      if (device_type != nullptr) device.device_type = std::string(device_type);
+    }
+  }
+  else {
+    std::cout << "Error during retreiving a device detailed: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+  }
+  sqlite3_finalize(stmt);
+
+  query = "SELECT c.color "
+    "FROM model_color mc "
+    "JOIN colors c ON mc.color_id = c.color_id";
+  query += " WHERE mc.model_id = " + std::to_string(id);
+  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      std::string color = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+      device.colors.emplace_back(color);
+    }
+    sqlite3_finalize(stmt); // Finalize after finishing with colors for a device
+  }
+  else {
+    std::cout << "Error during retreiving a color: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+  }
+
+  query = "SELECT a.alias "
+    "FROM aliases a ";
+  query += " WHERE a.model_id = " + std::to_string(id);
+  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+      std::string alias = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+      device.aliases.emplace_back(alias);
+    }
+    sqlite3_finalize(stmt); // Finalize after finishing with colors for a device
+  }
+  else {
+    std::cout << "Error during retreiving a alias: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+  }
+  std::cout << device.model << " | " << device.id << " | " << device.device_type << " | " << device.colors[0] << " | " << device.aliases[0] << std::endl;
+  sqlite3_close(db_ptr);
+  return device;
+}
+
+void Database::UpdateDeviceDetails(DeviceDetailed& device, const std::string& attr, const std::string& value) {
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
+  std::string query = "INSERT ";
+  if (attr == "aliases") {
+    query += "INTO aliases (alias, model_id) VALUES(?, ? )";
+    std::cout << query << std::endl;
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      sqlite3_bind_text(stmt, 1, value.c_str(), -1, SQLITE_STATIC);
+      sqlite3_bind_int(stmt, 2, device.id);
+    }
+    if (sqlite3_step(stmt) == SQLITE_DONE) {    }
+    else {
+      std::cout << "Error during inserting alias: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    }
+    sqlite3_finalize(stmt);
+  }
+  else if (attr == "colors") {
+    int color_id = -1;
+    query += "OR IGNORE INTO colors (color) VALUES (?)";
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      sqlite3_bind_text(stmt, 1, value.c_str(), -1, SQLITE_STATIC);
+      std::cout << "Color value: " << value << std::endl;
+    }
+    if (sqlite3_step(stmt) == SQLITE_DONE) {}
+    else {
+      std::cout << "Error during retreiving a ignore: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    }
+    sqlite3_finalize(stmt);
+    query = "SELECT color_id FROM colors WHERE color = ?";
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      sqlite3_bind_text(stmt, 1, value.c_str(), -1, SQLITE_STATIC);
+      if (sqlite3_step(stmt) == SQLITE_ROW) {
+        color_id = sqlite3_column_int(stmt, 0);
+        std::cout << "Color ID: " << std::endl;
+      }
+    } else {
+      std::cout << "Error during retreiving a getting color id : " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    }
+    sqlite3_finalize(stmt);
+    query = "INSERT INTO model_color (model_id, color_id) VALUES(?, ? )";
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      sqlite3_bind_int(stmt, 1, device.id);
+      sqlite3_bind_int(stmt, 2, color_id);
+      std::cout << "Model ID:" << device.id << " | " << color_id << std::endl;
+    } 
+    if (sqlite3_step(stmt) == SQLITE_DONE) {}
+    else {
+      std::cout << "Error during inserting model color pair: " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    }
+    sqlite3_finalize(stmt);
+  }
+
+  //sqlite3_finalize(stmt); 
+  sqlite3_close(db_ptr);
+}
+
+void Database::DeleteDeviceDetail(DeviceDetailed& device, const std::string& attr, const std::string& value) {
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
+  std::string query;
+  if (attr == "aliases") {
+    query = "DELETE FROM aliases WHERE alias = ?";
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      sqlite3_bind_text(stmt, 1, value.c_str(), -1, SQLITE_STATIC);
+    }
+    if (sqlite3_step(stmt) == SQLITE_DONE) {}
+
+  }
+  else if (attr == "colors") {
+    int color_id;
+    query = "SELECT color_id FROM colors WHERE color = ?";
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      sqlite3_bind_text(stmt, 1, value.c_str(), -1, SQLITE_STATIC);
+      if (sqlite3_step(stmt) == SQLITE_ROW) {
+        color_id = sqlite3_column_int(stmt, 0);
+        std::cout << "Color ID: " << std::endl;
+      }
+    }
+    if (sqlite3_step(stmt) == SQLITE_DONE) {}
+    else {
+      std::cout << "Error during retreiving a getting color id : " << sqlite3_errmsg(db_ptr) << " " << sqlite3_errcode(db_ptr) << std::endl;
+    }
+    sqlite3_finalize(stmt);
+    query = "DELETE FROM model_color WHERE model_id = ? AND color_id = ?";
+    if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      sqlite3_bind_int(stmt, 1, device.id);
+      sqlite3_bind_int(stmt, 2, color_id);
+    }
+    if (sqlite3_step(stmt) == SQLITE_DONE) {}
+
+  }
+  sqlite3_close(db_ptr);
+}

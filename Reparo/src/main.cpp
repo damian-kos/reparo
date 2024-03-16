@@ -23,6 +23,7 @@
 #include "settings.h"
 #include "updates.h"
 #include "repair_ticket.h"
+#include "devices.h"
 
 //json loaded = RO_Cfg::GetConfig();
 json loaded = RO_Cfg::data;
@@ -76,8 +77,6 @@ int main(int, char**)
   int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
   HWND hwnd = ::CreateWindowW(wc.lpszClassName, L"Reparo", WS_OVERLAPPEDWINDOW | WS_MAXIMIZE, 0, 0, screenWidth, screenHeight, nullptr, nullptr, wc.hInstance, nullptr);
-
-
 
   // Initialize Direct3D
   if (!CreateDeviceD3D(hwnd))
@@ -244,7 +243,6 @@ int main(int, char**)
           show_another_window = false;
       ImGui::End();
     }
-      
 
     if (ImGui::BeginMainMenuBar()) {
       if (ImGui::BeginMenu("Customers")) {
@@ -282,9 +280,18 @@ int main(int, char**)
         ImGui::EndMenu();
       }
       RO_Settings::Menu();
+      if (ImGui::BeginMenu("Help & Feedback")) {
+        if (ImGui::MenuItem("Help")) {
+          ShellExecute(0, L"open", L"https://forms.gle/chFQrpwHhWD6Yttq9", NULL, NULL, SW_SHOWNORMAL);
+        }
+        if (ImGui::MenuItem("Feedback")) {
+          ShellExecute(0, L"open", L"https://forms.gle/hSZwb8mzZ9Tem66o8", NULL, NULL, SW_SHOWNORMAL);
+
+        }
+        ImGui::EndMenu();
+      }
       ImGui::EndMainMenuBar();
     }
-    CrashReporter::CrashOnVec();
     Updater::ModalForUpdate();
     RO_Settings::DisplayLogoUploader();
     RO_Settings::TCsSttgsWin();
@@ -332,12 +339,20 @@ int main(int, char**)
       ImGui::End();
     }
 
+    if (*DeviceEditor::show_device) {
+      std::shared_ptr<DeviceEditor> device_editor = DeviceEditor::Get();
+      if (device_editor)
+        device_editor->Render();
+    }
+
+    DevicesView::Render();
+
     if (RepairTicket::show_window) {
       repair_ticket.RepairTicketWin();
     }
     RepairTicket::Modals();
 
-   
+
 
     // Rendering
     ImGui::Render();

@@ -39,6 +39,12 @@ namespace ImGui {
                                       bool* selection = nullptr, 
                                       HintInputFieldsW_Popup* rel_field = nullptr, 
                                       bool* feedback = nullptr);
+    IMGUI_API void InputTextWithPopup(const char* label, const char* hint,
+                                      HintInputFieldsW_PopupStr& field,
+                                      std::function<bool()> validation_function,
+                                      bool* selection = nullptr,
+                                      HintInputFieldsW_PopupStr* rel_field = nullptr,
+                                      bool* feedback = nullptr);
     IMGUI_API bool InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags,
                                      TextField& text_field, const ImRect& canvas);
     IMGUI_API bool InvisibleButtonEx(const char* str_id, ImGuiButtonFlags flags,

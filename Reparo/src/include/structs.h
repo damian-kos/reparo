@@ -32,6 +32,15 @@ struct HintInputField {
     bool valid = false;
 };
 
+struct HintInputFieldStr {
+  HintInputFieldStr() {}
+  HintInputFieldStr(ImGuiInputTextFlags flags) : imgui_flags(flags) {}
+  std::string buffer;
+  bool is_on = true;
+  ImGuiInputTextFlags imgui_flags = ImGuiInputTextFlags_None;
+  bool valid = false;
+};
+
 // Attributes for fields which have relations to other fields. Like Colors may be dependable on Model.
 struct Attribute { 
     std::vector<std::string> data;
@@ -46,6 +55,15 @@ struct HintInputFieldsW_Popup  {
     bool is_input_activated;
     bool is_widnow_active;
     Attribute attribute;
+};
+
+struct HintInputFieldsW_PopupStr {
+  HintInputFieldStr input{ ImGuiInputTextFlags_EnterReturnsTrue };
+  bool is_input_enter_pressed;
+  bool is_input_active;
+  bool is_input_activated;
+  bool is_widnow_active;
+  Attribute attribute;
 };
 
 struct Device {
@@ -97,4 +115,16 @@ struct TicketScales {
   static inline float temp_scale = 2.5;
   static inline float dpi_scale = print_dpi / temp_scale;
   static inline float margin = 50 * dpi_scale;
+};
+
+/// <summary>
+/// Device with all its details like colors, aliases, type etc.
+/// </summary>
+struct DeviceDetailed {
+  int id;
+  std::string model;
+  std::string brand;
+  std::string device_type;
+  std::vector<std::string> colors;
+  std::vector<std::string> aliases;
 };

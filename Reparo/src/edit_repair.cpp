@@ -48,7 +48,7 @@ void EditRepair::StateSection() {
 
   ImGui::SeparatorDecorator("STATE: ", true);
   if (!retreived) {
-    states = Database::GetRepairStates();
+    states = Database::GetSimpleTable("repair_states");
     retreived = !states.empty();
   }
 

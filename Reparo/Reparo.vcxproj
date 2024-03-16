@@ -132,18 +132,22 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>C:\src\crashpad\crashpad\out\Debug\gen;C:\src\crashpad\crashpad\third_party\mini_chromium\mini_chromium;C:\src\crashpad\crashpad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;client.lib;util.lib;base.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\src\crashpad\crashpad\out\Default\obj\third_party\mini_chromium\mini_chromium\base;C:\src\crashpad\crashpad\out\Default\obj\client;C:\src\crashpad\crashpad\out\Default\obj\util;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\include\crash_reporter.h" />
     <ClInclude Include="src\include\database.h" />
+    <ClInclude Include="src\include\devices.h" />
     <ClInclude Include="src\include\edit_repair.h" />
     <ClInclude Include="src\include\enums.h" />
     <ClInclude Include="src\include\finances.h" />
@@ -181,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\crash_reporter.cpp" />
+    <ClCompile Include="src\devices.cpp" />
     <ClCompile Include="src\ImGuiFileDialog.cpp" />
     <ClCompile Include="src\repair_ticket.cpp" />
     <ClCompile Include="src\settings.cpp" />
@@ -210,6 +215,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Reparo.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\Pobrane\Ro.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
