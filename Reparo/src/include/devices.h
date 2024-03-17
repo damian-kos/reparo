@@ -4,12 +4,14 @@
 #include "database.h"
 #include "imgui_viewer.h"
 
-
-struct Filter {
+struct ComboFromTable {
   std::unordered_map<int, std::string> values;
   std::string selection_value;
   int selected = 0;
   bool changed;
+};
+
+struct Filter : ComboFromTable {
 
   // Constructor to initialize with additional values
   Filter(const std::unordered_map<int, std::string>& additionalValues) {
@@ -26,6 +28,7 @@ public:
   static bool* show_device;
   DeviceDetailed device;
   void Render();
+  void DeviceTypeEdit();
   void ListDeviceAttrs(const std::string label, std::vector<std::string>& attrs);
   bool ColorButton(const char* label, const float color);
   void ReloadDevice();
@@ -36,6 +39,7 @@ private:
   static inline bool changed = false;
   std::string new_attr;
   static std::shared_ptr<DeviceEditor> instance;
+  static inline ComboFromTable types = { Database::GetSimpleTable("device_type") };
 };
 
 class DevicesView {
@@ -63,7 +67,7 @@ private:
   };
   static void PopulateNodes();
   static std::vector<std::vector<DeviceNode>> device_nodes;
-
+  static inline bool populated = false;
 };
 
 

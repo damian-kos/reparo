@@ -35,10 +35,10 @@ void EditRepair::Render() {
         ImGui::Spacing();
         ImGui::Spacing();
       }
-    }
     ImGui::EndTable();
-  }
+    }
   ImGui::EndTable();
+  }
 }
 
 void EditRepair::StateSection() {

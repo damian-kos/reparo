@@ -58,6 +58,7 @@ public:
     static DeviceDetailed RetreiveDevice(const int& id);
     static void UpdateDeviceDetails(DeviceDetailed& device, const std::string& attr, const std::string& value);
     static void DeleteDeviceDetail(DeviceDetailed& device, const std::string& attr, const std::string& value);
+    static void UpdateDeviceType(DeviceDetailed& device, const int& value);
     //DevicesSort RetreiveDevices();
     static sqlite3* PtrDB();
 

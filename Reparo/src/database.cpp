@@ -532,7 +532,7 @@ std::string GetStringFromColumn(sqlite3_stmt* stmt, int column_index, const std:
   return text ? std::string(text) : default_value;
 }
 RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direction, std::string* date_2, int state, int asc_desc, int order) {
-  //printf("RetreiveRepairsByDate is running with VARIANT: %d STATE: %d DIRECTION: %d ORDER: %d\n", date_direction, state, asc_desc, order);
+  printf("RetreiveRepairsByDate is running with VARIANT: %d STATE: %d DIRECTION: %d ORDER: %d\n", date_direction, state, asc_desc, order);
   sqlite3* db_ptr = PtrDB();
   sqlite3_stmt* stmt;
 
@@ -555,10 +555,10 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
   else {
     query += queries[0];
   }
-  if (state == 8) {
+  if (state == 8 || state == 0) {
     query += "";
   }
-  if (state != 8) {
+  if (state != 8 && state != 0) {
     query += " AND r.repair_state_id = ?";
   }
 
@@ -611,7 +611,7 @@ RepairsSort Database::RetreiveRepairsByDate(std::string* date_1, int date_direct
       }
     }
     //printf("%s\n", sum_query.c_str());
-    //printf("%s\n", query.c_str());
+  //printf("%s\n", query.c_str());
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
       int repair_id = sqlite3_column_int(stmt, 0);
@@ -725,11 +725,11 @@ DevicesSort Database::RetreiveDevices(const int type, const int brand, const std
     }
   }
 
-  for (auto& device : sort.devices) {
-    for (auto& alias : device.second.aliases) {
-      std::cout << device.second.model << " | " << alias << std::endl;
-    }
-  }
+  //for (auto& device : sort.devices) {
+  //  for (auto& alias : device.second.aliases) {
+  //    std::cout << device.second.model << " | " << alias << std::endl;
+  //  }
+  //}
   sqlite3_close(db_ptr);
   return sort;
 }
@@ -850,7 +850,6 @@ void Database::UpdateDeviceDetails(DeviceDetailed& device, const std::string& at
     sqlite3_finalize(stmt);
   }
 
-  //sqlite3_finalize(stmt); 
   sqlite3_close(db_ptr);
 }
 
@@ -889,5 +888,24 @@ void Database::DeleteDeviceDetail(DeviceDetailed& device, const std::string& att
     if (sqlite3_step(stmt) == SQLITE_DONE) {}
 
   }
+  sqlite3_close(db_ptr);
+}
+
+void Database::UpdateDeviceType(DeviceDetailed& device, const int& value) {
+  sqlite3* db_ptr = PtrDB();
+  sqlite3_stmt* stmt;
+  std::string query = "UPDATE models SET device_type_id = ? WHERE model_id = ?";
+  if (sqlite3_prepare_v2(db_ptr, query.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+    sqlite3_bind_int(stmt, 1, value);
+    sqlite3_bind_int(stmt, 2, device.id);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+      std::cerr << "Error updating a device's type: " << sqlite3_errmsg(db_ptr) << std::endl;
+    }
+  }
+  else {
+    std::cerr << "Error preparing SQL statement: " << sqlite3_errmsg(db_ptr) << std::endl;
+  }
+  sqlite3_finalize(stmt); 
   sqlite3_close(db_ptr);
 }

@@ -14,14 +14,48 @@ void DeviceEditor::Render() {
   ImGui::Button(device.model.c_str());
   ImGui::EndGroup(); ImGui::SameLine();
   // Device type
-  ImGui::BeginGroup();
-  ImGui::Button(device.device_type.c_str());
-  ImGui::EndGroup(); ImGui::SameLine();
+  DeviceTypeEdit();
   // Attributes
   ListDeviceAttrs("colors",device.colors);
   ListDeviceAttrs("aliases", device.aliases);
   ReloadDevice();
   ImGui::End();
+}
+
+void DeviceEditor::DeviceTypeEdit() {
+  ImGui::BeginGroup();
+  if(ImGui::Button(device.device_type.c_str())) {
+    ImGui::OpenPopup("Type");
+  }
+  if (ImGui::BeginPopup("Type")) {
+    if (ImGui::BeginCombo("Type", types.selection_value.c_str()))
+    {
+      for (auto& pair : types.values) {
+        const bool is_selected = (types.selected == pair.first);
+        if (ImGui::Selectable(types.values[pair.first].c_str(), is_selected)) {
+          types.selected = pair.first;
+          types.selection_value = pair.second;
+          types.changed = true;
+          std::cout << "Selected: " << types.selected << std::endl;
+        }
+        if (is_selected)
+          ImGui::SetItemDefaultFocus();
+      }
+      ImGui::EndCombo();
+    }
+    if (ImGui::Button("Save")) {
+      if (types.selection_value != device.device_type.c_str()) {
+        Database::UpdateDeviceType(device, types.selected);
+        changed = true;
+        ImGui::CloseCurrentPopup();
+      }
+    }
+    if (ImGui::Button("Close")) {
+      ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndPopup();
+  }
+  ImGui::EndGroup(); ImGui::SameLine();
 }
 
 void DeviceEditor::ListDeviceAttrs(const std::string label, std::vector<std::string>& attrs) {
@@ -98,6 +132,9 @@ void DeviceEditor::ReloadDevice() {
   }
 }
 
+/// <summary>
+/// Devices View
+/// </summary>
 
 std::vector<std::vector<DevicesView::DeviceNode>> DevicesView::device_nodes;
 
@@ -134,14 +171,15 @@ void DevicesView::FilterCombo(const int& i, Filter& filter) {
   ImGui::PopID();
 }
 
-
 void DevicesView::OnFilterChange() {
   //if (brands.changed || types.changed ) {
   if(ImGui::Button("Search")){
     std::string search(model.input.buffer);
     k_devices.devices.clear();
+    device_nodes.clear();
     k_devices = Database::RetreiveDevices(types.selected, brands.selected, search);
-
+    populated = false;
+    //PopulateNodes();
     std::cout << k_devices.devices.size() << std::endl;
   }
 }
@@ -155,94 +193,19 @@ void DevicesView::DevicesTable() {
     ImGui::TableSetupColumn("Brand");
     ImGui::TableSetupColumn("Type");
     ImGui::TableHeadersRow();
-    //struct MyTreeNode
-    //{
-    //  std::string Name;
-    //  std::string Type;
-    //  std::string Brand;
-    //  int             ChildIdx;
-    //  int             ChildCount;
-    //  static void DisplayNode(const MyTreeNode* node, const std::vector<MyTreeNode>& all_nodes, const int& i)
-    //  {
-    //    ImGui::TableNextRow();
-    //    //ImGui::Selectable(node->Name.c_str(), is_selected, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick | ImGuiSelectableFlags_AllowOverlap);
-    //    ImGui::TableNextColumn();
-
-    //    const bool is_folder = (node->ChildCount > 0);
-    //    if (is_folder)
-    //    {
-    //      bool open = ImGui::TreeNodeEx(node->Name.c_str(), tree_node_flags);
-    //      if (ImGui::BeginPopupContextItem()) {
-    //        if (ImGui::Button("Edit device details")) {
-    //          DeviceEditor::Set(std::make_shared<DeviceEditor>(k_devices.devices[i]));
-    //          *DeviceEditor::show_device = true;
-    //          std::cout << "Selected " << i << std::endl;
-    //        }
-    //        if (ImGui::Button("Delete device")) {
-    //        }
-    //        ImGui::EndPopup();
-    //      }
-    //      ImGui::TableNextColumn();
-    //      if (node->ChildIdx == 1)
-    //        ImGui::Text(node->Brand.c_str());
-    //      else
-    //        ImGui::Text("--");
-
-    //      //ImGui::TextDisabled("--");
-    //      ImGui::TableNextColumn();
-    //      ImGui::TextUnformatted(node->Type.c_str());
-    //      if (open)
-    //      {
-    //        for (int child_n = 0; child_n < node->ChildCount; child_n++)
-    //          DisplayNode(&all_nodes[node->ChildIdx + child_n], all_nodes, i);
-    //        ImGui::TreePop();
-    //      }
-    //    }
-    //    else
-    //    {
-    //      ImGui::TreeNodeEx(node->Name.c_str(), tree_node_flags | ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_NoTreePushOnOpen);
-    //      ImGui::TableNextColumn();
-    //      ImGui::TextDisabled("");
-    //      ImGui::TableNextColumn();
-    //      ImGui::TextUnformatted(node->Type.c_str());
-    //    }
-    //  }
-    //};
-
-    //if (k_devices.devices.empty()) {
-    //}
-    //else {
-    //  for (int i = 0; i < k_devices.devices.size(); i++) {
-    //    if (k_devices.devices[i].model != "") {
-    //    std::vector<MyTreeNode> nodes;
-    //    // Add root, colors, and aliases nodes
-    //      nodes.push_back({ k_devices.devices[i].model.c_str(), k_devices.devices[i].device_type.c_str(), k_devices.devices[i].brand.c_str(), 1, 2 });
-    //      nodes.push_back({ "Colors (" + std::to_string(k_devices.devices[i].colors.size()) + ")", "--", "--", 3, static_cast<int>(k_devices.devices[i].colors.size()) });
-    //      nodes.push_back({ "Aliases (" + std::to_string(k_devices.devices[i].aliases.size()) + ")", "--", "--",  static_cast<int>(k_devices.devices[i].colors.size() + 3), static_cast<int>(k_devices.devices[i].aliases.size()) });
-    //      for (auto& color : k_devices.devices[i].colors) {
-    //        nodes.push_back({ color, "", "", -1, -1 });
-    //      }
-    //      for (auto& alias : k_devices.devices[i].aliases) {
-    //        nodes.push_back({ alias, "", "", -1, -1 });
-    //      }
-    //      MyTreeNode::DisplayNode(&nodes[0], nodes, i);
-    //    }
-    //  }
-    //}
     for (int i = 0; i < device_nodes.size(); i++)     {
-      DeviceNode::DisplayNodeD(&device_nodes[i][0], device_nodes[0], i);
+      DeviceNode::DisplayNodeD(&device_nodes[i][0], device_nodes[i], i);
     }
-
 
     ImGui::EndTable();
   }
 }
 
 void DevicesView::PopulateNodes() {
-  static bool populated = false;
   if (!populated) {
     for (int i = 0; i < k_devices.devices.size(); i++) {
       if (k_devices.devices[i].model != "") {
+        //std::cout << k_devices.devices[i].model.c_str() << std::endl;
         std::vector<DeviceNode> nodes;
         nodes.push_back({ k_devices.devices[i].model.c_str(), k_devices.devices[i].device_type.c_str(), k_devices.devices[i].brand.c_str(), 1, 2 });
         nodes.push_back({ "Colors (" + std::to_string(k_devices.devices[i].colors.size()) + ")", "--", "--", 3, static_cast<int>(k_devices.devices[i].colors.size()) });
@@ -254,7 +217,6 @@ void DevicesView::PopulateNodes() {
           nodes.push_back({ alias, "", "", -1, -1 });
         }
         device_nodes.push_back(nodes);
-        //DeviceNode::DisplayNodeD(&device_nodes[0], device_nodes, i);
       }
     }
     populated = true;
